@@ -1,0 +1,14 @@
+0. BEFORE COMMITTING TO GITHUB!!! hide the private key and stuff of the game in the trophy section (new file not in github)
+1. default to audio objects if the audiocontext is taking a long time to load the songs
+2. land sound is corrupt in not chrome
+3. clean up level editor: (and have a seperate web page to the editor from the main game)
+	-export HOUSE option as linkable html thing to share with friends
+	-drop down selector for objects is dynamic to also be for tile type, and npc and item can select dialog and event?
+4. Future of Glitch Dungeon::
+	-If ever to make an expanded version, here are some things:
+		1. introduce secret spells as normal spells
+		2. Make more use out of death to checkpoint mechanism for travel with above
+		3. Make more nonlinear and allow much more sequence breaking
+		4. AS left right cycling through spells
+		5. Gaining a new spell alters the world (like glitched rooms)
+		6. Collect the sword in glitch dungeon 2

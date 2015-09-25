@@ -9,8 +9,8 @@ function Checkpoint(x, y){
 	this.z_index = 9;
 }
 
-Checkpoint.prototype.Update = function(delta, map){
-	GameSprite.prototype.Update.call(this, delta, map);
+Checkpoint.prototype.Update = function(map){
+	GameSprite.prototype.Update.call(this, map);
 	
 	if (this.IsColliding(map.player)){
 		map.player.touching_checkpoint = true;

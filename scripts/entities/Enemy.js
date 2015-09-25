@@ -33,14 +33,14 @@ Enemy.prototype.GlitchMe = function(){
 	}
 }
 
-Enemy.prototype.Update = function(delta, map){
+Enemy.prototype.Update = function(map){
 	if (this.facing == Facing.LEFT){
 		this.vel.x = -this.max_run_vel;
 	}
 	else{
 		this.vel.x = this.max_run_vel;
 	}
-	GameMover.prototype.Update.call(this, delta, map);
+	GameMover.prototype.Update.call(this, map);
 	
 	if (this.horizontal_collision){
 		if (this.facing == Facing.LEFT) 

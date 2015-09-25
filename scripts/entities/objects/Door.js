@@ -34,11 +34,11 @@ Door.prototype.Export = function(){
 	return obj;
 }
 
-Door.prototype.Update = function(delta, map){
+Door.prototype.Update = function(map){
 	if (this.room_x >= room_manager.house_width || this.room_y >= room_manager.house_height){
 		return;
 	}
-	GameSprite.prototype.Update.call(this, delta, map);
+	GameSprite.prototype.Update.call(this, map);
 	
 	if (this.IsColliding(map.player)){
 		if (map.player.on_ground){

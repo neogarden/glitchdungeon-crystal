@@ -17,9 +17,9 @@ Player.prototype.Export = function(){
 	obj.img_name = "player_grey_sheet";
 	return obj;
 }
-Player.prototype.Update = function(delta, map){
+Player.prototype.Update = function(map){
 	this.DieToSpikesAndStuff(map);
-	GameMover.prototype.Update.call(this, delta, map);
+	GameMover.prototype.Update.call(this, map);
 	this.touching_door = false;
 	this.touching_checkpoint = false;
 }

@@ -78,12 +78,12 @@ GameMover.prototype.ResetPosition = function(){
 
 /** FUNCTION DEFINITIONS****************************************/
 /**????????????????????????????????????????????????????????????*/
-GameMover.prototype.Update = function(delta, map)
+GameMover.prototype.Update = function(map)
 {
 	this.DieToSuffocation(map);
 	
 	if (!this.stuck_in_wall){
-		this.ApplyPhysics(delta, map);
+		this.ApplyPhysics(map);
 		this.prev_x = this.x;
 		this.prev_y = this.y;
 		if (!this.on_ground){
@@ -95,7 +95,7 @@ GameMover.prototype.Update = function(delta, map)
 	}
 	this.UpdateAnimationFromState();
 	
-	GameSprite.prototype.Update.call(this, delta, map);
+	GameSprite.prototype.Update.call(this, map);
 }
 
 /*********************PHYSICS AND COLLISION DETECTIONS********************/
@@ -172,14 +172,14 @@ GameMover.prototype.DieToSuffocation = function(map){
 
 GameMover.prototype.Die = function(){}
 
-GameMover.prototype.ApplyPhysics = function(delta, map)
+GameMover.prototype.ApplyPhysics = function(map)
 {
 	var prev_pos = {x: this.x, y: this.y};
 	
-	this.ApplyGravity(delta);
+	this.ApplyGravity();
 	
 	if (!this.horizontal_input) this.MoveStop();
-	this.HandleCollisionsAndMove(map, delta);
+	this.HandleCollisionsAndMove(map);
 	this.horizontal_input = false;
 	
 	if (this.x == prev_pos.x) this.vel.x = 0;
@@ -187,15 +187,15 @@ GameMover.prototype.ApplyPhysics = function(delta, map)
 	this.previous_bottom = this.y + this.bb;
 }
 
-GameMover.prototype.ApplyGravity = function(delta){
+GameMover.prototype.ApplyGravity = function(){
 	if (!this.on_ground){
 		if (this.vel.y < this.terminal_vel)
 		{
-			this.vel.y += (this.grav_acc * (delta/DNUM));
+			this.vel.y += (this.grav_acc);
 			if (this.vel.y > this.terminal_vel) 
 				this.vel.y = this.terminal_vel;
 		}else if (this.vel.y > this.terminal_vel){
-			this.vel.y -= (this.grav_acc * (delta/DNUM));
+			this.vel.y -= (this.grav_acc);
 			if (this.vel.y < this.terminal_vel)
 				this.vel.y = this.terminal_vel;
 		}
@@ -203,9 +203,6 @@ GameMover.prototype.ApplyGravity = function(delta){
 }
 
 GameMover.prototype.HandleCollisionsAndMove = function(map){
-	this.vel.x *= (delta/DNUM);
-	this.vel.y *= (delta/DNUM);
-
 	var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
 	var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
 	var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
@@ -223,9 +220,6 @@ GameMover.prototype.HandleCollisionsAndMove = function(map){
 	this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
 	this.y += this.vel.y;
 	if (this.vel.y != 0) this.played_land_sound = false;
-	
-	this.vel.x /= (delta/DNUM);
-	this.vel.y /= (delta/DNUM);
 }
 
 GameMover.prototype.HandleHorizontalCollisions = function(map, left_tile, right_tile, top_tile, bottom_tile, q, floor_tile){
@@ -359,16 +353,16 @@ GameMover.prototype.Move = function(mult){
 	else{ acc = this.air_run_acc; }
 	
 	if (Math.abs(this.vel.x) < this.max_run_vel){
-		this.vel.x += (acc * mult) * (delta/DNUM);
+		this.vel.x += (acc * mult);
 		this.CorrectVelocity(mult);
 	}
 	else if (Math.abs(this.vel.x) > this.max_run_vel){
-		this.vel.x -= (acc * mult) * (delta/DNUM);
+		this.vel.x -= (acc * mult);
 		if (Math.abs(this.vel.x) < this.max_run_vel)
 			this.vel.x = this.max_run_vel * mult;
 	}
 	else if (Math.abs(this.vel.x) == this.max_run_vel && this.vel.x != this.max_run_vel * mult){
-		this.vel.x += (acc * mult) * (delta/DNUM);
+		this.vel.x += (acc * mult);
 	}
 }
 
@@ -376,19 +370,19 @@ GameMover.prototype.MoveStop = function(){
 	this.mult = 0;
 	if (this.on_ground){
 		if (this.vel.x > 0){
-			this.vel.x -= (this.gnd_run_dec) * (delta/DNUM);
+			this.vel.x -= (this.gnd_run_dec);
 			if (this.vel.x < 0) this.vel.x = 0;
 		}else if (this.vel.x < 0){
-			this.vel.x += (this.gnd_run_dec) * (delta/DNUM);
+			this.vel.x += (this.gnd_run_dec);
 			if (this.vel.x > 0) this.vel.x = 0;
 		}
 		this.move_state = MoveState.STANDING;
 	}else{
 		if (this.vel.x > 0){
-			this.vel.x -= (this.air_run_dec) * (delta/DNUM);
+			this.vel.x -= (this.air_run_dec);
 			if (this.vel.x < 0) this.vel.x = 0;
 		}else if (this.vel.x < 0){
-			this.vel.x += (this.air_run_dec) * (delta/DNUM);
+			this.vel.x += (this.air_run_dec);
 			if (this.vel.x > 0) this.vel.x = 0;
 		}
 	}
@@ -411,14 +405,14 @@ GameMover.prototype.StartJump = function(){
 
 GameMover.prototype.Jump = function(){
 	if (this.is_jumping){
-		this.jump_timer+=(delta/DNUM);
+		this.jump_timer++;
 		if (this.jump_timer >= this.jump_time_limit){
 			this.jump_timer = 0;
 			this.is_jumping = false;
 			this.grav_acc = this.original_grav_acc;
 		}else{
 			this.grav_acc = this.float_grav_acc;
-			this.vel.y += (-this.jump_vel * ((this.jump_time_limit - (this.jump_timer/2)) / (this.jump_time_limit * 60))) * (delta/DNUM);
+			this.vel.y += (-this.jump_vel * ((this.jump_time_limit - (this.jump_timer/2)) / (this.jump_time_limit * 60)));
 		}
 	}
 }

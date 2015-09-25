@@ -7,6 +7,8 @@ function Room(){
 	this.MAP_WIDTH = ~~(GAME_WIDTH / Tile.WIDTH);
 	this.MAP_HEIGHT = ~~(GAME_HEIGHT / Tile.HEIGHT);
 	
+	this.paused = false;
+	
 	this.glitch_type = Glitch.GREY
 	this.glitch_sequence = [];
 	this.glitch_time = 0;
@@ -75,20 +77,21 @@ Room.prototype.isValidTile = function(i, j){
 	return !(i < 0 || i >= this.MAP_HEIGHT || j < 0 || j >= this.MAP_WIDTH);
 }
 
-Room.prototype.Update = function(input, delta){
+Room.prototype.Update = function(input){
 	input.Update(this.player);
-	this.player.Update(delta, this);
+	if (this.paused) return;
+	this.player.Update(this);
 	this.TryUpdateRoomIfPlayerOffscreen();
-	this.camera.Update(delta, this);
+	this.camera.Update(this);
 	
 	for (var i = this.entities.length-1; i >= 0; i--){
-		this.entities[i].Update(delta, this);
+		this.entities[i].Update(this);
 		if (this.entities[i].delete_me) this.entities.splice(i, 1);
 	}
 	
 	//UPDATE GLITCH SEQUENCE
 	if (room_manager && !room_manager.has_spellbook || !this.can_use_spellbook){
-		this.glitch_time+=(delta/DNUM);
+		this.glitch_time++;
 		
 		if (this.glitch_sequence.length > 1 
 				&& this.glitch_time > this.glitch_time_limit - 60 
@@ -184,7 +187,7 @@ Room.prototype.RenderSpeech = function(ctx){
 	var speech_height = 32;
 
 	if (this.spoken_text != null && this.spoken_text.length > 0){
-		this.speech_timer+=(delta/DNUM);
+		this.speech_timer++;
 		if (this.speech_timer > this.speech_time_limit){
 			this.speech_timer = 0;
 			this.Speak(null);

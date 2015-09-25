@@ -164,9 +164,9 @@ Dialog.Confirm = function(content, confirm_callback, title, confirm_text, close_
 		closeDialogButton.onclick();
 	}
 	dialogConfirm.onclick = function(e){
-		closeDialogButton.onclick();
 		if (typeof(confirm_callback) === "function")
 			confirm_callback();
+		closeDialogButton.onclick();
 	}
 	Dialog.addEventHandler(window, 'keyup', keyupHandler);
 	

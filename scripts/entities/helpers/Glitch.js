@@ -94,9 +94,6 @@ Glitch.RedTransform = function(map, player, only_visual){
 	map.tilesheet_name = "tile_red_sheet";
 			
 	player.HandleCollisionsAndMove = function(map){
-		this.vel.x *= (delta/DNUM);
-		this.vel.y *= (delta/DNUM);
-	
 		var left_tile = Math.floor((this.x + this.lb + this.vel.x) / Tile.WIDTH);
 		var right_tile = Math.ceil((this.x + this.rb + this.vel.x) / Tile.WIDTH);
 		var top_tile = Math.floor((this.y + this.tb + this.vel.y) / Tile.HEIGHT);
@@ -114,9 +111,6 @@ Glitch.RedTransform = function(map, player, only_visual){
 		this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
 		this.y += this.vel.y;
 		if (this.vel.y != 0) this.played_land_sound = false;
-		
-		this.vel.x /= (delta/DNUM);
-		this.vel.y /= (delta/DNUM);
 	}
 }
 
@@ -151,15 +145,15 @@ Glitch.GreenTransform = function(map, player, only_visual){
 		else{ acc = this.air_run_acc; }
 		
 		if (Math.abs(this.vel.x) < this.max_run_vel){
-			this.vel.x += (acc * mult) * (delta/DNUM);
+			this.vel.x += (acc * mult);
 			this.CorrectVelocity(mult);
 		}
 		else if (Math.abs(this.vel.x) > this.max_run_vel){
-			this.vel.x -= (acc * mult) * (delta/DNUM);
+			this.vel.x -= (acc * mult);
 			if (Math.abs(this.vel.x) < this.max_run_vel)
 				this.vel.x = this.max_run_vel * mult;
 		}else if (Math.abs(this.vel.x) == this.max_run_vel && this.vel.x != this.max_run_vel * mult){
-			this.vel.x += (acc * mult) * (delta/DNUM);
+			this.vel.x += (acc * mult);
 		}
 	}
 }
@@ -186,16 +180,16 @@ Glitch.BlueTransform = function(map, player, only_visual){
 	player.tb = 0;
 	player.bb = 14;
 	
-	player.ApplyGravity = function(delta, map)
+	player.ApplyGravity = function(map)
 	{
 		if (!this.on_ground){
 			if (this.vel.y > -this.terminal_vel)
 			{
-				this.vel.y -= (this.grav_acc) * (delta/DNUM);
+				this.vel.y -= (this.grav_acc);
 				if (this.vel.y < -this.terminal_vel) 
 					this.vel.y = -this.terminal_vel;
 			}else if (this.vel.y < -this.terminal_vel){
-				this.vel.y += (this.grav_acc) * (delta/DNUM);
+				this.vel.y += (this.grav_acc);
 				if (this.vel.y > -this.terminal_vel)
 					this.vel.y = -this.terminal_vel;
 			}
@@ -255,14 +249,14 @@ Glitch.BlueTransform = function(map, player, only_visual){
 
 	player.Jump = function(){
 		if (this.is_jumping){
-			this.jump_timer+=(delta/DNUM);
+			this.jump_timer++;
 			if (this.jump_timer >= this.jump_time_limit){
 				this.jump_timer = 0;
 				this.is_jumping = false;
 				this.grav_acc = this.original_grav_acc;
 			}else{
 				this.grav_acc = this.float_grav_acc;
-				this.vel.y += (this.jump_vel * ((this.jump_time_limit - (this.jump_timer/2)) / (this.jump_time_limit * 60))) * (delta/DNUM);
+				this.vel.y += (this.jump_vel * ((this.jump_time_limit - (this.jump_timer/2)) / (this.jump_time_limit * 60)));
 			}
 		}
 	}
@@ -274,9 +268,6 @@ Glitch.GoldTransform = function(map, player, only_visual){
 	map.tilesheet_name = "tile_gold_sheet";
 	
 	player.HandleCollisionsAndMove = function(map){
-		this.vel.x *= (delta/DNUM);
-		this.vel.y *= (delta/DNUM);
-	
 		var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
 		var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
 		var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
@@ -298,18 +289,15 @@ Glitch.GoldTransform = function(map, player, only_visual){
 		this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
 		this.y += this.vel.y;
 		if (this.vel.y != 0) this.played_land_sound = false;
-		
-		this.vel.x /= (delta/DNUM);
-		this.vel.y /= (delta/DNUM);
 	}
 	
-	player.Update = function(delta, map)
+	player.Update = function(map)
 	{
 		this.DieToSpikesAndStuff(map);
 		this.DieToSuffocation(map);
 		
 		if (!this.stuck_in_wall){
-			this.ApplyPhysics(delta, map);
+			this.ApplyPhysics(map);
 			this.prev_x = this.x;
 			this.prev_y = this.y;
 			if (!this.on_ground){
@@ -322,7 +310,7 @@ Glitch.GoldTransform = function(map, player, only_visual){
 			}
 		}
 		this.UpdateAnimationFromState();
-		GameSprite.prototype.Update.call(this, delta, map);
+		GameSprite.prototype.Update.call(this, map);
 		
 		this.touching_door = false;
 		this.touching_checkpoint = false;

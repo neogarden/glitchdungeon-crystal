@@ -1,16 +1,16 @@
 var level_edit = false;
 var master_volume = 0.5;
-var delta = 18; //this is a little hacky.
-var DNUM = 18;
 
 var bg_music = null;
 var bg_name = "RoccoW_outOfSight";
 var tryToPlay = null;
 var click_to_start = false;
 
-var GAME_WIDTH=160; //CHANGE TO /2
-var GAME_HEIGHT=120; //CHANGE TO /2
-var VIEW_SCALE = 4; //CHANGE TO *2
+var WINDOW_WIDTH = 640;
+var WINDOW_HEIGHT = 480;
+var VIEW_SCALE = 4;
+var GAME_WIDTH = WINDOW_WIDTH / VIEW_SCALE;
+var GAME_HEIGHT = WINDOW_HEIGHT / VIEW_SCALE;
 
 var canvas;
 var ctx;
@@ -27,6 +27,20 @@ var input_manager;
 var resource_manager;
 
 var room;
+var update_time = 0.33;
+
+window.requestAnimFrame = function(){
+    return (
+        window.requestAnimationFrame       || 
+        window.webkitRequestAnimationFrame || 
+        window.mozRequestAnimationFrame    || 
+        window.oRequestAnimationFrame      || 
+        window.msRequestAnimationFrame     || 
+        function(/* function */ callback){
+            window.setTimeout(callback, 1000 / 60);
+        }
+    );
+}();
 
 var init = function(){
 	if (level_edit) InitLevelEdit();
@@ -48,7 +62,6 @@ var init = function(){
 		canvas.onmousedown = function(e){LevelEditMouseDown(e); SoundMouseDown(e)}
 		canvas.onmousemove = LevelEditMouseMove;
 		canvas.onmouseup = function(e){ LevelEditMouseUp(e); SoundMouseUp(e); }
-		$("tileset_canvas").onmousedown = TileSetMouseDown;
 	}else{
 		canvas.onmousedown = SoundMouseDown;
 		canvas.onmouseup = SoundMouseUp;
@@ -77,7 +90,7 @@ var startGame = function(){
 		bg_name = "RoccoW_outOfSight";
 		stopMusic();
 		startMusic();
-		setInterval(main, 17);
+		requestAnimFrame(tick);
 	}.bind(this));
 };
 
@@ -139,13 +152,15 @@ var SoundMouseUp = function(e){
 }
 
 //main game loop
-var main = function(){
-	var now = Date.now();
-	//time variable so we can make the speed right no matter how fast the script
-    //delta = now - then;
+var tick = function(){
+	var now = new Date().getTime();
+	var elapsed = now - then;
+	var timeout_time = update_time - elapsed;
+	if (timeout_time < 0) timeout_time = 0;
 	
 	if (click_to_start){
-		update(delta);
+		stopMusic();
+		update();
 		render();
 	}else{		
 		//Erase screen
@@ -163,11 +178,15 @@ var main = function(){
 		ctx.fillText("SCREEN MAY RAPIDLY CHANGE COLOR", 134, GAME_HEIGHT/2+49);
 		ctx.fillText("CLICK TO START", 134, GAME_HEIGHT/2+80);
 	}
+	
+	setTimeout(function(){
+		requestAnimFrame(tick);
+	}, timeout_time);
 	then = now;
 }
 
-var update = function(delta){
-    room.Update(input_manager, delta);
+var update = function(){
+    room.Update(input_manager);
 	key_manager.ForgetKeysPressed();
 };
 

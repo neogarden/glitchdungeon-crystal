@@ -3,14 +3,13 @@
 	top: 25%;
     left: 25%;
 	min-width: 240px;
-	max-width: 320px;
 	min-height: 120px;
     /*margin-left: -250px;
     margin-top: -150px;*/
 	z-index: 9999;
 	
 	border: 1px solid black;
-	background: #ffffff;
+	background: #cccccc;
 }
 #dialogTitle{
 	border-bottom: 1px solid black;
@@ -33,6 +32,8 @@
 	padding-right: 10px;
 	font-size: 16px;
 	margin-bottom: 64px;
+	max-height: 200px;
+	overflow-y: auto;
 }
 #dialogButton{
 	position:absolute; 

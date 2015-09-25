@@ -2,22 +2,28 @@ function NPC(x, y, npc_id){
 	GameMover.call(this, x, y, 2, 2, 14, 16, "npc_sheet");
 	this.type = "NPC";
 	this.npc_id = npc_id;
+	this.dialog_index = 0;
 	this.animation.frame_delay = 30;
 }
 NPC.prototype.Import = function(obj){
 	GameMover.prototype.Import.call(this, obj);
 	this.npc_id = obj.npc_id;
+	this.npc_dialog = obj.npc_dialog;
 }
-
 NPC.prototype.Export = function(){
 	var obj = GameMover.prototype.Export.call(this);
 	obj.npc_id = this.npc_id;
+	obj.npc_dialog = this.npc_dialog;
 	return obj;
+}
+NPC.prototype.ReadOptions = function(options){
+}
+NPC.prototype.WriteOptions = function(){
 }
 extend(GameMover, NPC);
 
-NPC.prototype.Update = function(delta, map){
-	GameMover.prototype.Update.call(this, delta, map);
+NPC.prototype.Update = function(map){
+	GameMover.prototype.Update.call(this, map);
 	
 	var d = 16;
 	var dy = 8;
@@ -60,7 +66,7 @@ NPC.prototype.UpdateAnimationFromState = function(){
 
 //TEXT BABY
 NPC.prototype.GetText = function(){
-	if (this.npc_text) return this.npc_text;
+	if (this.npc_dialog) return this.npc_dialog[this.dialog_index];
 	
 	switch (this.npc_id){
 		case -1:

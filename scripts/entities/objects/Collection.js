@@ -26,7 +26,7 @@ Collection.prototype.Export = function(){
 }
 extend(GameSprite, Collection);
 
-Collection.prototype.Update = function(delta, map){
+Collection.prototype.Update = function(map){
 	if (this.IsColliding(map.player)){
 		this.delete_me = true;
 		Utils.playSound("pickup", master_volume, 0);
@@ -35,7 +35,7 @@ Collection.prototype.Update = function(delta, map){
 		this.GetEvent();
 	}
 	
-	GameSprite.prototype.Update.call(this, delta, map);
+	GameSprite.prototype.Update.call(this, map);
 }
 
 Collection.prototype.UpdateAnimationFromState = function(){

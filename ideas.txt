@@ -1,0 +1,1 @@
+hard mode: don't use default glitches: traverse dungeon on foot + artifacts?

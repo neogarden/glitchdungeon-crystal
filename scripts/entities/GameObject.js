@@ -39,11 +39,39 @@ GameObject.prototype.Export = function(){
 		kill_player: this.kill_player
 	};
 }
+GameObject.prototype.GenerateOptions = function(){
+	var dom = document.createElement("div");
+	var obj = this.Export();
+	for (var attribute in obj){
+		var span = document.createElement("span");
+		span.innerHTML = attribute;
+		
+		var input = document.createElement("input");
+		input.id = "ledit_options_" + attribute;
+		input.value = obj[attribute];
+		input.name = attribute;
+		var self = this;
+		
+		dom.appendChild(span);
+		dom.appendChild(document.createElement("br"));
+		dom.appendChild(input);
+		dom.appendChild(document.createElement("br"));
+	}
+	
+	var submit = function(){
+		for (var attribute in obj){
+			//TODO USING EVAL HERE IS REALLY UNSAFE
+			this[attribute] = eval($("ledit_options_" + attribute).value);
+		}
+	}.bind(this);
+	
+	return { dom: dom, submit: submit };
+}
 GameObject.prototype.ResetPosition = function(){
 	this.x = this.original_x;
 	this.y = this.original_y;
 }
-GameObject.prototype.Update = function(delta, map){}
+GameObject.prototype.Update = function(map){}
 GameObject.prototype.Render = function(ctx, camera){}
 
 GameObject.ZIndexSort = function(a,b){

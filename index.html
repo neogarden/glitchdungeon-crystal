@@ -49,11 +49,7 @@
 
 </head>
 <body>
-    <center>
-	  <table>
-		<tr>
-		<td>
-			<div id="level_edit_objects" style="display:none;">
+<canvas id="game_canvas" class="centerMe" oncontextmenu="return false;"></canvas>
 				<!--<div id="player_object" class="object_box" style="background: url('assets/images/player_grey_sheet.png');" onclick="ledit_select(this, 'player');">&nbsp;</div>
 				<div id="npc_object" class="object_box" style="background:url('assets/images/npc_sheet.png');" onclick="ledit_select(this,&quot;new NPC(0, 0, parseInt(prompt('id')))&quot;)">&nbsp;</div>
 				<div id="collection_object" class="object_box" style="background:url('assets/images/collection_sheet.png');" onclick="ledit_select(this,&quot;new Collection(0, 0, parseInt(prompt('id')))&quot;)">&nbsp;</div>
@@ -66,19 +62,8 @@
 				<div id="tile_kill" class="object_box" style="background-color: #ff0000;" onclick="ledit_select(this, Tile.KILL_PLAYER);">&nbsp;</div>
 				<div id="tile_ghost" class="object_box" onclick="ledit_select(this, Tile.GHOST);">&nbsp;</div>
 				<div id="tile_super_solid" class="object_box" style="background-color: #ffffff;" onclick="ledit_select(this, Tile.SUPER_SOLID);">&nbsp;</div>-->
-			</div>
-		</td>
-		<td>
-			<b>Glitch Dungeon</b><br/><br/>
-			<canvas id="game_canvas" class="centerMe" oncontextmenu="return false;"></canvas>
-		</td>
-		</tr>
-	  </table>
-	  <canvas id="tileset_canvas" style="display:none;position:absolute;right:10px;top:10px;background:#aaaaaa url('assets/images/tile_grey_sheet.png')" class="centerMe" oncontextmenu="return false;"></canvas>
+	  <!--<canvas id="tileset_canvas" style="display:none;position:absolute;right:10px;top:10px;background:#aaaaaa url('assets/images/tile_grey_sheet.png')" class="centerMe" oncontextmenu="return false;"></canvas>
 	  <div id="etc_options" style="display:none;">
-	  <div id="house_coordinates" style="position:absolute;right:10px;top:110px;">
-		0 0
-	  </div>
 	  <select id="glitch_options" style="position:absolute;right:10px;top:140px;">
 		<option value="Glitch.GREY">NONE</option>
 		<option value="Glitch.GREEN">FEATHER</option>
@@ -96,19 +81,19 @@
 		<option value="new Door(0, 0, parseInt(prompt('room x')), parseInt(prompt('room y')), parseInt(prompt('door id')), true, parseInt(prompt('num artifacts')))">Door (Lock)</option>
 		<option value="new Checkpoint(0, 0)">CheckPoint</option>
 	  </select>
-	  </div>
+	  </div>-->
 	  
       <div id="level_edit_buttons" style="display:none;">
-		<div style="position: absolute; left: 10px;">
-			width: <input type="text" id="room_width" value="320"/><br/>
-			heght: <input type="text" id="room_height" value="240"/><br/>
-			<input type="submit" value="change size" onclick="ledit_change_room_size();"/>
-		</div>
+		  Room Position: <span id="house_coordinates">0 0</span>
+		<div>
+			width: <input type="text" id="room_width" value="320"/>
+			<input type="submit" value="change size" onclick="ledit_change_room_size();"/><br/>
+			heght: <input type="text" id="room_height" value="240"/>
+		</div><br/>
 		<input type="submit" value="export" onclick="ledit_export();"/>
 		<input type="submit" value="import" onclick="ledit_import();"/>
 		<input type="submit" value="reset room" onclick="ledit_reset();"/>
 		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>
-		<br/><br/><textarea id="level_edit_export_text"></textarea>
 	  </div>
     </center>
 </body>

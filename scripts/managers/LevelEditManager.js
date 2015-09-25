@@ -3,6 +3,7 @@ var potential_level_edit_entity;
 var leee_offset_x;
 var lee_offset_y;
 var level_edit_entity;
+var level_edit_entity_grav_acc;
 var level_edit_object_is_tile = false;
 var level_edit_tileset_ctx;
 
@@ -10,18 +11,7 @@ var level_edit_tile_img_x = 0;
 var level_edit_tile_img_y = 0;
 
 function InitLevelEdit(){
-	$("level_edit_objects").style.display="block";
 	$("level_edit_buttons").style.display="block";
-	$("etc_options").style.display="block";
-	$("object_options").onchange = function(){
-		if ($("object_object").className == "selected_object_box"){
-			ledit_select($("object_object"), ledit_getSelected("object_options"));
-		}
-	}
-	
-	level_edit_tileset_ctx = $("tileset_canvas").getContext("2d");
-	$("tileset_canvas").width = 96;
-	$("tileset_canvas").height = 96;
 	
 	function keypress(e){
 		var code = (e.keyCode ? e.keyCode : e.which);
@@ -36,9 +26,38 @@ function InitLevelEdit(){
 }
 
 function DisableLevelEdit(){
-	$("level_edit_objects").style.display="none";
 	$("level_edit_buttons").style.display="none";
 	level_edit = false;
+}
+
+function leditCreateContextMenu(x, y, tile_x, tile_y){
+	var ctx_menu = CtxMenu.Init(x, y, document.body);
+	ctx_menu.Open();
+	
+	//EDIT OPTIONS
+	var entity = room.GetEntityAtXY(x, y);
+	if (entity !== undefined){
+		//EDIT NPC options
+		if (entity instanceof NPC){
+			ctx_menu.AddItem("edit npc", function(){
+				room.paused = true;
+				var options = this.GenerateOptions();
+				Dialog.Confirm("", options.submit, "edit npc", "edit", 
+					function(){ room.paused = false; }
+				);
+				Dialog.AddElement(options.dom);
+			}.bind(entity));
+		}
+		ctx_menu.AddDivider();
+	}
+	
+	//CREATION OPTIONS
+	ctx_menu.AddItem("new npc", function(){
+		var text = prompt("what should it say?");
+		var npc = new NPC(tile_x * Tile.WIDTH, tile_y * Tile.HEIGHT);
+		npc.npc_text = text;
+		room.entities.push(npc);
+	}.bind(this));
 }
 
 function DrawLevelEditGrid(ctx, room){
@@ -150,6 +169,8 @@ function LevelEditMouseDown(e){
 	
 	if (!right_click && potential_level_edit_entity !== undefined){
 		level_edit_entity = potential_level_edit_entity;
+		level_edit_entity_grav_acc = level_edit_entity.grav_acc;
+		level_edit_entity.grav_acc = 0;
 		potential_level_edit_entity = undefined;
 		document.body.style.cursor = "-webkit-grabbing";
 		
@@ -201,35 +222,13 @@ function LevelEditMouseUp(e){
 	
 	if (level_edit_entity !== undefined){
 		document.body.cursor = "auto";
+		level_edit_entity.grav_acc = level_edit_entity_grav_acc;
 		level_edit_entity = undefined;
 	}		
 		
 	//right click
 	if (right_click){
-		var ctx_menu = CtxMenu.Init(x, y, document.body);
-		ctx_menu.Open();
-		
-		//EDIT OPTIONS
-		var entity = room.GetEntityAtXY(x, y);
-		if (entity !== undefined){
-			//EDIT NPC options
-			if (entity instanceof NPC){
-				ctx_menu.AddItem("edit text", function(){
-					var text = prompt("what should it say?");
-					this.npc_text = text;
-				}.bind(entity));
-			}
-			
-			ctx_menu.AddDivider();
-		}
-		
-		//CREATION OPTIONS
-		ctx_menu.AddItem("new npc", function(){
-			var text = prompt("what should it say?");
-			var npc = new NPC(tile_x * Tile.WIDTH, tile_y * Tile.HEIGHT);
-			npc.npc_text = text;
-			room.entities.push(npc);
-		}.bind(this));
+		leditCreateContextMenu(x, y, tile_x, tile_y);
 	}
 }
 

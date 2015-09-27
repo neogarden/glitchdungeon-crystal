@@ -16,9 +16,13 @@ NPC.prototype.Export = function(){
 	obj.npc_dialog = this.npc_dialog;
 	return obj;
 }
-NPC.prototype.ReadOptions = function(options){
+NPC.prototype.ImportOptions = function(options){
+	this.npc_dialog = options.npc_dialog.value;
 }
-NPC.prototype.WriteOptions = function(){
+NPC.prototype.ExportOptions = function(){
+	var options = {};
+	options.npc_dialog = new TextArray(this.npc_dialog);
+	return options;
 }
 extend(GameMover, NPC);
 

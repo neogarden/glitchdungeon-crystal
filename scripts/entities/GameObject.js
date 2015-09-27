@@ -41,14 +41,14 @@ GameObject.prototype.Export = function(){
 }
 GameObject.prototype.GenerateOptions = function(){
 	var dom = document.createElement("div");
-	var obj = this.Export();
-	for (var attribute in obj){
+	var opt = this.ExportOptions();
+	for (var attribute in opt){
 		var span = document.createElement("span");
 		span.innerHTML = attribute;
 		
 		var input = document.createElement("input");
 		input.id = "ledit_options_" + attribute;
-		input.value = obj[attribute];
+		input.value = opt[attribute].value;
 		input.name = attribute;
 		var self = this;
 		
@@ -59,10 +59,10 @@ GameObject.prototype.GenerateOptions = function(){
 	}
 	
 	var submit = function(){
-		for (var attribute in obj){
-			//TODO USING EVAL HERE IS REALLY UNSAFE
-			this[attribute] = eval($("ledit_options_" + attribute).value);
+		for (var attribute in opt){
+			opt[attribute].value = $("ledit_options_" + attribute).value;
 		}
+		this.ImportOptions(opt);
 	}.bind(this);
 	
 	return { dom: dom, submit: submit };

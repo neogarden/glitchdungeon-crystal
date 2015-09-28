@@ -82,3 +82,4 @@ io.on('connection', function(socket) {
 app.listen(port);
 
 console.log("Nodejs http & socket server started at 127.0.0.1:"+port+"...");
+console.log("TODO: ");

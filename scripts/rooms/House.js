@@ -300,8 +300,18 @@ House.prototype.RevivePlayer = function(){
 	}else{
 		Glitch.TransformPlayer(room, this.glitch_type);
 	}
-	room.player.x = this.checkpoint.x;
-	room.player.y = this.checkpoint.y;
+	if (this.checkpoint.id !== undefined){
+		for (var i = 0; i < room.entities.length; i++){
+			var entity = room.entities[i];
+			if (entity instanceof Checkpoint && entity.id === this.checkpoint.id){
+				room.player.x = entity.x;
+				room.player.y = entity.y;
+			}
+		}
+	}else{
+		room.player.x = this.checkpoint.x;
+		room.player.y = this.checkpoint.y;
+	}
 	room.player.facing = this.checkpoint.facing;
 	room.player.die_to_suffocation = true;
 	console.log("num deaths: " + this.num_deaths);

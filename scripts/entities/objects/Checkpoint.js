@@ -7,6 +7,7 @@ function Checkpoint(x, y){
 	this.lex = 1;
 	
 	this.z_index = 9;
+	this.id = new Date().getTime();
 }
 
 Checkpoint.prototype.Update = function(map){
@@ -18,7 +19,8 @@ Checkpoint.prototype.Update = function(map){
 			if (!this.is_glitched) room_manager.RemoveGlitchedCheckpoint();
 			room_manager.DeactivateCheckpoints();
 			room_manager.checkpoint = {
-				x: this.x, y: this.y, 
+				id: this.id,
+				x: this.x, y: this.y, //failsafe, unnecessary
 				room_x: room_manager.room_index_x,
 				room_y: room_manager.room_index_y,
 				facing: room.player.facing

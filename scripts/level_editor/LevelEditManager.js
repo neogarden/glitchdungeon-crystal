@@ -54,7 +54,7 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 	//CREATION OPTIONS
 	ctx_menu.AddItem("new npc", function(){
 		room.paused = true;
-		var npc = new NPC(tile_x * Tile.WIDTH, tile_y * Tile.HEIGHT);
+		var npc = new NPC(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
 		var options = npc.GenerateOptions();
 		Dialog.Confirm("", function(){
 				options.submit();
@@ -64,7 +64,10 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 			function(){ room.paused = false; }
 		);
 		Dialog.AddElement(options.dom);
-		
+	}.bind(this));
+	ctx_menu.AddItem("new checkpoint", function(){
+		var checkpoint = new Checkpoint(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
+		room.entities.push(checkpoint);
 	}.bind(this));
 }
 

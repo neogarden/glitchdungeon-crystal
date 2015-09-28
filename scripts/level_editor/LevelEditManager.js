@@ -53,10 +53,18 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 	
 	//CREATION OPTIONS
 	ctx_menu.AddItem("new npc", function(){
-		var text = prompt("what should it say?");
+		room.paused = true;
 		var npc = new NPC(tile_x * Tile.WIDTH, tile_y * Tile.HEIGHT);
-		npc.npc_text = text;
-		room.entities.push(npc);
+		var options = npc.GenerateOptions();
+		Dialog.Confirm("", function(){
+				options.submit();
+				room.entities.push(npc);
+			},
+			"new npc", "create",
+			function(){ room.paused = false; }
+		);
+		Dialog.AddElement(options.dom);
+		
 	}.bind(this));
 }
 
@@ -206,6 +214,9 @@ function LevelEditMouseMove(e){
 		level_edit_entity.x *= (Tile.WIDTH / 2);
 		level_edit_entity.y = ~~((y + leee_offset_y) / (Tile.HEIGHT / 2));
 		level_edit_entity.y *= (Tile.HEIGHT / 2);
+		
+		level_edit_entity.original_x = level_edit_entity.x;
+		level_edit_entity.original_y = level_edit_entity.y;
 	}
 }
 

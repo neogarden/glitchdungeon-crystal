@@ -19,6 +19,7 @@ function Room(){
 	this.bg_code = "";
 	
 	this.spoken_text = "";
+	this.speech_display_arrow = false;
 	this.speech_timer = 0;
 	this.speech_time_limit = 0;
 	
@@ -177,10 +178,11 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	if (level_edit) $("house_coordinates").innerHTML = room_manager.room_index_x + " " + room_manager.room_index_y;
 }
 
-Room.prototype.Speak = function(text, speech_time){
+Room.prototype.Speak = function(text, speech_time, display_arrow){
 	this.spoken_text = text;
 	this.speech_time = 0;
 	this.speech_time_limit = speech_time || 240;
+	this.speech_display_arrow = display_arrow || false;
 }
 
 Room.prototype.RenderSpeech = function(ctx){
@@ -213,6 +215,14 @@ Room.prototype.RenderSpeech = function(ctx){
 				ctx.fillText(texts[i], Tile.WIDTH*2, h + (fs*i)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height, GAME_WIDTH-(Tile.WIDTH*2), fs);
 			}else if (check_textRenderContext(ctx)){
 				ctx.strokeText(texts[i], Tile.WIDTH*2, h + (fs*i)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height - 8, fs-2);
+			}
+		}
+		
+		if (this.speech_display_arrow){
+			if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))){
+				ctx.fillText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height - fs, fs*3, fs*3);
+			}else if (check_textRenderContext(ctx)){
+				ctx.strokeText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3) + GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height-8-fs, fs, fs-2);
 			}
 		}
 	}

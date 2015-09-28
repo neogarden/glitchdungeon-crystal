@@ -1,6 +1,7 @@
 function NPC(x, y, npc_id){
 	GameMover.call(this, x, y, 2, 2, 14, 16, "npc_sheet");
 	this.type = "NPC";
+	this.name = "NPC";
 	this.npc_id = npc_id;
 	this.npc_dialog = [];
 	this.advanced = false;
@@ -19,11 +20,16 @@ NPC.prototype.Export = function(){
 	return obj;
 }
 NPC.prototype.ImportOptions = function(options){
+	this.name = options.name.value;
 	this.npc_dialog = options.npc_dialog.value;
 }
 NPC.prototype.ExportOptions = function(){
 	var options = {};
-	options.npc_dialog = new TextArray(this.npc_dialog);
+	options.name = new TextOption(this.name);
+	var dialog = this.npc_dialog;
+	if (dialog === undefined || dialog.length <= 0)
+		dialog = [this.GetText()];	
+	options.npc_dialog = new TextArrayOption(dialog, 210, 69);
 	return options;
 }
 extend(GameMover, NPC);
@@ -46,10 +52,13 @@ NPC.prototype.Update = function(map){
 	
 	//TALK TO PLAYER AND SUCH
 	if (this.IsRectColliding(map.player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
+		if (!this.talking) this.advanced = true;
 		this.talking = true;
-		if (this.npc_id != 19)
-			room.Speak("NPC: "+this.GetText());
-		else room.Speak(this.GetText());
+		
+		room.Speak(
+			((this.name.length > 0) ? (this.name + ": ") : ("")) + this.GetText(),
+			240,
+			this.npc_dialog.length > 1);
 		
 		if (map.player.pressing_down && !this.advanced){
 			this.incrementDialog();
@@ -61,7 +70,7 @@ NPC.prototype.Update = function(map){
 	else if (this.talking){
 		this.talking = false;
 		room.Speak(null);
-		this.incrementDialog();
+		//this.incrementDialog();
 		this.advanced = false;
 	}
 }
@@ -88,7 +97,8 @@ NPC.prototype.UpdateAnimationFromState = function(){
 
 //TEXT BABY
 NPC.prototype.GetText = function(){
-	if (this.npc_dialog) return this.npc_dialog[this.dialog_index];
+	if (this.npc_dialog && this.npc_dialog.length > 0) 
+		return this.npc_dialog[this.dialog_index];
 	
 	switch (this.npc_id){
 		case -1:

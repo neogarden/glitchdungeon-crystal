@@ -46,11 +46,7 @@ GameObject.prototype.GenerateOptions = function(){
 		var span = document.createElement("span");
 		span.innerHTML = attribute;
 		
-		var input = document.createElement("input");
-		input.id = "ledit_options_" + attribute;
-		input.value = opt[attribute].value;
-		input.name = attribute;
-		var self = this;
+		var input = opt[attribute].ExportDom(attribute);
 		
 		dom.appendChild(span);
 		dom.appendChild(document.createElement("br"));
@@ -60,7 +56,7 @@ GameObject.prototype.GenerateOptions = function(){
 	
 	var submit = function(){
 		for (var attribute in opt){
-			opt[attribute].value = $("ledit_options_" + attribute).value;
+			opt[attribute].UpdateFromDom();
 		}
 		this.ImportOptions(opt);
 	}.bind(this);

@@ -292,10 +292,6 @@ function ledit_save(level_name, should_alert){
   });
 }
 
-function ledit_saveas(){
-  
-}
-
 function ledit_load(){
 	var obj_str = $("level_edit_export_text").value;
 	try{

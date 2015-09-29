@@ -10,17 +10,18 @@
 <script src="scripts/lib/contextmenu.js"></script>
 <link rel="stylesheet" type="text/css" href="scripts/lib/dialog.css"/>
 <script src="scripts/lib/dialog.js"></script>
+<script src="scripts/lib/socket.io.js"></script>
+<script src="scripts/lib/GJAPI.js"></script>
+<script src="scripts/lib/strokeText.js"></script>
+<script src="scripts/lib/nodejs.js"></script>
+<script src="scripts/lib/md5.js"></script>
 
 <!--Load all the scripts to be used-->
-<script src="scripts/strokeText.js"></script>
 <script src="scripts/Utils.js"></script>
-<script src="scripts/nodejs.js"></script>
-<script src="scripts/md5.js"></script>
 <script src="scripts/managers/FileManager.js"></script>
 <script src="scripts/managers/KeyManager.js"></script>
 <script src="scripts/managers/InputManager.js"></script>
 <script src="scripts/managers/ResourceManager.js"></script>
-<script src="scripts/GJAPI.js"></script>
 <script src="scripts/Main.js"></script>
 
 <!--Level editor-->
@@ -31,6 +32,7 @@
 <!--House and Rooms-->
 <script src="scripts/rooms/House.js"></script>
 <script src="scripts/rooms/Room.js"></script>
+<script src="scripts/rooms/RoomIllusion.js"></script>
 <script src="scripts/rooms/Camera.js"></script>
 
 <!--Entities-->
@@ -94,8 +96,8 @@
 			<input type="submit" value="change size" onclick="ledit_change_room_size();"/><br/>
 			heght: <input type="text" id="room_height" value="240"/>
 		</div><br/>
-		<input type="submit" value="save" onclick="ledit_save(prompt('level name?'), true);"/>
-		<input type="submit" value="save as" onclick="ledit_saveas();"/>
+		<input type="submit" value="save" onclick="ledit_save('main', true);"/>
+		<input type="submit" value="save as" onclick="ledit_save(prompt('level name?'), true);"/>
 		<input type="submit" value="load" onclick="ledit_load();"/>
 		<input type="submit" value="reset room" onclick="ledit_reset();"/>
 		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>

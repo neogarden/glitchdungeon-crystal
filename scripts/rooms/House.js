@@ -27,6 +27,26 @@ function House(callback){
 	setTimeout(function(){this.LoadNextRoom(callback);}.bind(this), 0);
 }
 
+House.prototype.Export = function(){
+  var room_jsons = [];
+  var etc = {room_indices: []};
+  for (var i in this.rooms){
+    var room_row = [];
+    for (var j in this.rooms[i]){
+      var room = this.rooms[i][j];
+      if (room instanceof RoomIllusion) continue;
+      room.index_y = i;
+      room.index_x = j;
+      
+      room_row.push(room.Export());
+      etc.room_indices.push({y: i, x: j});
+    }
+    room_jsons.push(room_row);
+  }
+  
+  return {rooms: room_jsons, etc: JSON.stringify(etc)};
+}
+
 House.prototype.LoadNextRoom = function(callback){
 	var room_q = this.room_load_queue.splice(0, 1)[0];
 	//console.log(room_q);
@@ -76,14 +96,6 @@ House.prototype.SetUpRooms = function(){
 
 House.prototype.FinishedLoading = function(callback){
 	this.rooms[2][4].entities.push(new Collection(11*Tile.WIDTH, 3*Tile.HEIGHT, 6));
-	this.old_rooms = [];
-	for (var i = 0; i < this.rooms.length; i++){
-		var row = [];
-		for (var j = 0; j < this.rooms[i].length; j++){
-			row.push(this.rooms[i][j].Export());
-		}
-		this.old_rooms.push(row);
-	}
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {

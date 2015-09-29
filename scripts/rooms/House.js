@@ -24,52 +24,26 @@ function House(callback){
 	this.room_load_queue = [];
 	this.SetUpRooms();
 	
-	//SET UP GLITCHED ROOMS
-	var self = this;
-	this.glitched_rooms = [];
-	for (var i = 0; i < this.house_height; i++){
-		var row = [];
-		for (var j = 0; j < this.house_width; j++){
-			row.push([]);
-		}
-		this.glitched_rooms.push(row);
-	}
-	var setupGlitchedRoom = function(i, j){
-		self.room_load_queue.push([i, j, true]);
-		Room.ImportAsync(self.path + j + "_" + i + "_glitched.txt", function(room){
-			self.glitched_rooms[i][j] = room;
-		});
-	}
-	setupGlitchedRoom(0, 1);
-	setupGlitchedRoom(0, 0);
-	setupGlitchedRoom(5, 0);
-	setupGlitchedRoom(4, 3);
-	setupGlitchedRoom(3, 3);
-	setupGlitchedRoom(2, 2);
-	
 	setTimeout(function(){this.LoadNextRoom(callback);}.bind(this), 0);
 }
 
-House.prototype.LoadNextRoom = function(callback){	
+House.prototype.LoadNextRoom = function(callback){
 	var room_q = this.room_load_queue.splice(0, 1)[0];
 	//console.log(room_q);
 	var i = room_q[0];
 	var j = room_q[1];
-	var glitched = room_q[2];
 	var filename = this.path + j + "_" + i;
-	if (glitched) filename += "_glitched";
 	filename += ".txt";
 	
 	self = this;
 	
 	Room.ImportAsync(filename, function(room){
-		if (!glitched){
-			self.rooms[i][j] = room;
-			self.rooms_loaded++;
-		}
-		else self.glitched_rooms[i][j] = room;
+	  room.index_y = i;
+	  room.index_x = j;
+		self.rooms[i][j] = room;
+		self.rooms_loaded++;
 		
-		if (!glitched && self.rooms_loaded >= self.house_height * self.house_width){
+		if (self.rooms_loaded >= self.house_height * self.house_width){
 			console.log("done loading");
 			self.FinishedLoading(callback);
 		}
@@ -113,7 +87,7 @@ House.prototype.FinishedLoading = function(callback){
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {
-		x: room.player.x, y: room.player.y, 
+		x: room.player.x, y: room.player.y,
 		room_x: this.room_index_x,
 		room_y: this.room_index_y,
 		facing: room.player.facing
@@ -156,7 +130,7 @@ House.prototype.Restart = function(){
 	room.player.stuck_in_wall = false;
 	this.DeactivateCheckpoints();
 	this.checkpoint = {
-		x: room.player.x, y: room.player.y, 
+		x: room.player.x, y: room.player.y,
 		room_x: this.room_index_x,
 		room_y: this.room_index_y,
 		facing: room.player.facing
@@ -172,7 +146,7 @@ House.prototype.Reset = function(){
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {
-		x: room.player.x, y: room.player.y, 
+		x: room.player.x, y: room.player.y,
 		room_x: this.room_index_x,
 		room_y: this.room_index_y,
 		facing: room.player.facing
@@ -243,7 +217,7 @@ House.prototype.ChangeRoom = function(){
 		
 		bg_name = "RoccoW_iveGotNothing";
 		if (resource_manager.play_music){
-			stopMusic();	
+			stopMusic();
 			startMusic();
 		}
 		
@@ -269,7 +243,7 @@ House.prototype.RandomGlitch = function(){
 		glitch = this.spellbook[rindex];
 	}*/
 	this.glitch_index++;
-	if (this.glitch_index >= this.spellbook.length) 
+	if (this.glitch_index >= this.spellbook.length)
 		this.glitch_index = 0; //-1;
 		
 	if (this.glitch_index < 0){

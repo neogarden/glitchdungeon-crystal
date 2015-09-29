@@ -67,13 +67,11 @@ Collection.prototype.GetEvent = function(){
 			room_manager.rooms[4][2].entities.push(new NPC(1*Tile.WIDTH, 7*Tile.HEIGHT, 3));
 			room_manager.rooms[4][2].entities.push(new Checkpoint(this.x, this.y));
 			room_manager.rooms[4][2].bg_code = "switch (Ǥlitch_type){\n\tcase Ǥlitch.ǤREY:\n\t\tbreak;\n\tcあse Ǥlitch.RED:\n\t\tǤlitch.RedTrあnsform(mあp, mあp.plあyer, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.ǤREEN:\n\t\tǤlitch.ǤreenTrあnsform(mあp, mあp.player, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.BLUE:";
-			room_manager.rooms[0][1].Import(room_manager.glitched_rooms[0][1].Export());
-			room_manager.rooms[0][0].Import(room_manager.glitched_rooms[0][0].Export());
 			
 			//room_manager.spellbook = [Glitch.GREEN, Glitch.RED];
 			bg_name = "lhommeEraseForm";
 			if (resource_manager.play_music){
-				stopMusic();	
+				stopMusic();
 				startMusic();
 			}
 			break;
@@ -81,9 +79,9 @@ Collection.prototype.GetEvent = function(){
 			if (room_manager.spellbook.indexOf(Glitch.GREEN) < 0)
 				room_manager.spellbook.push(Glitch.GREEN);
 			break;
-		case 2: 
+		case 2:
 			if (room_manager.spellbook.indexOf(Glitch.RED) < 0)
-				room_manager.spellbook.push(Glitch.RED);	
+				room_manager.spellbook.push(Glitch.RED);
 			break;
 		case 3:
 			if (room_manager.spellbook.indexOf(Glitch.BLUE) < 0)
@@ -112,11 +110,6 @@ Collection.prototype.GetEvent = function(){
 			room.tiles[5][12].collision = Tile.SOLID;
 			room.tiles[5][12].tileset_x = 0;
 			
-			room_manager.rooms[5][0].Import(room_manager.glitched_rooms[5][0].Export());
-			room_manager.rooms[4][3].Import(room_manager.glitched_rooms[4][3].Export());
-			room_manager.rooms[3][3].Import(room_manager.glitched_rooms[3][3].Export());
-			room_manager.rooms[2][2].Import(room_manager.glitched_rooms[2][2].Export());
-			
 			for (var i = 0; i < room_manager.rooms.length; i++){
 				for (var j = 0; j < room_manager.rooms[i].length; j++){
 					for (var k = 0; k < room_manager.rooms[i][j].entities.length; k++){
@@ -136,7 +129,7 @@ Collection.prototype.GetEvent = function(){
 			
 			bg_name = "TomWoxom_North";
 			if (resource_manager.play_music){
-				stopMusic();	
+				stopMusic();
 				startMusic();
 			}
 			break;

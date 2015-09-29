@@ -15,7 +15,7 @@ function InitLevelEdit(){
 	
 	function keypress(e){
 		var code = (e.keyCode ? e.keyCode : e.which);
-		if (code == 13) { //Enter keycode                        
+		if (code == 13) { //Enter keycode
 			e.preventDefault();
 			ledit_change_room_size();
 		}
@@ -42,7 +42,7 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 			ctx_menu.AddItem("edit npc", function(){
 				room.paused = true;
 				var options = this.GenerateOptions();
-				Dialog.Confirm("", options.submit, "edit npc", "edit", 
+				Dialog.Confirm("", options.submit, "edit npc", "edit",
 					function(){ room.paused = false; }
 				);
 				Dialog.AddElement(options.dom);
@@ -207,7 +207,7 @@ function LevelEditMouseMove(e){
 	if (level_edit_entity === undefined){
 		if (entity !== undefined){
 			document.body.style.cursor = "-webkit-grab";
-			potential_level_edit_entity = entity; 
+			potential_level_edit_entity = entity;
 		}
 		else{
 			document.body.style.cursor = "auto";
@@ -238,7 +238,7 @@ function LevelEditMouseUp(e){
 		document.body.cursor = "auto";
 		level_edit_entity.grav_acc = level_edit_entity_grav_acc;
 		level_edit_entity = undefined;
-	}		
+	}
 		
 	//right click
 	if (right_click){
@@ -263,11 +263,40 @@ function ledit_add_glitch(){
 	room.glitch_time = 0;
 }
 
-function ledit_export(){
-	$("level_edit_export_text").value = JSON.stringify(room.Export());
+function ledit_save(level_name, should_alert){
+  var path = "assets/rooms/"+level_name+"/";
+  var json = room_manager.Export();
+  FileManager.ensureExists(path, function(err){
+    try{
+      if (err) console.log(err);
+      else{
+        for (var i = 0; i < json.rooms.length; i++){
+          for (var j = 0; j < json.rooms[i].length; j++){
+            var room = json.rooms[i][j];
+            var ikey = room.index_y;
+            var jkey = room.index_x;
+            FileManager.saveFile(path + ikey + "_" + jkey + ".json",
+              JSON.stringify(room));
+          }
+        }
+        FileManager.saveFile(path + "etc.json", json.etc);
+        if (should_alert) Dialog.Alert("level saved to file!");
+        return;
+      }
+    }catch(e){
+      console.log(e);
+    }
+    if (should_alert){
+      Dialog.Alert("error saving level!<br/>(check console for details)");
+    }
+  });
 }
 
-function ledit_import(){
+function ledit_saveas(){
+  
+}
+
+function ledit_load(){
 	var obj_str = $("level_edit_export_text").value;
 	try{
 		if (obj_str !== null && obj_str !== ""){

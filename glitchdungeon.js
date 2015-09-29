@@ -83,3 +83,13 @@ app.listen(port);
 
 console.log("Nodejs http & socket server started at 127.0.0.1:"+port+"...");
 console.log("TODO: ");
+var todoFile = "todo.txt";
+fs.exists(todoFile, function(exists) {
+	if (exists) {
+		fs.readFile(todoFile, function(error, content) {
+			if (!error) {
+			  console.log(content.toString());
+			}
+		});
+	}
+});

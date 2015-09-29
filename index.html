@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8"> 
+<meta charset="utf-8">
 <title>glitch dungeon</title>
 <link rel="stylesheet" type="text/css" href="style.css"/>
 
@@ -12,9 +12,11 @@
 <script src="scripts/lib/dialog.js"></script>
 
 <!--Load all the scripts to be used-->
-<script src="scripts/strokeText.js"></script> 
+<script src="scripts/strokeText.js"></script>
 <script src="scripts/Utils.js"></script>
+<script src="scripts/nodejs.js"></script>
 <script src="scripts/md5.js"></script>
+<script src="scripts/managers/FileManager.js"></script>
 <script src="scripts/managers/KeyManager.js"></script>
 <script src="scripts/managers/InputManager.js"></script>
 <script src="scripts/managers/ResourceManager.js"></script>
@@ -55,7 +57,6 @@
 <body>
 <canvas id="game_canvas" class="centerMe" oncontextmenu="return false;"></canvas>
 				<!--<div id="player_object" class="object_box" style="background: url('assets/images/player_grey_sheet.png');" onclick="ledit_select(this, 'player');">&nbsp;</div>
-				<div id="npc_object" class="object_box" style="background:url('assets/images/npc_sheet.png');" onclick="ledit_select(this,&quot;new NPC(0, 0, parseInt(prompt('id')))&quot;)">&nbsp;</div>
 				<div id="collection_object" class="object_box" style="background:url('assets/images/collection_sheet.png');" onclick="ledit_select(this,&quot;new Collection(0, 0, parseInt(prompt('id')))&quot;)">&nbsp;</div>
 				<div id="object_object" class="object_box" style="background: url('assets/images/obj_sheet.png');" onclick="ledit_select(this, ledit_getSelected('object_options'));">&nbsp;</div>
 				<div id="enemy_object" class="object_box" style="background:url('assets/images/enemy_sheet.png');" onclick="ledit_select(this,&quot;new Enemy(0, 0, parseInt(prompt('type')))&quot;)">&nbsp;</div>
@@ -83,7 +84,6 @@
 	  <select id="object_options" style="position:absolute;right:10px;top:196px;">
 		<option value="new Door(0, 0, parseInt(prompt('room x')), parseInt(prompt('room y')), parseInt(prompt('door id')))">Door</option>
 		<option value="new Door(0, 0, parseInt(prompt('room x')), parseInt(prompt('room y')), parseInt(prompt('door id')), true, parseInt(prompt('num artifacts')))">Door (Lock)</option>
-		<option value="new Checkpoint(0, 0)">CheckPoint</option>
 	  </select>
 	  </div>-->
 	  
@@ -94,11 +94,11 @@
 			<input type="submit" value="change size" onclick="ledit_change_room_size();"/><br/>
 			heght: <input type="text" id="room_height" value="240"/>
 		</div><br/>
-		<input type="submit" value="export" onclick="ledit_export();"/>
-		<input type="submit" value="import" onclick="ledit_import();"/>
+		<input type="submit" value="save" onclick="ledit_save(prompt('level name?'), true);"/>
+		<input type="submit" value="save as" onclick="ledit_saveas();"/>
+		<input type="submit" value="load" onclick="ledit_load();"/>
 		<input type="submit" value="reset room" onclick="ledit_reset();"/>
 		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>
 	  </div>
-    </center>
 </body>
 </html>

@@ -1,6 +1,8 @@
 Room.GLITCH_TIME_LIMIT_ORIGINAL = 240;
 
 function Room(){
+  this.index_x = 0;
+  this.index_y = 0;
 	this.SCREEN_WIDTH = GAME_WIDTH;
 	this.SCREEN_HEIGHT = GAME_HEIGHT;
 	
@@ -94,10 +96,10 @@ Room.prototype.Update = function(input){
 	if (room_manager && !room_manager.has_spellbook || !this.can_use_spellbook){
 		this.glitch_time++;
 		
-		if (this.glitch_sequence.length > 1 
-				&& this.glitch_time > this.glitch_time_limit - 60 
+		if (this.glitch_sequence.length > 1
+				&& this.glitch_time > this.glitch_time_limit - 60
 				&& this.glitch_time < this.glitch_time_limit)
-		{		
+		{
 			if ((~~this.glitch_time) % 20 === 0){
 				var temp_index = this.glitch_index;
 				temp_index++;
@@ -197,7 +199,7 @@ Room.prototype.RenderSpeech = function(ctx){
 		}
 		
 		var h = 0;
-		if (this.player.y+(this.player.bb/2) >= GAME_HEIGHT/2) 
+		if (this.player.y+(this.player.bb/2) >= GAME_HEIGHT/2)
 			h = (-1)*(GAME_HEIGHT/1.5)+Tile.HEIGHT;
 		
 		ctx.fillStyle = "#ffffff";
@@ -292,7 +294,7 @@ Room.prototype.ChangeSize = function(width, height){
 	for (var i = 0; i < this.MAP_HEIGHT; i++){
 		if (i >= old_height) this.tiles[i] = [];
 		for (var j = 0; j < this.MAP_WIDTH; j++){
-			if (i >= old_height) 
+			if (i >= old_height)
 				this.tiles[i].push(new Tile(j * Tile.WIDTH, i * Tile.HEIGHT));
 			else if (j >= old_width)
 				this.tiles[i].push(new Tile(j * Tile.WIDTH, i * Tile.HEIGHT));

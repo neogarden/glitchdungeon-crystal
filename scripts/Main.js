@@ -36,7 +36,7 @@ window.requestAnimFrame = function(){
         window.mozRequestAnimationFrame    || 
         window.oRequestAnimationFrame      || 
         window.msRequestAnimationFrame     || 
-        function(/* function */ callback){
+        function(callback){
             window.setTimeout(callback, 1000 / 60);
         }
     );
@@ -80,7 +80,8 @@ var startGame = function(){
 	if (game_started) return;
 	game_started = true;
 
-	room_manager = new House(function(){
+	room_manager = new House();
+	room_manager.Import("main", function(){
 		room = room_manager.GetRoom();
 		
 		//Let's play the game!

@@ -1,5 +1,5 @@
-function House(callback){
-	this.path = "assets/rooms/room_";
+function House(){
+	this.path = "assets/rooms";
 	this.num_deaths = 0;
 	this.spells_cast = 0;
 	this.then = Date.now();
@@ -17,14 +17,6 @@ function House(callback){
 	this.room_index_y = 0;
 	this.old_room_index_x = 0;
 	this.old_room_index_y = 0;
-	
-	this.house_width = 6;
-	this.house_height = 6;
-	this.rooms_loaded = 0;
-	this.room_load_queue = [];
-	this.SetUpRooms();
-	
-	setTimeout(function(){this.LoadNextRoom(callback);}.bind(this), 0);
 }
 
 House.prototype.Export = function(){
@@ -35,10 +27,11 @@ House.prototype.Export = function(){
     for (var j in this.rooms[i]){
       var room = this.rooms[i][j];
       if (room instanceof RoomIllusion) continue;
+	  room = room.Export();
       room.index_y = i;
       room.index_x = j;
       
-      room_row.push(room.Export());
+      room_row.push(room);
       etc.room_indices.push({y: i, x: j});
     }
     room_jsons.push(room_row);
@@ -47,66 +40,60 @@ House.prototype.Export = function(){
   return {rooms: room_jsons, etc: JSON.stringify(etc)};
 }
 
-House.prototype.LoadNextRoom = function(callback){
-	var room_q = this.room_load_queue.splice(0, 1)[0];
-	//console.log(room_q);
-	var i = room_q[0];
-	var j = room_q[1];
-	var filename = this.path + j + "_" + i;
-	filename += ".txt";
+House.prototype.Import = function(level_name, callback){
+	var path = this.path + "/" + level_name + "/";
 	
-	self = this;
+	var loaded = 0;
+	var needs_loading = 0;
+	this.level_name = level_name;
 	
-	Room.ImportAsync(filename, function(room){
-	  room.index_y = i;
-	  room.index_x = j;
-		self.rooms[i][j] = room;
-		self.rooms_loaded++;
-		
-		if (self.rooms_loaded >= self.house_height * self.house_width){
-			console.log("done loading");
-			self.FinishedLoading(callback);
+	FileManager.loadFile(path + "etc.json", function(err, json){
+		if (err){
+			alert("error loading level");
+			console.log(err);
+			return;
 		}
 		
-		if (self.room_load_queue.length > 0){
-			setTimeout(function(){
-				self.LoadNextRoom(callback);
-			}.bind(self), 0);
+		this.etc = JSON.parse(json);
+		needs_loading = this.etc.room_indices.length;
+		
+		this.rooms = [];
+		
+		for (var i = 0; i < this.etc.room_indices.length; i++){
+			var index = this.etc.room_indices[i];
+			var y = index.y;
+			var x = index.x;
+			FileManager.loadFile(path + y + "_" + x + ".json", function(y, x, error, json){
+				if (error){
+					alert("error loading level");
+					console.log(error);
+				}
+				
+				var room = JSON.parse(json);
+				room.y = y;
+				room.x = x;
+				new_room = new Room();
+				new_room.Import(room);
+				if (this.rooms[y] === undefined) this.rooms[y] = [];
+				this.rooms[y][x] = new_room;
+				loaded++;
+				if (loaded === needs_loading){
+					//FINISHED LOADING ALL THE LEVELS
+					var room = this.rooms[this.room_index_y][this.room_index_x];
+					this.checkpoint = {
+						x: room.player.x, y: room.player.y,
+						room_x: this.room_index_x,
+						room_y: this.room_index_y,
+						facing: room.player.facing
+					};
+					this.old_checkpoint = null;
+					this.new_checkpoint = null;
+					
+					callback();
+				}
+			}.bind(this, y, x));
 		}
-	});
-}
-
-House.prototype.SetUpRooms = function(){
-	this.rooms = [];
-	for (var i = 0; i < this.house_height; i++){
-		var row = [];
-		for (var j = 0; j < this.house_width; j++){
-			row.push([]);
-		}
-		this.rooms.push(row);
-	}
-	
-	for (var i = 0; i < this.house_height; i++){
-		for (var j = 0; j < this.house_width; j++){
-			this.room_load_queue.push([i, j, false]);
-		}
-	}
-	//this.rooms[99][99] = Room.Import(path + "99_99.txt");
-}
-
-House.prototype.FinishedLoading = function(callback){
-	this.rooms[2][4].entities.push(new Collection(11*Tile.WIDTH, 3*Tile.HEIGHT, 6));
-	
-	var room = this.rooms[this.room_index_y][this.room_index_x];
-	this.checkpoint = {
-		x: room.player.x, y: room.player.y,
-		room_x: this.room_index_x,
-		room_y: this.room_index_y,
-		facing: room.player.facing
-	};
-	this.old_checkpoint = null;
-	this.new_checkpoint = null;
-	callback();
+	}.bind(this));
 }
 
 House.prototype.Restart = function(){

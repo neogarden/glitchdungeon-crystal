@@ -36,23 +36,36 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 	
 	//EDIT OPTIONS
 	var entity = room.GetEntityAtXY(x, y);
+	var name = "";
+	var index = 0;
 	if (entity !== undefined){
-		//EDIT NPC options
-		if (entity instanceof NPC){
-			ctx_menu.AddItem("edit npc", function(){
-				room.paused = true;
-				var options = this.GenerateOptions();
-				Dialog.Confirm("", options.submit, "edit npc", "edit",
-					function(){ room.paused = false; }
-				);
-				Dialog.AddElement(options.dom);
-			}.bind(entity));
-		}
+		name = entity.constructor.name;
+		index = room.entities.indexOf(entity);
+	}
+	
+	if (entity !== undefined){
+		//EDIT options
+		ctx_menu.AddItem("edit " + name, function(){
+			room.paused = true;
+			var options = this.GenerateOptions();
+			Dialog.Confirm("", options.submit, "edit " + name, "edit",
+				function(){ room.paused = false; }
+			);
+			Dialog.AddElement(options.dom);
+		}.bind(entity));
+
+		//DELETE OPTIONS
+		ctx_menu.AddItem("delete " + name, function(){
+			room.paused = true;
+			Dialog.Confirm("are you sure you wish to delete this " + name + "?", function(){ room.entities.splice(index, 1); }, "delete " + name, "delete", function(){ room.paused = false; }
+			);
+		}.bind(entity));
+		
 		ctx_menu.AddDivider();
 	}
 	
 	//CREATION OPTIONS
-	ctx_menu.AddItem("new npc", function(){
+	ctx_menu.AddItem("new NPC", function(){
 		room.paused = true;
 		var npc = new NPC(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
 		var options = npc.GenerateOptions();
@@ -60,12 +73,12 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 				options.submit();
 				room.entities.push(npc);
 			},
-			"new npc", "create",
+			"new NPC", "create",
 			function(){ room.paused = false; }
 		);
 		Dialog.AddElement(options.dom);
 	}.bind(this));
-	ctx_menu.AddItem("new checkpoint", function(){
+	ctx_menu.AddItem("new Checkpoint", function(){
 		var checkpoint = new Checkpoint(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
 		room.entities.push(checkpoint);
 	}.bind(this));

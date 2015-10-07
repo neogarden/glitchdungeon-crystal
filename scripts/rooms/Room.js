@@ -264,7 +264,6 @@ Room.prototype.Render = function(ctx, level_edit){
 	for (var i = 0; i < this.MAP_HEIGHT; i++){ for (var j = 0; j < this.MAP_WIDTH; j++){
 		this.tiles[i][j].Render(ctx, this.camera, tile_img);
 	} }
-	if (level_edit) DrawLevelEditGrid(ctx, this);
 	
 	//DRAW THE REMAINING ENTITIES
 	for (var i = index; i < entities.length; i++){

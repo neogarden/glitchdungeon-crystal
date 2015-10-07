@@ -1,4 +1,3 @@
-var level_edit = false;
 var master_volume = 0.5;
 
 var bg_music = null;
@@ -21,6 +20,7 @@ var then;
 var fontColor = "rgb(0,0,0)";
 
 //managers
+var level_edit_manager;
 var room_manager;
 var key_manager;
 var input_manager;
@@ -43,7 +43,9 @@ window.requestAnimFrame = function(){
 }();
 
 var init = function(){
-	if (level_edit) InitLevelEdit();
+	level_edit_manager = new LevelEditManager();
+	//comment out if not allowing level editing
+	level_edit_manager.Init();
 	console.log("init");
 	
 	canvas = $("game_canvas");
@@ -54,18 +56,22 @@ var init = function(){
 	set_textRenderContext(ctx);
 	click_to_start = false;
 	
+	canvas.onmousedown = function(e){
+		level_edit_manager.MouseDown(e); 
+		SoundMouseDown(e)
+	}.bind(this);
+	canvas.onmousemove = function(e){ 
+		level_edit_manager.MouseMove(e); 
+	};
+	canvas.onmouseup = function(e){ 
+		level_edit_manager.MouseUp(e); 
+		SoundMouseUp(e); 
+	};
+	
 	//Handle keyboard controls
 	key_manager = new KeyManager();
 	window.onkeydown = key_manager.KeyDown.bind(key_manager);
 	window.onkeyup = key_manager.KeyUp.bind(key_manager);
-	if (level_edit){
-		canvas.onmousedown = function(e){LevelEditMouseDown(e); SoundMouseDown(e)}
-		canvas.onmousemove = LevelEditMouseMove;
-		canvas.onmouseup = function(e){ LevelEditMouseUp(e); SoundMouseUp(e); }
-	}else{
-		canvas.onmousedown = SoundMouseDown;
-		canvas.onmouseup = SoundMouseUp;
-	}
 	
 	input_manager = new InputManager(key_manager);
 	

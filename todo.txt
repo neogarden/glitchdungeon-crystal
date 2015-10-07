@@ -1,7 +1,3 @@
-1. tile editing: right clicking and selecting "edit tiles" will bring up tile editing user interface:
-	game is paused
-	left click to add/change tiles
-	press space to switch between collision view and image view
-	collision type can be rotated with scroll wheel or selected in dialog
+1.	collision type can be rotated with scroll wheel or selected in dialog
 	image type can be rotated with scroll wheel or selected in dialog
 	

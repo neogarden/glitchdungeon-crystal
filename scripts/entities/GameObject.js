@@ -39,6 +39,12 @@ GameObject.prototype.Export = function(){
 		kill_player: this.kill_player
 	};
 }
+GameObject.prototype.ExportOptions = function(){
+	return {};
+}
+GameObject.prototype.ImportOptions = function(options){
+}
+
 GameObject.prototype.GenerateOptions = function(){
 	var dom = document.createElement("div");
 	var opt = this.ExportOptions();

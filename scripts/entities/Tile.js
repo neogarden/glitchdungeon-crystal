@@ -7,6 +7,10 @@ Slope.LOW_NEG = -30;
 Slope.MID_NEG = -45;
 Slope.HI_NEG = -60;
 
+Tile.NORMAL_DISPLAY = 0;
+Tile.COLLISION_DISPLAY = 1;
+Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
+
 
 Tile.WIDTH = 8;
 Tile.HEIGHT = 8;
@@ -73,12 +77,35 @@ Tile.prototype.Render = function(ctx, camera, image){
 	var row = this.tileset_y;
 	var column = this.tileset_x;
 	
-	ctx.drawImage(image, 
-		//SOURCE RECTANGLE
-		Tile.WIDTH * column, Tile.HEIGHT * row, Tile.WIDTH, Tile.HEIGHT,
-		//DESTINATION RECTANGLE
-		~~(this.x-camera.x+camera.screen_offset_x+0.5), 
-		~~(this.y-camera.y+camera.screen_offset_y+0.5),
-		Tile.WIDTH, Tile.HEIGHT
-	);
+	if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY){
+		ctx.drawImage(image, 
+			//SOURCE RECTANGLE
+			Tile.WIDTH * column, Tile.HEIGHT * row, Tile.WIDTH, Tile.HEIGHT,
+			//DESTINATION RECTANGLE
+			~~(this.x-camera.x+camera.screen_offset_x+0.5), 
+			~~(this.y-camera.y+camera.screen_offset_y+0.5),
+			Tile.WIDTH, Tile.HEIGHT
+		);
+	}else if (Tile.DISPLAY_TYPE === Tile.COLLISION_DISPLAY){
+		switch (this.collision){
+			case Tile.GHOST:
+				ctx.fillStyle = "#000000";
+				break;
+			default: case Tile.SOLID:
+				ctx.fillStyle = "#aaaaaa";
+				break;
+			case Tile.FALLTHROUGH:
+				ctx.fillStyle = "#00ffff";
+				break;
+			case Tile.KILL_PLAYER:
+				ctx.fillStyle = "#ff0000";
+				break;
+			case Tile.SUPER_SOLID:
+				ctx.fillStyle = "#ffffff";
+				break;
+		}
+		ctx.fillRect(~~(this.x-camera.x + camera.screen_offset_x + 0.5),
+					 ~~(this.y-camera.y + camera.screen_offset_y + 0.5),
+					 Tile.WIDTH, Tile.HEIGHT);
+	}
 }

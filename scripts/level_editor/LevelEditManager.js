@@ -1,16 +1,19 @@
-var level_edit_mouse_down = false;
-var potential_level_edit_entity;
-var leee_offset_x;
-var lee_offset_y;
-var level_edit_entity;
-var level_edit_entity_grav_acc;
-var level_edit_object_is_tile = false;
-var level_edit_tileset_ctx;
+function LevelEditManager(){
+	this.enabled = false;
+	this.mouse_down = false;
+	this.potential_entity = undefined;
+	this.entity = undefined;
+	this.entity_grav_acc = 0;
+	
+	this.ctx_menu_timer = 0;
+	this.ctx_menu_time_limit = 3;
+	
+	this.offset_x = 0;
+	this.offset_y = 0;
+	this.tile_mode = false;
+}
 
-var level_edit_tile_img_x = 0;
-var level_edit_tile_img_y = 0;
-
-function InitLevelEdit(){
+LevelEditManager.prototype.Init = function(){
 	$("level_edit_buttons").style.display="block";
 	
 	function keypress(e){
@@ -22,19 +25,27 @@ function InitLevelEdit(){
 	}
 	$("room_width").onkeypress = keypress;
 	$("room_height").onkeypress = keypress;
-	level_edit = true;
+	this.enabled = true;
 }
 
-function DisableLevelEdit(){
+LevelEditManager.prototype.Disable = function(){
 	$("level_edit_buttons").style.display="none";
-	level_edit = false;
+	this.enabled = false;
 }
 
-function leditCreateContextMenu(x, y, tile_x, tile_y){
+LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 	var ctx_menu = CtxMenu.Init(x, y, document.body);
 	ctx_menu.Open();
 	
-	//EDIT OPTIONS
+	//MODE OPTIONS
+	ctx_menu.AddItem("toggle tile mode", function(){
+		if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY)
+			Tile.DISPLAY_TYPE = Tile.COLLISION_DISPLAY;
+		else Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
+	}.bind(this));
+	
+	ctx_menu.AddDivider();
+	
 	var entity = room.GetEntityAtXY(x, y);
 	var name = "";
 	var index = 0;
@@ -84,7 +95,7 @@ function leditCreateContextMenu(x, y, tile_x, tile_y){
 	}.bind(this));
 }
 
-function DrawLevelEditGrid(ctx, room){
+LevelEditManager.prototype.DrawGrid = function(ctx, room){
 	return;
 	
 	var color = "#000000";
@@ -124,8 +135,8 @@ function LeditSetTileImage(tile_x, tile_y){
 	level_edit_tileset_ctx.stroke();
 }
 
-function LevelEditMouseDown(e){
-	if (!level_edit) return;
+LevelEditManager.prototype.MouseDown = function(e){
+	if (!this.enabled) return;
 	e.preventDefault();
 	level_edit_mouse_down = true;
 	
@@ -135,110 +146,83 @@ function LevelEditMouseDown(e){
 	var y = (e.clientY - box.top) / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = Math.floor(x / Tile.WIDTH);
 	var tile_y = Math.floor(y / Tile.HEIGHT);
-	
-	/*if (level_edit_object_is_tile){
-		var tile = room.tiles[tile_y][tile_x];
-		tile.kill_player = false;
-		tile.tileset_x = level_edit_tile_img_x;
-		tile.tileset_y = level_edit_tile_img_y;
-		if (e.which === 3 && e.button === 2){ //RIGHT CLICK. REMOVE Tile
-			tile.collision = Tile.GHOST;
-			tile.tileset_x = 0;
-			tile.tileset_y = 0;
-		}else{
-			switch (level_edit_object){
-				case Tile.SOLID:
-					tile.collision = Tile.SOLID;
-					break;
-				case Tile.SUPER_SOLID:
-					tile.collision = Tile.SUPER_SOLID;
-					break;
-				case Tile.FALLTHROUGH:
-					tile.collision = Tile.FALLTHROUGH;
-					break;
-				case Tile.KILL_PLAYER:
-					tile.collision = Tile.KILL_PLAYER;
-					tile.kill_player = true;
-					break;
-				default:
-					tile.collision = Tile.GHOST;
-					break;
-			}
-		}
-	}
-	else{
-		if (level_edit_object == 'player'){
-			room.player.x = x - (room.player.rb/2);
-			room.player.y = y - room.player.bb;
-		}
-		else{
-			if (e.which === 3 && e.button === 2){ //RIGHT CLICK. REMOVE OBJ IF UNDER
-				for (var i = room.entities.length-1; i >= 0; i--){
-					if (room.entities[i].IsPointColliding(x, y)){
-						room.entities.splice(i, 1);
-					}
-				}
-			}else{
-				x = tile_x * Tile.WIDTH;
-				y = tile_y * Tile.HEIGHT;
-				var obj = eval(level_edit_object);
-				obj.x = x;
-				obj.y = y;
-				obj.original_x = x;
-				obj.original_y = y;
-				room.entities.push(obj);
-			}
-		}
-	}*/
-	
-	if (!right_click && potential_level_edit_entity !== undefined){
-		level_edit_entity = potential_level_edit_entity;
-		level_edit_entity_grav_acc = level_edit_entity.grav_acc;
-		level_edit_entity.grav_acc = 0;
+
+	//NON TILE MODE!!! !ENTITY MODE!!!
+	if (!right_click && this.potential_entity !== undefined){
+		this.entity = this.potential_entity;
+		this.entity_grav_acc = this.entity.grav_acc;
+		this.entity.grav_acc = 0;
 		potential_level_edit_entity = undefined;
 		document.body.style.cursor = "-webkit-grabbing";
 		
-		leee_offset_x = level_edit_entity.x - x;
-		leee_offset_y = level_edit_entity.y - y;
+		this.offset_x = this.entity.x - x;
+		this.offset_y = this.entity.y - y;
+	}
+	
+	var timer_callback = function(){};
+	
+	if (this.potential_entity === undefined){
+		timer_callback = function(){
+			//TILE MODE!!!
+			this.tile_mode = true;
+			this.PlaceTile(tile_x, tile_y, right_click);
+		}.bind(this);
+	}
+	
+	if (right_click){
+		this.ctx_menu_timer = 0;
+		this.ctx_menu_timer_id = setInterval(function(){
+			this.ctx_menu_timer++;
+			if (this.ctx_menu_timer >= this.ctx_menu_time_limit){
+				timer_callback();
+				clearInterval(this.ctx_menu_timer_id);
+				this.ctx_menu_timer_id = undefined;
+			}
+		}.bind(this), 100);
+	}else{
+		timer_callback();
 	}
 }
 
-function LevelEditMouseMove(e){
-	if (!level_edit) return;
-	if (level_edit_mouse_down && level_edit_object_is_tile){
-		LevelEditMouseDown(e);
+LevelEditManager.prototype.MouseMove = function(e){
+	if (!this.enabled) return;
+	if (this.mouse_down && level_edit_object_is_tile){
+		this.MouseDown(e);
 		return;
 	}
 	
 	var box = canvas.getBoundingClientRect();
 	var x = (e.clientX - box.left) / VIEW_SCALE + room.camera.x - room.camera.screen_offset_x;
 	var y = (e.clientY - box.top) / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
-	var tile_x = x / Tile.WIDTH;
-	var tile_y = y / Tile.HEIGHT;
+	var tile_x = Math.floor(x / Tile.WIDTH);
+	var tile_y = Math.floor(y / Tile.HEIGHT);
 	
+	if (this.tile_mode){
+		this.PlaceTile(tile_x, tile_y, (e.which === 3 && e.button === 2));
+	}
 	var entity = room.GetEntityAtXY(x, y);
-	if (level_edit_entity === undefined){
+	if (this.entity === undefined){		
+		document.body.style.cursor = "auto";
+		this.potential_entity = undefined;
 		if (entity !== undefined){
 			document.body.style.cursor = "-webkit-grab";
-			potential_level_edit_entity = entity;
-		}
-		else{
-			document.body.style.cursor = "auto";
+			this.potential_entity = entity;
 		}
 	}else{
-		level_edit_entity.x = ~~((x + leee_offset_x) / (Tile.WIDTH / 2));
-		level_edit_entity.x *= (Tile.WIDTH / 2);
-		level_edit_entity.y = ~~((y + leee_offset_y) / (Tile.HEIGHT / 2));
-		level_edit_entity.y *= (Tile.HEIGHT / 2);
+		this.entity.x = ~~((x + this.offset_x) / (Tile.WIDTH / 2));
+		this.entity.x *= (Tile.WIDTH / 2);
+		this.entity.y = ~~((y + this.offset_y) / (Tile.HEIGHT / 2));
+		this.entity.y *= (Tile.HEIGHT / 2);
 		
-		level_edit_entity.original_x = level_edit_entity.x;
-		level_edit_entity.original_y = level_edit_entity.y;
+		this.entity.original_x = this.entity.x;
+		this.entity.original_y = this.entity.y;
 	}
 }
 
-function LevelEditMouseUp(e){
-	if (!level_edit) return;
-	level_edit_mouse_down = false;
+LevelEditManager.prototype.MouseUp = function(e){
+	if (!this.enabled) return;
+	this.mouse_down = false;
+	this.tile_mode = false;
 	var right_click = (e.which === 3 && e.button === 2);
 	
 	var box = canvas.getBoundingClientRect();
@@ -247,36 +231,74 @@ function LevelEditMouseUp(e){
 	var tile_x = x / Tile.WIDTH;
 	var tile_y = y / Tile.HEIGHT;
 	
-	if (level_edit_entity !== undefined){
+	if (this.entity !== undefined){
 		document.body.cursor = "auto";
-		level_edit_entity.grav_acc = level_edit_entity_grav_acc;
-		level_edit_entity = undefined;
+		this.entity.grav_acc = this.entity_grav_acc;
+		this.entity = undefined;
 	}
 		
 	//right click
-	if (right_click){
-		leditCreateContextMenu(x, y, tile_x, tile_y);
+	if (right_click && this.ctx_menu_timer < this.ctx_menu_time_limit){
+		this.CreateContextMenu(x, y, tile_x, tile_y);
+	}
+	if (this.ctx_menu_timer_id !== undefined){
+		clearInterval(this.ctx_menu_timer_id);
+	}
+	this.ctx_menu_timer_id = undefined;
+}
+
+LevelEditManager.prototype.PlaceTile = function(tile_x, tile_y, right_click){
+	var tile = room.tiles[tile_y][tile_x];
+	tile.kill_player = false;
+	//tile.tileset_x = level_edit_tile_img_x;
+	//tile.tileset_y = level_edit_tile_img_y;
+	if (right_click){ //RIGHT CLICK. REMOVE Tile
+		tile.collision = Tile.GHOST;
+		tile.tileset_x = 0;
+		tile.tileset_y = 0;
+	}else{
+		tile.collision = Tile.SOLID;
+		tile.tileset_x = 0;
+		tile.tileset_y = 1;
+		/*switch (level_edit_object){
+			case Tile.SOLID:
+				tile.collision = Tile.SOLID;
+				break;
+			case Tile.SUPER_SOLID:
+				tile.collision = Tile.SUPER_SOLID;
+				break;
+			case Tile.FALLTHROUGH:
+				tile.collision = Tile.FALLTHROUGH;
+				break;
+			case Tile.KILL_PLAYER:
+				tile.collision = Tile.KILL_PLAYER;
+				tile.kill_player = true;
+				break;
+			default:
+				tile.collision = Tile.GHOST;
+				break;
+		}*/
 	}
 }
 
-function ledit_change_room_size(){
+LevelEditManager.prototype.ChangeRoomSize = function(){
 	room.ChangeSize($("room_width").value, $("room_height").value);
 }
 
-function ledit_change_glitch(){
+LevelEditManager.prototype.ChangeGlitch = function(){
 	room.glitch_sequence = [eval(ledit_getSelected("glitch_options"))];
 	room.glitch_index = 0;
 	room.glitch_type = room.glitch_sequence[0];
 	Glitch.TransformPlayer(room, room.glitch_type);
 }
 
-function ledit_add_glitch(){
+LevelEditManager.prototype.AddGlitch = function(){
 	room.glitch_sequence.push(eval(ledit_getSelected("glitch_options")));
 	room.glitch_index = 0;
 	room.glitch_time = 0;
 }
 
-function ledit_save(level_name, should_alert){
+LevelEditManager.prototype.Save = function(level_name, should_alert){
   var path = "assets/rooms/"+level_name+"/";
   var json = room_manager.Export();
   FileManager.ensureExists(path, function(err){
@@ -305,7 +327,7 @@ function ledit_save(level_name, should_alert){
   });
 }
 
-function ledit_load(){
+LevelEditManager.prototype.Load = function(){
 	var obj_str = $("level_edit_export_text").value;
 	try{
 		if (obj_str !== null && obj_str !== ""){
@@ -316,17 +338,17 @@ function ledit_load(){
 	}
 }
 
-function ledit_reset(){
+LevelEditManager.prototype.ResetRoom = function(){
 	room = new Room();
 	$("room_width").value = room.SCREEN_WIDTH;
 	$("room_height").value = room.SCREEN_HEIGHT;
 }
 
-function ledit_reset_house(){
+LevelEditManager.prototype.ResetLevel = function(){
 	room_manager.Reset();
 }
 
-function ledit_getSelected(drop_down){
+LevelEditManager.prototype.GetSelected = function(drop_down){
 	var e = $(drop_down);
 	return e.options[e.selectedIndex].value;
 }

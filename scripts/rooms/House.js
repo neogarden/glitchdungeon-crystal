@@ -294,8 +294,8 @@ House.prototype.RevivePlayer = function(){
 }
 
 House.prototype.DeactivateCheckpoints = function(){
-	for (var i = 0; i < this.house_height; i++){
-		for (var j = 0; j < this.house_width; j++){
+	for (var i = 0; i < this.rooms.length; i++){
+		for (var j = 0; j < this.rooms[i].length; j++){
 			var room = this.rooms[i][j];
 			for (var k = 0; k < room.entities.length; k++){
 				if (room.entities[k].type === "Checkpoint"){

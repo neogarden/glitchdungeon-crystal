@@ -176,8 +176,6 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 		room.player.y = this.player.y;
 		room.player.x = 0 + Tile.WIDTH/2 - room.player.lb;
 	}
-	
-	if (level_edit) $("house_coordinates").innerHTML = room_manager.room_index_x + " " + room_manager.room_index_y;
 }
 
 Room.prototype.Speak = function(text, speech_time, display_arrow){

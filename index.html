@@ -62,16 +62,27 @@
 				<!--<div id="player_object" class="object_box" style="background: url('assets/images/player_grey_sheet.png');" onclick="ledit_select(this, 'player');">&nbsp;</div>
 				<div id="collection_object" class="object_box" style="background:url('assets/images/collection_sheet.png');" onclick="ledit_select(this,&quot;new Collection(0, 0, parseInt(prompt('id')))&quot;)">&nbsp;</div>
 				<div id="object_object" class="object_box" style="background: url('assets/images/obj_sheet.png');" onclick="ledit_select(this, ledit_getSelected('object_options'));">&nbsp;</div>
-				<div id="enemy_object" class="object_box" style="background:url('assets/images/enemy_sheet.png');" onclick="ledit_select(this,&quot;new Enemy(0, 0, parseInt(prompt('type')))&quot;)">&nbsp;</div>
-				
-				
-				<div id="tile_solid" class="object_box" style="background-color: #ff00ff;" onclick="ledit_select(this, Tile.SOLID);">&nbsp;</div>
-				<div id="tile_fallthrough" class="object_box" style="background-color: #00ffff;" onclick="ledit_select(this, Tile.FALLTHROUGH);">&nbsp;</div>
-				<div id="tile_kill" class="object_box" style="background-color: #ff0000;" onclick="ledit_select(this, Tile.KILL_PLAYER);">&nbsp;</div>
-				<div id="tile_ghost" class="object_box" onclick="ledit_select(this, Tile.GHOST);">&nbsp;</div>
-				<div id="tile_super_solid" class="object_box" style="background-color: #ffffff;" onclick="ledit_select(this, Tile.SUPER_SOLID);">&nbsp;</div>-->
-	  <!--<canvas id="tileset_canvas" style="display:none;position:absolute;right:10px;top:10px;background:#aaaaaa url('assets/images/tile_grey_sheet.png')" class="centerMe" oncontextmenu="return false;"></canvas>
-	  <div id="etc_options" style="display:none;">
+				<div id="enemy_object" class="object_box" style="background:url('assets/images/enemy_sheet.png');" onclick="ledit_select(this,&quot;new Enemy(0, 0, parseInt(prompt('type')))&quot;)">&nbsp;</div>-->
+	  <div style="position:absolute;right:10px;top:10px;">
+	    <span>tile image selection:</span><br/>
+		<canvas id="tileset_canvas" style="background:#aaaaaa url('assets/images/tile_grey_sheet.png');" class="centerMe" oncontextmenu="return false;"></canvas><br/><br/>
+		<span>tile collision selection:</span><br/>
+		<input type="radio" name="collision" value="Tile.GHOST">
+			<span style="width:32px;height:32px;background-color:#000000;border: 1px solid white;">&nbsp;&nbsp;</span> no collision<br/>
+		
+		<input type="radio" name="collision" value="Tile.SOLID" checked>
+			<span style="width:32px;height:32px;background-color:#aaaaaa;border: 1px solid white;">&nbsp;&nbsp;</span> solid<br/>
+		
+		<input type="radio" name="collision" value="Tile.SUPER_SOLID">
+			<span style="width:32px;height:32px;background-color:#ffffff;border: 1px solid white;">&nbsp;&nbsp;</span> super solid<br/>
+		
+		<input type="radio" name="collision" value="Tile.FALLTHROUGH">
+			<span style="width:32px;height:32px;background-color:#00ffff;border: 1px solid white;">&nbsp;&nbsp;</span> fallthrough<br/>
+			
+		<input type="radio" name="collision" value="Tile.KILL_PLAYER">
+			<span style="width:32px;height:32px;background-color:#ff0000;border: 1px solid white;">&nbsp;&nbsp;</span> deadly<br/>
+	  </div>
+	  <!--<div id="etc_options" style="display:none;">
 	  <select id="glitch_options" style="position:absolute;right:10px;top:140px;">
 		<option value="Glitch.GREY">NONE</option>
 		<option value="Glitch.GREEN">FEATHER</option>
@@ -91,14 +102,15 @@
 	  </div>-->
 	  
       <div id="level_edit_buttons" style="display:none;">
-		  Room Position: <span id="house_coordinates">0 0</span>
+		  Room Position: <span id="house_coordinates">0 0</span><br/>
+		  Prev Room Pos: <span id="house_coordinates_old">0 0</span>
 		<div>
 			width: <input type="text" id="room_width" value="320"/>
 			<input type="submit" value="change size" onclick="ledit_change_room_size();"/><br/>
 			heght: <input type="text" id="room_height" value="240"/>
 		</div><br/>
-		<input type="submit" value="save" onclick="ledit_save('main', true);"/>
-		<input type="submit" value="save as" onclick="ledit_save(prompt('level name?'), true);"/>
+		<input type="submit" value="save" onclick="level_edit_manager.TrueSave();"/>
+		<input type="submit" value="save as" onclick="level_edit_manager.Save(prompt('level name?'), true);"/>
 		<input type="submit" value="load" onclick="ledit_load();"/>
 		<input type="submit" value="reset room" onclick="ledit_reset();"/>
 		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>

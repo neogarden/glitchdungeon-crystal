@@ -1,3 +1,1 @@
-1.	collision type can be rotated with scroll wheel or selected in dialog
-	image type can be rotated with scroll wheel or selected in dialog
-	
+1. right click option: change room offscreen top down left right position

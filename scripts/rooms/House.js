@@ -185,6 +185,10 @@ House.prototype.ChangeRoom = function(){
 			room.entities[i].ResetPosition();
 		}
 	}
+	if (level_edit){
+		$("house_coordinates_old").innerHTML = this.old_room_index_x + " " + this.old_room_index_y;
+		$("house_coordinates").innerHTML = this.room_index_x + " " + this.room_index_y;
+	}
 	this.old_room_index_x = this.room_index_x;
 	this.old_room_index_y = this.room_index_y;
 	
@@ -264,15 +268,7 @@ House.prototype.RevivePlayer = function(){
 
 	this.room_index_x = this.checkpoint.room_x;
 	this.room_index_y = this.checkpoint.room_y;
-	this.old_room_index_x = this.room_index_x;
-	this.old_room_index_y = this.room_index_y;
-	room = this.GetRoom();
-	room.player = new Player();
-	if (!this.has_spellbook || !room.can_use_spellbook){
-		Glitch.TransformPlayer(room, room.glitch_type);
-	}else{
-		Glitch.TransformPlayer(room, this.glitch_type);
-	}
+	this.ChangeRoom();
 	if (this.checkpoint.id !== undefined){
 		for (var i = 0; i < room.entities.length; i++){
 			var entity = room.entities[i];
@@ -288,7 +284,6 @@ House.prototype.RevivePlayer = function(){
 	room.player.facing = this.checkpoint.facing;
 	room.player.die_to_suffocation = true;
 	console.log("num deaths: " + this.num_deaths);
-	room.Speak(null);
 	
 	this.RemoveGlitchedCheckpoint();
 }

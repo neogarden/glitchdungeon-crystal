@@ -11,6 +11,8 @@ function LevelEditManager(){
 	this.offset_x = 0;
 	this.offset_y = 0;
 	this.tile_mode = false;
+	this.tile_img_x = 0;
+	this.tile_img_y = 0;
 }
 
 LevelEditManager.prototype.Init = function(){
@@ -26,6 +28,47 @@ LevelEditManager.prototype.Init = function(){
 	$("room_width").onkeypress = keypress;
 	$("room_height").onkeypress = keypress;
 	this.enabled = true;
+	
+	var zoom = 2;
+	var canvas = $("tileset_canvas");
+	var ctx = canvas.getContext("2d");
+	ctx.canvas.width = 96*zoom;
+	ctx.canvas.height = 96*zoom;
+	ctx.scale(zoom, zoom);
+	
+	canvas.onmousedown = function(e){
+		var box = canvas.getBoundingClientRect();
+		var x = (e.clientX - box.left) / 2;
+		var y = (e.clientY - box.top) / 2;
+		var tile_x = Math.floor(x / Tile.WIDTH);
+		var tile_y = Math.floor(y / Tile.HEIGHT);
+		
+		this.setTileImg(tile_x, tile_y);
+	}.bind(this);
+}
+
+LevelEditManager.prototype.setTileImg = function(tile_x, tile_y){
+	var canvas = $("tileset_canvas");
+	var ctx = canvas.getContext("2d");
+	this.tile_img_x = tile_x;
+	this.tile_img_y = tile_y;
+	canvas.width = canvas.width;
+	var zoom = canvas.width / 96;
+	
+	
+	ctx.fillStyle = "#222222";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	sharpen(ctx);
+	ctx.drawImage(resource_manager[room.tilesheet_name], 
+		//SOURCE RECTANGLE
+		0, 0, 96, 96,
+		//DESTINATION RECTANGLE
+		0, 0, canvas.width, canvas.height
+	);
+	ctx.lineWidth = "1";
+	ctx.strokeStyle = "#ffffff";
+	ctx.rect(tile_x * Tile.WIDTH * zoom, tile_y * Tile.HEIGHT * zoom, Tile.WIDTH * zoom, Tile.HEIGHT * zoom);
+	ctx.stroke();
 }
 
 LevelEditManager.prototype.Disable = function(){
@@ -250,34 +293,15 @@ LevelEditManager.prototype.MouseUp = function(e){
 LevelEditManager.prototype.PlaceTile = function(tile_x, tile_y, right_click){
 	var tile = room.tiles[tile_y][tile_x];
 	tile.kill_player = false;
-	//tile.tileset_x = level_edit_tile_img_x;
-	//tile.tileset_y = level_edit_tile_img_y;
+	tile.tileset_x = this.tile_img_x;
+	tile.tileset_y = this.tile_img_y;
 	if (right_click){ //RIGHT CLICK. REMOVE Tile
 		tile.collision = Tile.GHOST;
 		tile.tileset_x = 0;
 		tile.tileset_y = 0;
 	}else{
-		tile.collision = Tile.SOLID;
-		tile.tileset_x = 0;
-		tile.tileset_y = 1;
-		/*switch (level_edit_object){
-			case Tile.SOLID:
-				tile.collision = Tile.SOLID;
-				break;
-			case Tile.SUPER_SOLID:
-				tile.collision = Tile.SUPER_SOLID;
-				break;
-			case Tile.FALLTHROUGH:
-				tile.collision = Tile.FALLTHROUGH;
-				break;
-			case Tile.KILL_PLAYER:
-				tile.collision = Tile.KILL_PLAYER;
-				tile.kill_player = true;
-				break;
-			default:
-				tile.collision = Tile.GHOST;
-				break;
-		}*/
+		var collision = document.querySelector('input[name="collision"]:checked').value;
+		tile.collision = eval(collision);
 	}
 }
 
@@ -296,6 +320,12 @@ LevelEditManager.prototype.AddGlitch = function(){
 	room.glitch_sequence.push(eval(ledit_getSelected("glitch_options")));
 	room.glitch_index = 0;
 	room.glitch_time = 0;
+}
+
+LevelEditManager.prototype.TrueSave = function(){
+	Dialog.Confirm("this will overwrite current main<br/>MAKE SURE EVERYTHING IS OK", function(){
+		level_edit_manager.Save('main', true)
+	}, "save to main?", "YES, save");
 }
 
 LevelEditManager.prototype.Save = function(level_name, should_alert){

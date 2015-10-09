@@ -89,6 +89,7 @@ var startGame = function(){
 	room_manager = new House();
 	room_manager.Import("main", function(){
 		room = room_manager.GetRoom();
+		level_edit_manager.setTileImg(0, 1);
 		
 		//Let's play the game!
 		console.log("start");

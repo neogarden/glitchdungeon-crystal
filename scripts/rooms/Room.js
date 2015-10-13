@@ -1,8 +1,8 @@
 Room.GLITCH_TIME_LIMIT_ORIGINAL = 240;
 
 function Room(){
-  this.index_x = 0;
-  this.index_y = 0;
+	this.index_x = 0;
+	this.index_y = 0;
 	this.SCREEN_WIDTH = GAME_WIDTH;
 	this.SCREEN_HEIGHT = GAME_HEIGHT;
 	
@@ -129,26 +129,21 @@ Room.prototype.Update = function(input){
 }
 
 Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
+	var new_coords = [0, 0];
+	
 	//OFFSCREEN TOP
 	if (this.player.y + this.player.bb <= 0){
+		new_coords = [0, -1];
 		room_manager.room_index_y--;
-		if (room_manager.room_index_y < 0) room_manager.room_index_y = room_manager.house_height - 1;
 		
-		room_manager.ChangeRoom();
-		
-		room.player.x = this.player.x;
 		if (room.player.x <= 8) room.player.x+=8;
 		if (room.player.x >= room.MAP_WIDTH * Tile.WIDTH -8) room.player.x -= 8;
 		room.player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - room.player.bb;
 	}
 	//OFFSCREEN BOTTOM
 	else if (this.player.y + this.player.tb >= (this.MAP_HEIGHT * Tile.HEIGHT)){
-		room_manager.room_index_y++;
-		if (room_manager.room_index_y >= room_manager.house_height) room_manager.room_index_y = 0;
+		new_coords = [0, 1];
 		
-		room_manager.ChangeRoom();
-		
-		room.player.x = this.player.x;
 		if (room.player.x <= 8) room.player.x+=8;
 		if (room.player.x >= room.MAP_WIDTH * Tile.WIDTH -8) room.player.x -= 8;
 		room.player.y = 0 + Tile.HEIGHT/2 + room.player.tb;
@@ -156,25 +151,27 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	
 	//OFFSCREEN LEFT
 	if (this.player.x <= 0){
-		room_manager.room_index_x--;
-		if (room_manager.room_index_x < 0) room_manager.room_index_x = room_manager.house_width - 1;
+		new_coords = [-1, 0];
 		
 		room.player.facing = Facing.LEFT;
-		room_manager.ChangeRoom();
-		
-		room.player.y = this.player.y;
 		room.player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH/2 - room.player.rb;
 	}
 	//OFFSCREEN RIGHT
 	else if (this.player.x + Tile.WIDTH >= (this.MAP_WIDTH * Tile.WIDTH)){
-		room_manager.room_index_x++;
-		if (room_manager.room_index_x >= room_manager.house_width) room_manager.room_index_x = 0;
+		new_coords = [1, 0];
 		
 		room.player.facing = Facing.RIGHT;
-		room_manager.ChangeRoom();
-		
-		room.player.y = this.player.y;
 		room.player.x = 0 + Tile.WIDTH/2 - room.player.lb;
+	}
+	
+	var player = room.player;
+	
+	if (new_coords[0] !== 0 || new_coords[1] !== 0){
+		room_manager.room_index_x = new_coords[0];
+		room_manager.room_index_y = new_coords[1];		
+		
+		room_manager.ChangeRoom();
+		room.player = player;
 	}
 }
 

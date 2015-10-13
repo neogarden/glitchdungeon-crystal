@@ -170,6 +170,8 @@ House.prototype.ChangeRoom = function(){
 		
 	if (this.old_room_index_x != this.room_index_x || this.old_room_index_y != this.room_index_y){
 		room = this.GetRoom();
+		room.index_x = this.room_index_x;
+		room.index_y = this.room_index_y;
 		room.player.facing = clone.facing;
 		room.player.vel = clone.vel;
 		room.player.on_ground = clone.on_ground;

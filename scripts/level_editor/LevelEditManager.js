@@ -5,6 +5,7 @@ function LevelEditManager(){
 	this.entity = undefined;
 	this.entity_grav_acc = 0;
 	
+	this.ctx_menu_visible = false;
 	this.ctx_menu_timer = 0;
 	this.ctx_menu_time_limit = 3;
 	
@@ -79,6 +80,7 @@ LevelEditManager.prototype.Disable = function(){
 LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 	var ctx_menu = CtxMenu.Init(x, y, document.body);
 	ctx_menu.Open();
+	this.ctx_menu_visible = true;
 	
 	//MODE OPTIONS
 	ctx_menu.AddItem("toggle tile mode", function(){
@@ -223,7 +225,9 @@ LevelEditManager.prototype.MouseDown = function(e){
 			}
 		}.bind(this), 100);
 	}else{
-		timer_callback();
+		if (!this.ctx_menu_visible)
+			timer_callback();
+		this.ctx_menu_visible = false;
 	}
 }
 

@@ -6,6 +6,7 @@ function House(){
 	this.time = 0;
 	this.beat_game = false;
 	this.submitted = false;
+	player;
 
 	this.num_artifacts = 0;
 	this.has_spellbook = false;
@@ -15,8 +16,6 @@ function House(){
 
 	this.room_index_x = 0;
 	this.room_index_y = 0;
-	this.old_room_index_x = 0;
-	this.old_room_index_y = 0;
 }
 
 House.prototype.Export = function(){
@@ -32,7 +31,7 @@ House.prototype.Export = function(){
       room.index_x = j;
       
       room_row.push(room);
-      etc.room_indices.push({y: i, x: j});
+      etc.room_indices.push({x: j, y: i});
     }
     room_jsons.push(room_row);
   }
@@ -47,6 +46,8 @@ House.prototype.Import = function(level_name, callback){
 	var needs_loading = 0;
 	this.level_name = level_name;
 	
+	player = new Player(13, 72);
+	
 	FileManager.loadFile(path + "etc.json", function(err, json){
 		if (err){
 			alert("error loading level");
@@ -57,13 +58,13 @@ House.prototype.Import = function(level_name, callback){
 		this.etc = JSON.parse(json);
 		needs_loading = this.etc.room_indices.length;
 		
-		this.rooms = [];
+		this.rooms = {};
 		
 		for (var i = 0; i < this.etc.room_indices.length; i++){
 			var index = this.etc.room_indices[i];
 			var y = index.y;
 			var x = index.x;
-			FileManager.loadFile(path + y + "_" + x + ".json", function(y, x, error, json){
+			FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){
 				if (error){
 					alert("error loading level");
 					console.log(error);
@@ -81,10 +82,10 @@ House.prototype.Import = function(level_name, callback){
 					//FINISHED LOADING ALL THE LEVELS
 					var room = this.rooms[this.room_index_y][this.room_index_x];
 					this.checkpoint = {
-						x: room.player.x, y: room.player.y,
+						x: player.x, y: player.y,
 						room_x: this.room_index_x,
 						room_y: this.room_index_y,
-						facing: room.player.facing
+						facing: player.facing
 					};
 					this.old_checkpoint = null;
 					this.new_checkpoint = null;
@@ -112,30 +113,23 @@ House.prototype.Restart = function(){
 
 	this.room_index_x = 0;
 	this.room_index_y = 0;
-	this.old_room_index_x = 0;
-	this.old_room_index_y = 0;
-	
-	for (var i = 0; i < this.old_rooms.length; i++){
-		for (var j = 0; j < this.old_rooms[i].length; j++){
-			this.rooms[i][j].Import(this.old_rooms[i][j]);
-		}
-	}
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
-	room.player.x = 20;
-	room.player.y = 72;
-	room.player.facing = Facing.RIGHT;
-	room.player.vel = {x: 0, y: 0};
-	room.player.stuck_in_wall = false;
+	player.x = 20;
+	player.y = 72;
+	player.facing = Facing.RIGHT;
+	player.vel = {x: 0, y: 0};
+	player.stuck_in_wall = false;
 	this.DeactivateCheckpoints();
 	this.checkpoint = {
-		x: room.player.x, y: room.player.y,
+		x: player.x, y: player.y,
 		room_x: this.room_index_x,
 		room_y: this.room_index_y,
-		facing: room.player.facing
+		facing: player.facing
 	};
 	this.old_checkpoint = null;
 	this.new_checkpoint = null;
+	player = player;
 }
 
 House.prototype.Reset = function(){
@@ -145,10 +139,10 @@ House.prototype.Reset = function(){
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {
-		x: room.player.x, y: room.player.y,
+		x: player.x, y: player.y,
 		room_x: this.room_index_x,
 		room_y: this.room_index_y,
-		facing: room.player.facing
+		facing: player.facing
 	};
 	
 	this.num_artifacts = 0;
@@ -157,14 +151,12 @@ House.prototype.Reset = function(){
 }
 
 House.prototype.GetRoom = function(){
-	console.log(this.room_index_x, this.room_index_y);
 	return this.rooms[this.room_index_y][this.room_index_x];
 }
 
 House.prototype.ChangeRoom = function(){
-	var clone = room.player;
-	room.player.pressing_down = false;
-	room.player.pressed_down = false;
+	player.pressing_down = false;
+	player.pressed_down = false;
 	var glitch_type = this.glitch_type;
 	var could_use_spellbook = room.can_use_spellbook;
 		
@@ -172,10 +164,6 @@ House.prototype.ChangeRoom = function(){
 		room = this.GetRoom();
 		room.index_x = this.room_index_x;
 		room.index_y = this.room_index_y;
-		room.player.facing = clone.facing;
-		room.player.vel = clone.vel;
-		room.player.on_ground = clone.on_ground;
-		
 		
 		room.glitch_type = glitch_type;
 		if (!this.has_spellbook || !room.can_use_spellbook){
@@ -194,6 +182,8 @@ House.prototype.ChangeRoom = function(){
 	this.old_room_index_x = this.room_index_x;
 	this.old_room_index_y = this.room_index_y;
 	
+	player = player;
+	
 	room.Speak(null);
 	if (!room.can_use_spellbook)
 		room.Speak("a dark force prevents\nyou from casting\nspells here");
@@ -204,7 +194,7 @@ House.prototype.ChangeRoom = function(){
 	}else{
 		Glitch.TransformPlayer(room, room.glitch_type); //this.glitch);
 	}
-	//room.player.die_to_suffocation = true;
+	//player.die_to_suffocation = true;
 	
 	var temp_bg_name = "Rolemusic_deathOnTheBattlefield";
 	if (this.room_index_x === 5 && this.room_index_y === 0 && bg_name !== temp_bg_name){
@@ -227,7 +217,7 @@ House.prototype.ChangeRoom = function(){
 		}
 		
 		room.ChangeSize(320, 120);
-		room.player.x = 16;
+		player.x = 16;
 	}
 }
 
@@ -275,37 +265,41 @@ House.prototype.RevivePlayer = function(){
 		for (var i = 0; i < room.entities.length; i++){
 			var entity = room.entities[i];
 			if (entity instanceof Checkpoint && entity.id === this.checkpoint.id){
-				room.player.x = entity.x;
-				room.player.y = entity.y;
+				player.x = entity.x;
+				player.y = entity.y;
 			}
 		}
 	}else{
-		room.player.x = this.checkpoint.x;
-		room.player.y = this.checkpoint.y;
+		player.x = this.checkpoint.x;
+		player.y = this.checkpoint.y;
 	}
-	room.player.facing = this.checkpoint.facing;
-	room.player.die_to_suffocation = true;
+	player.facing = this.checkpoint.facing;
+	player.die_to_suffocation = true;
 	console.log("num deaths: " + this.num_deaths);
-	
-	this.RemoveGlitchedCheckpoint();
 }
 
 House.prototype.DeactivateCheckpoints = function(){
-	for (var i = 0; i < this.rooms.length; i++){
-		for (var j = 0; j < this.rooms[i].length; j++){
+	var is_glitched = false;
+	for (var i in this.rooms){
+		for (var j in this.rooms[i]){
 			var room = this.rooms[i][j];
 			for (var k = 0; k < room.entities.length; k++){
 				if (room.entities[k].type === "Checkpoint"){
+					if (room.entities[k].is_glitched){
+						is_glitched = true;
+						continue;
+					}
 					room.entities[k].Deactivate();
 				}
 			}
 		}
 	}
+	return !is_glitched;
 }
 
 House.prototype.RemoveGlitchedCheckpoint = function(){
-	for (var i = 0; i < this.rooms.length; i++){
-		for (var j = 0; j < this.rooms[i].length; j++){
+	for (var i in this.rooms){
+		for (var j in this.rooms[i]){
 			for (var k = 0; k < this.rooms[i][j].entities.length; k++){
 				if (this.rooms[i][j].entities[k].type == "Checkpoint" && this.rooms[i][j].entities[k].is_glitched){
 					this.rooms[i][j].entities.splice(k, 1);

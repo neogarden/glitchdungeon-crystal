@@ -193,6 +193,7 @@ var tick = function(){
 	then = now;
 }
 
+var player;
 var update = function(){
     room.Update(input_manager);
 	key_manager.ForgetKeysPressed();

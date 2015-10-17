@@ -13,17 +13,18 @@ function Checkpoint(x, y){
 Checkpoint.prototype.Update = function(map){
 	GameSprite.prototype.Update.call(this, map);
 	
-	if (this.IsColliding(map.player)){
-		map.player.touching_checkpoint = true;
+	if (this.IsColliding(player)){
+		player.touching_checkpoint = true;
 		if (!this.active){
-			if (!this.is_glitched) room_manager.RemoveGlitchedCheckpoint();
-			room_manager.DeactivateCheckpoints();
+			//if (!this.is_glitched) room_manager.RemoveGlitchedCheckpoint();
+			if (!room_manager.DeactivateCheckpoints() && !this.is_glitched)
+				return;
 			room_manager.checkpoint = {
 				id: this.id,
 				x: this.x, y: this.y, //failsafe, unnecessary
 				room_x: room_manager.room_index_x,
 				room_y: room_manager.room_index_y,
-				facing: room.player.facing
+				facing: player.facing
 			}
 			Utils.playSound("checkpoint", master_volume, 0);
 			this.active = true;

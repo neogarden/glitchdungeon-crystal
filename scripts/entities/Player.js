@@ -24,6 +24,9 @@ Player.prototype.Update = function(map){
 	this.touching_checkpoint = false;
 }
 
+Player.prototype.PressX = function(){
+}
+
 Player.prototype.DieToSpikesAndStuff = function(map){
 	var q = 3;
 	var x = this.x;
@@ -63,7 +66,5 @@ Player.prototype.Die = function(){
 	Utils.playSound("hurt", master_volume, 0);
 	room_manager.RevivePlayer();
 }
-
-
 
 extend(GameMover, Player);

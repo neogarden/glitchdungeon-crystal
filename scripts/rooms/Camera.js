@@ -14,7 +14,6 @@ function Camera(x, y){
 }
 		
 Camera.prototype.Update = function(map){
-	var player = map.player;
 	//Horizontal panning RIGHT
 	if (player.x + player.rb + this.x_lim - this.x >= this.width){
 		if (this.x < map.MAP_WIDTH * Tile.WIDTH - this.width){

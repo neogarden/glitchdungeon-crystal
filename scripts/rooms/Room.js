@@ -32,12 +32,11 @@ function Room(){
 }
 
 Room.prototype.CreateEntities = function(){
-	this.player = new Player(GAME_WIDTH/2, GAME_HEIGHT-Tile.HEIGHT-16);
 	this.entities = [];
 }
 
 Room.prototype.GetEntityAtXY = function(x, y){
-	if (this.player.IsPointColliding(x, y)) return this.player;
+	if (player.IsPointColliding(x, y)) return player;
 	
 	for (var i = 0; i < this.entities.length; i++){
 		var entity = this.entities[i];
@@ -81,9 +80,9 @@ Room.prototype.isValidTile = function(i, j){
 }
 
 Room.prototype.Update = function(input){
-	input.Update(this.player);
+	input.Update(player);
 	if (this.paused) return;
-	this.player.Update(this);
+	player.Update(this);
 	this.TryUpdateRoomIfPlayerOffscreen();
 	this.camera.Update(this);
 	
@@ -132,46 +131,42 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	var new_coords = [0, 0];
 	
 	//OFFSCREEN TOP
-	if (this.player.y + this.player.bb <= 0){
+	if (player.y + player.bb <= 0){
 		new_coords = [0, -1];
-		room_manager.room_index_y--;
 		
-		if (room.player.x <= 8) room.player.x+=8;
-		if (room.player.x >= room.MAP_WIDTH * Tile.WIDTH -8) room.player.x -= 8;
-		room.player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - room.player.bb;
+		if (player.x <= 8) player.x+=8;
+		if (player.x >= room.MAP_WIDTH * Tile.WIDTH -8) player.x -= 8;
+		player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - player.bb;
 	}
 	//OFFSCREEN BOTTOM
-	else if (this.player.y + this.player.tb >= (this.MAP_HEIGHT * Tile.HEIGHT)){
+	else if (player.y + player.tb >= (this.MAP_HEIGHT * Tile.HEIGHT)){
 		new_coords = [0, 1];
 		
-		if (room.player.x <= 8) room.player.x+=8;
-		if (room.player.x >= room.MAP_WIDTH * Tile.WIDTH -8) room.player.x -= 8;
-		room.player.y = 0 + Tile.HEIGHT/2 + room.player.tb;
+		if (player.x <= 8) player.x+=8;
+		if (player.x >= room.MAP_WIDTH * Tile.WIDTH -8) player.x -= 8;
+		player.y = 0 + Tile.HEIGHT/2 + player.tb;
 	}
 	
 	//OFFSCREEN LEFT
-	if (this.player.x <= 0){
+	if (player.x <= 0){
 		new_coords = [-1, 0];
 		
-		room.player.facing = Facing.LEFT;
-		room.player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH/2 - room.player.rb;
+		player.facing = Facing.LEFT;
+		player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH/2 - player.rb;
 	}
 	//OFFSCREEN RIGHT
-	else if (this.player.x + Tile.WIDTH >= (this.MAP_WIDTH * Tile.WIDTH)){
+	else if (player.x + Tile.WIDTH >= (this.MAP_WIDTH * Tile.WIDTH)){
 		new_coords = [1, 0];
 		
-		room.player.facing = Facing.RIGHT;
-		room.player.x = 0 + Tile.WIDTH/2 - room.player.lb;
+		player.facing = Facing.RIGHT;
+		player.x = 0 + Tile.WIDTH/2 - player.lb;
 	}
 	
-	var player = room.player;
-	
 	if (new_coords[0] !== 0 || new_coords[1] !== 0){
-		room_manager.room_index_x = new_coords[0];
-		room_manager.room_index_y = new_coords[1];		
+		room_manager.room_index_x += new_coords[0];
+		room_manager.room_index_y += new_coords[1];		
 		
 		room_manager.ChangeRoom();
-		room.player = player;
 	}
 }
 
@@ -194,7 +189,7 @@ Room.prototype.RenderSpeech = function(ctx){
 		}
 		
 		var h = 0;
-		if (this.player.y+(this.player.bb/2) >= GAME_HEIGHT/2)
+		if (player.y+(player.bb/2) >= GAME_HEIGHT/2)
 			h = (-1)*(GAME_HEIGHT/1.5)+Tile.HEIGHT;
 		
 		ctx.fillStyle = "#ffffff";
@@ -228,7 +223,7 @@ Room.prototype.RenderSpeech = function(ctx){
 Room.prototype.Render = function(ctx, level_edit){
 	//SORT ENTITIES BY Z INDEX (descending)
 	var entities = this.entities.slice(0);
-	entities.push(this.player);
+	entities.push(player);
 	entities.sort(GameObject.ZIndexSort);
 	var index = 0;
 
@@ -330,7 +325,6 @@ Room.prototype.Export = function(){
 		,glitch_sequence: this.glitch_sequence
 		,glitch_time_limit: this.glitch_time_limit
 		,can_use_spellbook: this.can_use_spellbook
-		,player: {type: "Player", obj: this.player.Export()}
 		,entities: entities
 		,tiles: tiles
 		,bg_code: this.bg_code
@@ -358,7 +352,6 @@ Room.Import = function(file_name){
 
 Room.prototype.Import = function(room){
 	this.ChangeSize(room.width, room.height);
-	this.player = new Player(); this.player.Import(room.player.obj);
 	this.glitch_index = 0;
 	this.glitch_time = 0;
 	this.glitch_time_limit = room.glitch_time_limit || Room.GLITCH_TIME_LIMIT_ORIGINAL;

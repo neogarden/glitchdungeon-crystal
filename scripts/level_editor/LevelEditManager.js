@@ -344,7 +344,7 @@ LevelEditManager.prototype.Save = function(level_name, should_alert){
             var room = json.rooms[i][j];
             var ikey = room.index_y;
             var jkey = room.index_x;
-            FileManager.saveFile(path + ikey + "_" + jkey + ".json",
+            FileManager.saveFile(path + jkey + "_" + ikey + ".json",
               JSON.stringify(room));
           }
         }

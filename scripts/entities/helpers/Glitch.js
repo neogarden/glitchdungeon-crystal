@@ -19,7 +19,7 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual){
 	Glitch.PREVIOUS = glitch_type;
 	if (glitch_type === Glitch.NEGATIVE){
 		die_to_suffocation = false;
-		map.player.stuck_in_wall = false;
+		player.stuck_in_wall = false;
 	}
 	if (room_manager) room_manager.glitch_type = glitch_type;
 	normalize = defaultValue(normalize, true);
@@ -27,68 +27,73 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual){
 	
 	//Normalize the player before transforming
 	if (normalize){
-		var facing = map.player.facing;
-		var vel = map.player.vel;
-		var is_jumping = map.player.is_jumping;
-		var jump_timer = map.player.jump_timer;
-		var jump_time_limit = map.player.jump_time_limit;
-		var on_ground = map.player.on_ground;
-		var stuck_in_wall = map.player.stuck_in_wall;
-		map.player = new Player(map.player.x, map.player.y);
-		map.player.die_to_suffocation = die_to_suffocation;
-		map.player.stuck_in_wall = stuck_in_wall;
-		map.player.facing = facing;
-		map.player.vel = vel;
-		map.player.is_jumping = is_jumping;
-		map.player.jump_timer = jump_timer;
-		map.player.jump_time_limit = jump_time_limit;
-		map.player.on_ground = on_ground;
-		if (map.player.is_jumping)
-			map.player.grav_acc = map.player.float_grav_acc;
-		//map.player.grav_acc = grav_acc;
+		var facing = player.facing;
+		var vel = player.vel;
+		var is_jumping = player.is_jumping;
+		var jump_timer = player.jump_timer;
+		var jump_time_limit = player.jump_time_limit;
+		var on_ground = player.on_ground;
+		var stuck_in_wall = player.stuck_in_wall;
+		var checkpoint_power = player.has_glitch_checkpoint;
+		player = new Player(player.x, player.y);
+		player.die_to_suffocation = die_to_suffocation;
+		player.stuck_in_wall = stuck_in_wall;
+		player.facing = facing;
+		player.vel = vel;
+		player.is_jumping = is_jumping;
+		player.jump_timer = jump_timer;
+		player.jump_time_limit = jump_time_limit;
+		player.on_ground = on_ground;
+		if (player.is_jumping)
+			player.grav_acc = player.float_grav_acc;
+		//player.grav_acc = grav_acc;
 		if (map.glitch_type != Glitch.RED){
-			map.player.on_ground = false;
+			player.on_ground = false;
 		}
-		map.player.was_on_ground = true;
+		player.was_on_ground = true;
+		if (checkpoint_power !== undefined)
+			Glitch.PinkTransform();
+		player.has_glitch_checkpoint = checkpoint_power;
+		player.on_ground = true;
 
 		map.tilesheet_name = "tile_grey_sheet";
 	}
 
-	var oldbb = map.player.bb;
+	var oldbb = player.bb;
 	switch (glitch_type){
 		case Glitch.GREY:
 			break;
 		case Glitch.RED:
-			Glitch.RedTransform(map, map.player, only_visual);
+			Glitch.RedTransform(map, only_visual);
 			break;
 		case Glitch.GREEN:
-			Glitch.GreenTransform(map, map.player, only_visual);
+			Glitch.GreenTransform(map, only_visual);
 			break;
 		case Glitch.BLUE:
-			Glitch.BlueTransform(map, map.player, only_visual);
+			Glitch.BlueTransform(map, only_visual);
 			break;
 		case Glitch.GOLD:
-			Glitch.GoldTransform(map, map.player, only_visual);
+			Glitch.GoldTransform(map, only_visual);
 			break;
 		case Glitch.ZERO:
-			Glitch.ZeroTransform(map, map.player, only_visual);
+			Glitch.ZeroTransform(map, only_visual);
 			break;
 		case Glitch.NEGATIVE:
-			Glitch.NegativeTransform(map, map.player, only_visual);
+			Glitch.NegativeTransform(map, only_visual);
 			break;
 		case Glitch.PINK:
-			Glitch.PinkTransform(map, map.player, only_visual);
+			Glitch.PinkTransform(map, only_visual);
 			break;
 		default: break;
 	}
 
-	map.player.y += oldbb - map.player.bb;
-	map.player.image = eval("resource_manager." + map.player.img_name);
+	player.y += oldbb - player.bb;
+	player.image = eval("resource_manager." + player.img_name);
 }
 extend(GameSprite, Glitch);
 
 //******GLITCH TRANSFORMATION DEFINTIIONS***************************/
-Glitch.RedTransform = function(map, player, only_visual){
+Glitch.RedTransform = function(map, only_visual){
 	player.img_name = "player_red_sheet";
 	if (only_visual) return;
 	map.tilesheet_name = "tile_red_sheet";
@@ -114,7 +119,7 @@ Glitch.RedTransform = function(map, player, only_visual){
 	}
 }
 
-Glitch.GreenTransform = function(map, player, only_visual){
+Glitch.GreenTransform = function(map, only_visual){
 	player.img_name = "player_green_sheet";
 	if (only_visual) return;
 	map.tilesheet_name = "tile_green_sheet";
@@ -158,7 +163,7 @@ Glitch.GreenTransform = function(map, player, only_visual){
 	}
 }
 
-Glitch.ZeroTransform = function(map, player, only_visual){
+Glitch.ZeroTransform = function(map, only_visual){
 	player.img_name = "player_zero_sheet";
 	if (only_visual) return;
 	map.tilesheet_name = "tile_zero_sheet";
@@ -172,7 +177,7 @@ Glitch.ZeroTransform = function(map, player, only_visual){
 	}*/
 }
 
-Glitch.BlueTransform = function(map, player, only_visual){
+Glitch.BlueTransform = function(map, only_visual){
 	player.img_name = "player_blue_sheet";
 	if (only_visual) return;
 	map.tilesheet_name = "tile_blue_sheet";
@@ -262,7 +267,7 @@ Glitch.BlueTransform = function(map, player, only_visual){
 	}
 }
 
-Glitch.GoldTransform = function(map, player, only_visual){
+Glitch.GoldTransform = function(map, only_visual){
 	player.img_name = "player_gold_sheet";
 	if (only_visual) return;
 	map.tilesheet_name = "tile_gold_sheet";
@@ -317,7 +322,7 @@ Glitch.GoldTransform = function(map, player, only_visual){
 	}
 }
 
-Glitch.NegativeTransform = function(map, player, only_visual){
+Glitch.NegativeTransform = function(map, only_visual){
 	player.img_name = "player_negative_sheet";
 	if (only_visual) return;
 	map.tilesheet_name = "tile_negative_sheet";
@@ -402,31 +407,36 @@ Glitch.NegativeTransform = function(map, player, only_visual){
 	player.DieToSuffocation = function(map){};
 }
 
-Glitch.PinkTransform = function(map, player, only_visual){
-	player.img_name = "player_pink_sheet";
-	if (only_visual) return;
-	map.tilesheet_name = "tile_pink_sheet";
+Glitch.PinkTransform = function(map){
+	//player.img_name = "player_pink_sheet";
+	//if (only_visual) return;
+	//map.tilesheet_name = "tile_pink_sheet";
 	
-	player.PressDown = function(){
-		this.pressing_down = true;
-		this.pressed_down = true;
-		this.on_ground = false;
-		
-		if (!this.touching_door && !this.touching_checkpoint){
+	if (player.has_glitch_checkpoint === undefined)
+		player.has_glitch_checkpoint = false;
+	
+	player.PressX = function(){
+		if (!player.has_glitch_checkpoint){
+			if (!this.touching_door && !this.touching_checkpoint){			
+				room_manager.new_checkpoint = {
+					x: this.x, y: this.y, 
+					room_x: room_manager.room_index_x,
+					room_y: room_manager.room_index_y,
+					facing: this.facing
+				};
+				room_manager.old_checkpoint = room_manager.checkpoint;
+			
+				var checkpoint = new Checkpoint(this.x, this.y);
+				checkpoint.lex = 3;
+				checkpoint.is_glitched = true;
+				room.entities.push(checkpoint);
+				
+				player.has_glitch_checkpoint = true;
+			}
+		}else{
 			room_manager.RemoveGlitchedCheckpoint();
-		
-			room_manager.new_checkpoint = {
-				x: this.x, y: this.y, 
-				room_x: room_manager.room_index_x,
-				room_y: room_manager.room_index_y,
-				facing: this.facing
-			};
-			room_manager.old_checkpoint = room_manager.checkpoint;
-		
-			var checkpoint = new Checkpoint(this.x, this.y);
-			checkpoint.lex = 3;
-			checkpoint.is_glitched = true;
-			room.entities.push(checkpoint);
+			
+			player.has_glitch_checkpoint = false;
 		}
 	}
 }

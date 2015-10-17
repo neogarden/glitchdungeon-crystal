@@ -39,8 +39,8 @@ NPC.prototype.Update = function(map){
 	
 	var d = 16;
 	var dy = 8;
-	var px = map.player.x + (map.player.rb/2);
-	if (map.player.y + map.player.bb > this.y - dy && map.player.y < this.y + this.bb + dy){
+	var px = player.x + (player.rb/2);
+	if (player.y + player.bb > this.y - dy && player.y < this.y + this.bb + dy){
 		if (px < this.x + this.lb && px > this.x + this.lb - d){
 			this.facing = Facing.LEFT;
 		}
@@ -51,7 +51,7 @@ NPC.prototype.Update = function(map){
 	
 	
 	//TALK TO PLAYER AND SUCH
-	if (this.IsRectColliding(map.player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
+	if (this.IsRectColliding(player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
 		if (!this.talking) this.advanced = true;
 		this.talking = true;
 		
@@ -60,11 +60,11 @@ NPC.prototype.Update = function(map){
 			240,
 			this.npc_dialog.length > 1);
 		
-		if (map.player.pressing_down && !this.advanced){
+		if (player.pressing_down && !this.advanced){
 			this.incrementDialog();
 			this.advanced = true;
 		}
-		if (!map.player.pressing_down)
+		if (!player.pressing_down)
 			this.advanced = false;
 	}
 	else if (this.talking){
@@ -112,7 +112,7 @@ NPC.prototype.GetText = function(){
 		case 3:
 			return "press space bar or numbers\n to cast a spell";
 		case 4:
-			return "press down to\nplace a memory";
+			return "press X to\nplace a memory.\npress X again to forget";
 		case 5:
 			return "are we free now?";
 		case 6:

@@ -39,14 +39,27 @@ House.prototype.Export = function(){
   return {rooms: room_jsons, etc: JSON.stringify(etc)};
 }
 
-House.prototype.Import = function(level_name, callback){
+House.prototype.SoftImport = function(level_name, callback){
+	this.Import(level_name, function(){
+		for (var i in this.rooms){
+			for (var j in this.rooms[i]){
+				old_rooms[i][j] = this.rooms[i][j];
+			}
+		}
+		callback();
+	}, false);
+}
+
+House.prototype.Import = function(level_name, callback, reset_rooms){
+	if (reset_rooms === undefined) reset_rooms = true;
 	var path = this.path + "/" + level_name + "/";
 	
 	var loaded = 0;
 	var needs_loading = 0;
 	this.level_name = level_name;
 	
-	player = new Player(13, 72);
+	if (player === undefined)
+		player = new Player(13, 72);
 	
 	FileManager.loadFile(path + "etc.json", function(err, json){
 		if (err){
@@ -58,7 +71,8 @@ House.prototype.Import = function(level_name, callback){
 		this.etc = JSON.parse(json);
 		needs_loading = this.etc.room_indices.length;
 		
-		this.rooms = {};
+		if (reset_rooms)
+			this.rooms = {};
 		
 		for (var i = 0; i < this.etc.room_indices.length; i++){
 			var index = this.etc.room_indices[i];
@@ -151,7 +165,9 @@ House.prototype.Reset = function(){
 }
 
 House.prototype.GetRoom = function(){
-	return this.rooms[this.room_index_y][this.room_index_x];
+	if (this.rooms[this.room_index_y] !== undefined)
+		return this.rooms[this.room_index_y][this.room_index_x];
+	else return undefined;
 }
 
 House.prototype.ChangeRoom = function(){
@@ -159,6 +175,22 @@ House.prototype.ChangeRoom = function(){
 	player.pressed_down = false;
 	var glitch_type = this.glitch_type;
 	var could_use_spellbook = room.can_use_spellbook;
+	
+	if (this.GetRoom() === undefined){
+		if (this.rooms[this.room_index_y] !== undefined){
+			if (this.room_index_x < 0){
+				var room_row = Object.keys(this.rooms[this.room_index_y]);
+				this.room_index_x = room_row[room_row.length-1];
+			}else
+				this.room_index_x = 0;
+		}else{
+			if (this.room_index_y < 0){
+				var room_col = Object.keys(this.rooms);
+				this.room_index_y =  room_col[room_col.length-1];
+			}else
+				this.room_index_y = 0;
+		}
+	}
 		
 	if (this.old_room_index_x != this.room_index_x || this.old_room_index_y != this.room_index_y){
 		room = this.GetRoom();

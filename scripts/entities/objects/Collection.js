@@ -107,22 +107,20 @@ Collection.prototype.GetEvent = function(){
 			room.tiles[5][12].collision = Tile.SOLID;
 			room.tiles[5][12].tileset_x = 0;
 			
-			/*for (var i = 0; i < room_manager.rooms.length; i++){
-				for (var j = 0; j < room_manager.rooms[i].length; j++){
-					for (var k = 0; k < room_manager.rooms[i][j].entities.length; k++){
-						if (room_manager.rooms[i][j].entities[k].type === "Collection"){
-							room_manager.rooms[i][j].entities[k].Update = GameSprite.prototype.Update;
+			room_manager.SoftImport("glitched", function(){ 
+				room = room_manager.GetRoom(); 
+				
+				for (var i in room_manager.rooms){
+					for (var j in room_manager.rooms[i]){
+						for (var k = 0; k < room_manager.rooms[i][j].entities.length; k++){
+							if (room_manager.rooms[i][j].entities[k].type === "Collection"){
+								room_manager.rooms[i][j].entities[k].Update = GameSprite.prototype.Update;
+							}
 						}
 					}
 				}
-			}*/
-			
-			var door = room_manager.rooms[0][1].GetDoor(2, null);
-			door.room_x = 2;
-			door.room_y = 0;
-			door = room_manager.rooms[0][1].GetDoor(0, null);
-			door.room_x = 1;
-			door.room_y = 0;
+			});
+
 			
 			bg_name = "TomWoxom_North";
 			if (resource_manager.play_music){

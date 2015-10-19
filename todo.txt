@@ -1,2 +1,1 @@
-1. rearrange rooms so that glitch dungeon 1 is playable!!!
-	-offscreen left of final spell room is a different set of room identical to previous rooms but "glitched"
+1. start designing "HARD MODE"

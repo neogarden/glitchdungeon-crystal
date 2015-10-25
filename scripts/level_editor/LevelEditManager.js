@@ -4,6 +4,7 @@ function LevelEditManager(){
 	this.potential_entity = undefined;
 	this.entity = undefined;
 	this.entity_grav_acc = 0;
+	this.typing = false;
 	
 	this.ctx_menu_visible = false;
 	this.ctx_menu_timer = 0;
@@ -104,8 +105,9 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 		ctx_menu.AddItem("edit " + name, function(){
 			room.paused = true;
 			var options = this.GenerateOptions();
+			level_edit_manager.typing = true;
 			Dialog.Confirm("", options.submit, "edit " + name, "edit",
-				function(){ room.paused = false; }
+				function(){ room.paused = false; level_edit_manager.typing = false; }
 			);
 			Dialog.AddElement(options.dom);
 		}.bind(entity));
@@ -125,19 +127,47 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 		room.paused = true;
 		var npc = new NPC(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
 		var options = npc.GenerateOptions();
+		level_edit_manager.typing = true;
 		Dialog.Confirm("", function(){
 				options.submit();
 				room.entities.push(npc);
 			},
 			"new NPC", "create",
-			function(){ room.paused = false; }
+			function(){ 
+				room.paused = false; 
+				level_edit_manager.typing = false;
+			}
 		);
 		Dialog.AddElement(options.dom);
 	}.bind(this));
+    
 	ctx_menu.AddItem("new Checkpoint", function(){
 		var checkpoint = new Checkpoint(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
 		room.entities.push(checkpoint);
 	}.bind(this));
+    
+    ctx_menu.AddItem("new Powerup", function(){
+        room.paused = true;
+        var powerup = new Collection(tile_x * Tile.WIDTH-8, tile_y * Tile.HEIGHT-8, 0);
+        var options = powerup.GenerateOptions();
+        level_edit_manager.typing = true;
+        Dialog.Confirm("", function(){
+                options.submit();
+                room.entities.push(powerup);
+            }, "new Powerup", "create",
+            function(){
+                room.paused = false;
+                level_edit_manager.typing = false;
+            }
+        );
+        Dialog.AddElement(options.dom);
+    }.bind(this));
+    
+    ctx_menu.AddItem("new Enemy", function(){
+    }.bind(this));
+    
+    ctx_menu.AddItem("new Door", function(){
+    }.bind(this));
 }
 
 LevelEditManager.prototype.DrawGrid = function(ctx, room){

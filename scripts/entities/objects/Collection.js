@@ -3,10 +3,7 @@ function Collection(x, y, collection_id){
 	this.type = "Collection";
 	this.collection_id = collection_id;
 	//this.animation.frame_delay = 30;
-	
-	var ani_x = Math.floor(this.collection_id / 6) * 2;
-	var ani_y = this.collection_id % 6;
-	this.animation.Change(ani_x, ani_y, 2);
+    this.UpdateAnimation();
 	
 	this.z_index = 8;
 }
@@ -24,6 +21,17 @@ Collection.prototype.Export = function(){
 	obj.collection_id = this.collection_id;
 	return obj;
 }
+Collection.prototype.ImportOptions = function(options){
+	this.collection_id = Number(options.collection_id.value);
+    this.UpdateAnimation();
+}
+Collection.prototype.ExportOptions = function(){
+	var options = {};
+    options.collection_id = new TextDropdown(
+        this.GetCollectionTypes(), this.collection_id
+    );
+	return options;
+}
 extend(GameSprite, Collection);
 
 Collection.prototype.Update = function(map){
@@ -31,114 +39,114 @@ Collection.prototype.Update = function(map){
 		this.delete_me = true;
 		Utils.playSound("pickup", master_volume, 0);
 		room_manager.num_artifacts++;
-		room.Speak("item get: "+this.GetName());
-		this.GetEvent();
+		room.Speak("item get: "+this.GetName(false));
+		this.GetName(true);
 	}
+    this.UpdateAnimation();
 	
 	GameSprite.prototype.Update.call(this, map);
 }
 
+Collection.prototype.UpdateAnimation = function(){
+    var ani_x = Math.floor(this.collection_id / 6) * 2;
+	var ani_y = this.collection_id % 6;
+	this.animation.Change(ani_x, ani_y, 2);
+}
 Collection.prototype.UpdateAnimationFromState = function(){
 }
 
-Collection.prototype.GetName = function(){
+Collection.prototype.GetCollectionTypes = function(){
+    var collection_types = [];
+    var i = 0;
+    var old_collection_id = this.collection_id;
+    this.collection_id = i;
+    var name = this.GetName(false);
+    while (name !== undefined){
+        collection_types.push({name: name, value: i});
+        i++;
+        this.collection_id = i;
+        name = this.GetName(false);
+    }
+    return collection_types;
+}
+
+Collection.prototype.GetName = function(activate_event){
 	switch (this.collection_id){
-		case 0: return "grimoire";
-		case 1: return "feather spell";
-		case 2: return "floor spell";
-		case 3: return "gravity spell";
-		case 4: return "wall spell";
-		case 5: return "invis spell";
-		case 6: return "undefined";
-		case 7: return "memory spell";
-		default: break;
+		case 0: 
+            if (activate_event) this.Grimoire(); 
+            return "grimoire";
+		case 1: 
+            if (activate_event) this.FeatherSpell(); 
+            return "feather spell";
+		case 2: 
+            if (activate_event) this.FloorSpell(); 
+            return "floor spell";
+		case 3: 
+            if (activate_event) this.GravitySpell();
+            return "gravity spell";
+		case 4: 
+            if (activate_event) this.WallSpell();
+            return "wall spell";
+		case 5: 
+            if (activate_event) this.InvisSpell();
+            return "invis spell";
+		case 6: 
+            if (activate_event) this.UndefinedSpell();
+            return "undefined";
+		case 7: 
+            if (activate_event) this.MemorySpell();
+            return "memory spell";
+		default: return undefined;
 	}
 }
 
-Collection.prototype.GetEvent = function(){
-	switch (this.collection_id){
-		case 0:
-			room_manager.has_spellbook = true;
-			//var door = room_manager.rooms[4][2].GetDoor(0);
-			//door.locked = true;
-			//door.room_x = 5;
-			//door.room_y = 0;
-			//door.num_artifacts = 5;
-			room_manager.rooms[4][2].entities.push(new NPC(1*Tile.WIDTH, 7*Tile.HEIGHT, 3));
-			room_manager.rooms[4][2].entities.push(new Checkpoint(this.x, this.y));
-			room_manager.rooms[4][2].bg_code = "switch (Ǥlitch_type){\n\tcase Ǥlitch.ǤREY:\n\t\tbreak;\n\tcあse Ǥlitch.RED:\n\t\tǤlitch.RedTrあnsform(mあp, mあp.plあyer, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.ǤREEN:\n\t\tǤlitch.ǤreenTrあnsform(mあp, mあp.player, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.BLUE:";
-			
-			bg_name = "lhommeEraseForm";
-			if (resource_manager.play_music){
-				stopMusic();
-				startMusic();
-			}
-			break;
-		case 1:
-			if (room_manager.spellbook.indexOf(Glitch.GREEN) < 0)
-				room_manager.spellbook.push(Glitch.GREEN);
-			break;
-		case 2:
-			if (room_manager.spellbook.indexOf(Glitch.RED) < 0)
-				room_manager.spellbook.push(Glitch.RED);
-			break;
-		case 3:
-			if (room_manager.spellbook.indexOf(Glitch.BLUE) < 0)
-				room_manager.spellbook.push(Glitch.BLUE);
-			break;
-		case 4:
-			if (room_manager.spellbook.indexOf(Glitch.GOLD) < 0)
-				room_manager.spellbook.push(Glitch.GOLD);
-			break;
-		case 5:
-			if (room_manager.spellbook.indexOf(Glitch.ZERO) < 0)
-				room_manager.spellbook.push(Glitch.ZERO);
-			break;
-		case 6:
-			if (!room_manager.beat_game)
-				Trophy.GiveTrophy(Trophy.POWERS);
-		
-			if (room_manager.spellbook.indexOf(Glitch.NEGATIVE) < 0)
-				room_manager.spellbook.push(Glitch.NEGATIVE);
-			
-			player.y = 3*Tile.HEIGHT;
-			room.tiles[5][11].collision = Tile.SOLID;
-			room.tiles[5][11].tileset_x = 0;
-			room.tiles[5][12].collision = Tile.SOLID;
-			room.tiles[5][12].tileset_x = 0;
-			
-			room_manager.SoftImport("glitched", function(){ 
-				room = room_manager.GetRoom(); 
-				
-				for (var i in room_manager.rooms){
-					for (var j in room_manager.rooms[i]){
-						for (var k = 0; k < room_manager.rooms[i][j].entities.length; k++){
-							if (room_manager.rooms[i][j].entities[k].type === "Collection"){
-								room_manager.rooms[i][j].entities[k].Update = GameSprite.prototype.Update;
-							}
-						}
-					}
-				}
-			});
+Collection.prototype.Grimoire = function(){
+    room_manager.has_spellbook = true;
+    room.bg_code = "switch (Ǥlitch_type){\n\tcase Ǥlitch.ǤREY:\n\t\tbreak;\n\tcあse Ǥlitch.RED:\n\t\tǤlitch.RedTrあnsform(mあp, mあp.plあyer, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.ǤREEN:\n\t\tǤlitch.ǤreenTrあnsform(mあp, mあp.player, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.BLUE:";
+    
+    bg_name = "lhommeEraseForm";
+    if (resource_manager.play_music){
+        stopMusic();
+        startMusic();
+    }
+}
 
-			
-			bg_name = "TomWoxom_North";
-			if (resource_manager.play_music){
-				stopMusic();
-				startMusic();
-			}
-			break;
-		case 7:
-			Trophy.GiveTrophy(Trophy.SECRET);
-		
-			//if (room_manager.spellbook.indexOf(Glitch.PINK) < 0)
-			//	room_manager.spellbook.push(Glitch.PINK);
-			Glitch.PinkTransform();
-			room.entities.push(new NPC(4*Tile.WIDTH, 3*Tile.HEIGHT, 21));
-			room.entities.push(new NPC(8*Tile.WIDTH, 3*Tile.HEIGHT, 4));
-			room.entities.push(new NPC(13*Tile.WIDTH, 3*Tile.HEIGHT, 15));
-			
-			break;
-		default: break;
-	}
+Collection.prototype.FeatherSpell = function(){    
+    if (room_manager.spellbook.indexOf(Glitch.GREEN) < 0)
+        room_manager.spellbook.push(Glitch.GREEN);
+}
+
+Collection.prototype.FloorSpell = function(){
+    if (room_manager.spellbook.indexOf(Glitch.RED) < 0)
+        room_manager.spellbook.push(Glitch.RED);
+}
+
+Collection.prototype.GravitySpell = function(){
+    if (room_manager.spellbook.indexOf(Glitch.BLUE) < 0)
+        room_manager.spellbook.push(Glitch.BLUE);
+}
+
+Collection.prototype.WallSpell = function(){
+    if (room_manager.spellbook.indexOf(Glitch.GOLD) < 0)
+        room_manager.spellbook.push(Glitch.GOLD);
+}
+
+Collection.prototype.InvisSpell = function(){
+    if (room_manager.spellbook.indexOf(Glitch.ZERO) < 0)
+        room_manager.spellbook.push(Glitch.ZERO);
+}
+
+Collection.prototype.UndefinedSpell = function(){    
+    if (room_manager.spellbook.indexOf(Glitch.NEGATIVE) < 0)
+        room_manager.spellbook.push(Glitch.NEGATIVE);
+    
+    bg_name = "TomWoxom_North";
+    if (resource_manager.play_music){
+        stopMusic();
+        startMusic();
+    }
+}
+
+Collection.prototype.MemorySpell = function(){
+    Glitch.PinkTransform();
 }

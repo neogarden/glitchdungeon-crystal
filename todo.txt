@@ -1,1 +1,2 @@
-1. start designing "HARD MODE"
+2. Add creation of enemies
+3. Add creation of doors

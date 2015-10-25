@@ -31,6 +31,8 @@ KeyManager.NUMBERS = [49, 50, 51, 52, 53, 54, 55];
 
 
 KeyManager.prototype.KeyDown = function(e){
+	if (level_edit_manager.typing) return;
+	
 	this.keys_down[e.keyCode] = true;
 	if (!this.keys_have_pressed[e.keyCode]){
 		this.keys_pressed[e.keyCode] = true;
@@ -41,6 +43,8 @@ KeyManager.prototype.KeyDown = function(e){
 }
 
 KeyManager.prototype.KeyUp = function(e){
+	if (level_edit_manager.typing) return;
+	
 	this.keys_up[e.keyCode] = true;
 	
 	delete this.keys_down[e.keyCode];
@@ -55,6 +59,7 @@ KeyManager.prototype.ForgetKeysPressed = function(){
 }
 
 KeyManager.prototype.PreventArrowDefaults = function(e){
+	if (level_edit_manager.typing) return;
 	switch(e.keyCode){
     case KeyManager.LEFT: 
 	case KeyManager.UP: 

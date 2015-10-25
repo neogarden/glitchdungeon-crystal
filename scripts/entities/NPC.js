@@ -95,6 +95,41 @@ NPC.prototype.UpdateAnimationFromState = function(){
 	this.prev_move_state = this.move_state;
 }
 
+NPC.prototype.Render = function(ctx, camera){
+	if (this.image === null || !this.visible) return;
+	var ani = this.animation;
+	var row = ani.rel_ani_y;
+	var column = ani.rel_ani_x + ani.curr_frame;
+	
+	ctx.drawImage(this.image, 
+		//SOURCE RECTANGLE
+		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
+		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
+		ani.frame_width, ani.frame_height,
+		//DESTINATION RECTANGLE
+		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset, 
+		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset,
+		ani.frame_width, ani.frame_height
+	);
+	
+	var f = -1;
+	if (this.facing === Facing.LEFT) f = 1;
+	var v = -this.animation.curr_frame;
+	
+	//NOW DRAW THE HAT
+	if (!room_manager.beat_game) return;
+	ctx.drawImage(resource_manager.hat_grey_sheet, 
+		//SOURCE RECTANGLE
+		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
+		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
+		ani.frame_width, ani.frame_height,
+		//DESTINATION RECTANGLE
+		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f, 
+		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 7 + v,
+		ani.frame_width, ani.frame_height
+	);
+}
+
 //TEXT BABY
 NPC.prototype.GetText = function(){
 	if (this.npc_dialog && this.npc_dialog.length > 0) 

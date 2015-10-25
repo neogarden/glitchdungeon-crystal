@@ -177,7 +177,12 @@ House.prototype.ChangeRoom = function(){
 	var could_use_spellbook = room.can_use_spellbook;
 	
 	if (this.GetRoom() === undefined){
-		if (this.rooms[this.room_index_y] !== undefined){
+        //create new room!!!
+        if (this.rooms[this.room_index_y] === undefined)
+            this.rooms[this.room_index_y] = {};
+        this.rooms[this.room_index_y][this.room_index_x] = new Room();
+        //pacman wrap
+		/*if (this.rooms[this.room_index_y] !== undefined){
 			if (this.room_index_x < 0){
 				var room_row = Object.keys(this.rooms[this.room_index_y]);
 				this.room_index_x = room_row[room_row.length-1];
@@ -189,7 +194,7 @@ House.prototype.ChangeRoom = function(){
 				this.room_index_y =  room_col[room_col.length-1];
 			}else
 				this.room_index_y = 0;
-		}
+		}*/
 	}
 		
 	if (this.old_room_index_x != this.room_index_x || this.old_room_index_y != this.room_index_y){

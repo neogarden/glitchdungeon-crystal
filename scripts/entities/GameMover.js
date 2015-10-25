@@ -166,7 +166,9 @@ GameMover.prototype.DieToSuffocation = function(map){
 	if (dead){ 
 		this.stuck_in_wall = true;
 		//this.Die();
-	}
+	}else{
+        this.stuck_in_wall = false;
+    }
 }
 
 GameMover.prototype.Die = function(){}

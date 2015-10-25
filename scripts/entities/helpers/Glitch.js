@@ -50,11 +50,9 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual){
 		if (map.glitch_type != Glitch.RED){
 			player.on_ground = false;
 		}
-		player.was_on_ground = true;
 		if (checkpoint_power !== undefined)
 			Glitch.PinkTransform();
 		player.has_glitch_checkpoint = checkpoint_power;
-		player.on_ground = true;
 
 		map.tilesheet_name = "tile_grey_sheet";
 	}
@@ -311,7 +309,9 @@ Glitch.GoldTransform = function(map, only_visual){
 				if (!this.horizontal_collision){
 					if (this.vel.y < 0) this.move_state = MoveState.JUMPING;
 					else this.move_state = MoveState.FALLING;
-				}
+				}else{
+                    this.on_ground = true;
+                }
 			}
 		}
 		this.UpdateAnimationFromState();
@@ -418,13 +418,12 @@ Glitch.PinkTransform = function(map){
 	player.PressX = function(){
 		if (!player.has_glitch_checkpoint){
 			if (!this.touching_door && !this.touching_checkpoint){			
-				room_manager.new_checkpoint = {
+				room_manager.glitched_checkpoint = {
 					x: this.x, y: this.y, 
 					room_x: room_manager.room_index_x,
 					room_y: room_manager.room_index_y,
 					facing: this.facing
 				};
-				room_manager.old_checkpoint = room_manager.checkpoint;
 			
 				var checkpoint = new Checkpoint(this.x, this.y);
 				checkpoint.lex = 3;
@@ -434,6 +433,7 @@ Glitch.PinkTransform = function(map){
 				player.has_glitch_checkpoint = true;
 			}
 		}else{
+            room_manager.GlitchRevivePlayer();
 			room_manager.RemoveGlitchedCheckpoint();
 			
 			player.has_glitch_checkpoint = false;

@@ -123,9 +123,11 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 	}
 	
 	//CREATION OPTIONS
+    var px = tile_x * Tile.WIDTH-8;
+    var py = tile_y * Tile.HEIGHT - 8;
 	ctx_menu.AddItem("new NPC", function(){
 		room.paused = true;
-		var npc = new NPC(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
+		var npc = new NPC(px, py);
 		var options = npc.GenerateOptions();
 		level_edit_manager.typing = true;
 		Dialog.Confirm("", function(){
@@ -142,13 +144,13 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 	}.bind(this));
     
 	ctx_menu.AddItem("new Checkpoint", function(){
-		var checkpoint = new Checkpoint(tile_x * Tile.WIDTH - 8, tile_y * Tile.HEIGHT - 8);
+		var checkpoint = new Checkpoint(px, py);
 		room.entities.push(checkpoint);
 	}.bind(this));
     
     ctx_menu.AddItem("new Powerup", function(){
         room.paused = true;
-        var powerup = new Collection(tile_x * Tile.WIDTH-8, tile_y * Tile.HEIGHT-8, 0);
+        var powerup = new Collection(px, py, 0);
         var options = powerup.GenerateOptions();
         level_edit_manager.typing = true;
         Dialog.Confirm("", function(){
@@ -164,6 +166,20 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
     }.bind(this));
     
     ctx_menu.AddItem("new Enemy", function(){
+        room.paused = true;
+        var enemy = new Enemy(px, py, 0);
+        var options = enemy.GenerateOptions();
+        level_edit_manager.typing = true;
+        Dialog.Confirm("", function(){
+                options.submit();
+                room.entities.push(enemy);
+            }, "new Enemy", "create",
+            function(){
+                room.paused = false;
+                level_edit_manager.typing = false;
+            }
+        );
+        Dialog.AddElement(options.dom);
     }.bind(this));
     
     ctx_menu.AddItem("new Door", function(){

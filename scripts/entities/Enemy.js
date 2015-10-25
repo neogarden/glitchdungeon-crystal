@@ -23,6 +23,20 @@ Enemy.prototype.Export = function(){
 	obj.enemy_id = this.enemy_id;
 	return obj;
 }
+Enemy.prototype.ImportOptions = function(options){
+	this.enemy_id = Number(options.enemy_id.value);
+    this.GlitchMe();
+}
+Enemy.prototype.ExportOptions = function(){
+	var options = {};
+    options.enemy_id = new TextDropdown(
+        [
+            {name: "enemy", value: 0}, 
+            {name: "floating enemy", value: 1}
+        ], this.enemy_id
+    );
+	return options;
+}
 extend(GameMover, Enemy);
 
 Enemy.prototype.GlitchMe = function(){
@@ -30,7 +44,11 @@ Enemy.prototype.GlitchMe = function(){
 		this.ApplyGravity = function(){}
 		this.HandleHorizontalCollisions = function(){};
 		this.HandleVerticalCollisions = function(){};
-	}
+	}else if (this.enemy_id === 0){
+        this.ApplyGravity = GameMover.prototype.ApplyGravity;
+        this.HandleHorizontalCollisions = GameMover.prototype.HandleHorizontalCollisions;
+        this.HandleVerticalCollisions = GameMover.prototype.HandleVerticalCollisions;
+    }
 }
 
 Enemy.prototype.Update = function(map){

@@ -315,6 +315,17 @@ House.prototype.RevivePlayer = function(){
 	console.log("num deaths: " + this.num_deaths);
 }
 
+House.prototype.GlitchRevivePlayer = function(){
+    this.room_index_x = this.glitched_checkpoint.room_x;
+    this.room_index_y = this.glitched_checkpoint.room_y;
+    this.ChangeRoom();
+    player.x = this.glitched_checkpoint.x;
+    player.y = this.glitched_checkpoint.y;
+    player.facing = this.glitched_checkpoint.facing;
+    player.die_to_suffocation = true;
+    Utils.playSound("switchglitch", master_volume, 0);
+}
+
 House.prototype.DeactivateCheckpoints = function(){
 	var is_glitched = false;
 	for (var i in this.rooms){
@@ -347,20 +358,5 @@ House.prototype.RemoveGlitchedCheckpoint = function(){
 	
 	if (this.new_checkpoint != null){
 		this.new_checkpoint = null;
-		if (this.old_checkpoint != null){
-			var room = this.rooms[this.old_checkpoint.room_y][this.old_checkpoint.room_x];
-			for (var i = 0; i < room.entities.length; i++){
-				if (room.entities[i].type === "Checkpoint" && !room.entities[i].is_glitched &&
-						room.entities[i].x === this.old_checkpoint.x &&
-						room.entities[i].y === this.old_checkpoint.y){
-					
-						this.checkpoint = this.old_checkpoint;
-						this.old_checkpoint = null;
-						//Utils.playSound("checkpoint", master_volume, 0);
-						room.entities[i].active = true;
-						room.entities[i].animation.Change(1, 0, 2);
-				}
-			}
-		}
 	}
 }

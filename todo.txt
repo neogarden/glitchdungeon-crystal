@@ -1,2 +1,1 @@
-2. Add creation of enemies
 3. Add creation of doors

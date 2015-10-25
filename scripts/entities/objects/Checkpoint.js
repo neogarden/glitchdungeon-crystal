@@ -16,19 +16,25 @@ Checkpoint.prototype.Update = function(map){
 	if (this.IsColliding(player)){
 		player.touching_checkpoint = true;
 		if (!this.active){
-			//if (!this.is_glitched) room_manager.RemoveGlitchedCheckpoint();
-			if (!room_manager.DeactivateCheckpoints() && !this.is_glitched)
-				return;
-			room_manager.checkpoint = {
-				id: this.id,
-				x: this.x, y: this.y, //failsafe, unnecessary
-				room_x: room_manager.room_index_x,
-				room_y: room_manager.room_index_y,
-				facing: player.facing
-			}
-			Utils.playSound("checkpoint", master_volume, 0);
-			this.active = true;
-			this.animation.Change(this.lex, 0, 2);
+            if (this.is_glitched){
+                Utils.playSound("checkpoint", master_volume, 0);
+                this.active = true;
+                this.animation.Change(this.lex, 0, 2);
+                return;
+            }
+            else{
+                room_manager.DeactivateCheckpoints();
+                room_manager.checkpoint = {
+                    id: this.id,
+                    x: this.x, y: this.y, //failsafe, unnecessary
+                    room_x: room_manager.room_index_x,
+                    room_y: room_manager.room_index_y,
+                    facing: player.facing
+                }
+                Utils.playSound("checkpoint", master_volume, 0);
+                this.active = true;
+                this.animation.Change(this.lex, 0, 2);
+            }
 		}
 	}
 }

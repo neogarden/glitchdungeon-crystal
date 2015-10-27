@@ -100,7 +100,6 @@ GameMover.prototype.Update = function(map)
 
 /*********************PHYSICS AND COLLISION DETECTIONS********************/
 GameMover.prototype.DieToSuffocation = function(map){
-	if (!this.die_to_suffocation) return;
 	this.die_to_suffocation = false;
 
 	var left_tile = Math.floor((this.x + this.lb) / Tile.WIDTH);

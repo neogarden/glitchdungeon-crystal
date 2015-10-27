@@ -33,6 +33,23 @@ Door.prototype.Export = function(){
 	obj.num_artifacts = this.num_artifacts;
 	return obj;
 }
+Door.prototype.ImportOptions = function(options){
+	this.room_x = Number(options.room_x.value);
+	this.room_y = Number(options.room_y.value);
+	this.door_id = options.door_id.value;
+	this.locked = options.locked.value;
+	this.num_artifacts = Number(options.num_artifacts.value);
+}
+Door.prototype.ExportOptions = function(){
+	var options = {};
+	options.room_x = new NumberOption(this.room_x);
+	options.room_y = new NumberOption(this.room_y);
+	options.door_id = new TextOption(this.door_id);
+	options.locked = new CheckboxOption(this.locked);
+	options.num_artifacts = new NumberOption(this.num_artifacts);
+	return options;
+}
+extend(GameSprite, Door);
 
 Door.prototype.Update = function(map){
 	if (this.room_x >= room_manager.house_width || this.room_y >= room_manager.house_height){
@@ -74,7 +91,6 @@ Door.prototype.Update = function(map){
 	if (this.locked) this.animation.Change(0, 1, 2);
 	else this.animation.Change(0, 0, 1);
 }
-extend(GameSprite, Door);
 
 Door.prototype.SwitchRooms = function(map){
 	room_manager.room_index_x = this.room_x;

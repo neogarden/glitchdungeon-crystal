@@ -416,8 +416,9 @@ Glitch.PinkTransform = function(map){
 		player.has_glitch_checkpoint = false;
 	
 	player.PressX = function(){
-		if (!player.has_glitch_checkpoint){
-			if (!this.touching_door && !this.touching_checkpoint){			
+		if (!this.touching_door && !this.touching_checkpoint){
+			if (!this.has_glitch_checkpoint){
+				room_manager.RemoveGlitchedCheckpoint();
 				room_manager.glitched_checkpoint = {
 					x: this.x, y: this.y, 
 					room_x: room_manager.room_index_x,
@@ -430,13 +431,12 @@ Glitch.PinkTransform = function(map){
 				checkpoint.is_glitched = true;
 				room.entities.push(checkpoint);
 				
-				player.has_glitch_checkpoint = true;
+				this.has_glitch_checkpoint = true;
+			}else{
+				room.entities.push(new Residue(this.x, this.y, room_manager.glitched_checkpoint));
+				
+				this.has_glitch_checkpoint = false;
 			}
-		}else{
-            room_manager.GlitchRevivePlayer();
-			room_manager.RemoveGlitchedCheckpoint();
-			
-			player.has_glitch_checkpoint = false;
 		}
 	}
 }

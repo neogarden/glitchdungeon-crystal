@@ -59,7 +59,7 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 	this.level_name = level_name;
 	
 	if (player === undefined)
-		player = new Player(13, 72);
+		player = new Player(13, 64);
 	
 	FileManager.loadFile(path + "etc.json", function(err, json){
 		if (err){
@@ -349,8 +349,13 @@ House.prototype.RemoveGlitchedCheckpoint = function(){
 	for (var i in this.rooms){
 		for (var j in this.rooms[i]){
 			for (var k = 0; k < this.rooms[i][j].entities.length; k++){
-				if (this.rooms[i][j].entities[k].type == "Checkpoint" && this.rooms[i][j].entities[k].is_glitched){
+				if (this.rooms[i][j].entities[k] instanceof Checkpoint && this.rooms[i][j].entities[k].is_glitched){
 					this.rooms[i][j].entities.splice(k, 1);
+					k--;
+				}
+				if (this.rooms[i][j].entities[k] instanceof Residue){
+					this.rooms[i][j].entities.splice(k, 1);
+					k--;
 				}
 			}
 		}

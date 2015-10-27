@@ -183,6 +183,20 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
     }.bind(this));
     
     ctx_menu.AddItem("new Door", function(){
+		room.paused = true;
+		var door = new Door(px, py, room_manager.room_index_x, room_manager.room_index_y, "id", false, 0);
+		var options = door.GenerateOptions();
+		level_edit_manager.typing = true;
+		Dialog.Confirm("", function(){
+				options.submit();
+				room.entities.push(door);
+			}, "new Door", "create",
+			function(){
+				room.paused = false;
+				level_edit_manager.typing = false;
+			}
+		);
+		Dialog.AddElement(options.dom);
     }.bind(this));
 }
 

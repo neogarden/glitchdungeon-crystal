@@ -1,7 +1,10 @@
+.context_menu{
+	width: auto;
+}
 .context_menu_table{
 	border: thin solid #808080;
 	cursor: default;
-	min-width: 100px;
+	min-width: 200px;
 	background-color: #ffffff;
 }
 .context_menu_item    /*Context Menu Item Style*/

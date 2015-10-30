@@ -119,7 +119,7 @@ GameMover.prototype.DieToSuffocation = function(map){
 		for (var j = left_tile; j <= right_tile; j++){
 			if (!map.isValidTile(i, j)) continue;
 			var tile = map.tiles[i][j];
-			if (tile.collision === Tile.GHOST || tile.collision === Tile.FALLTHROUGH){
+			if (tile.collision !== Tile.SOLID || tile.collision !== Tile.SUPER_SOLID){
 				continue;
 			}
 			

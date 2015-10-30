@@ -75,13 +75,16 @@ CtxMenu.prototype.AddNode = function(label, node){
 	var item = document.createElement("div");
 	item.className = "context_menu_item";
 	item.innerHTML = label;
-	item.onclick = function(e){
+	item.onmouseover = function(e){
 		var width = window.getComputedStyle(this.dom, null).getPropertyValue("width");
 		width = Number(width.substr(0, width.length-2));
-		node.x = (this.x + width);
-		node.y = e.clientY;
-		node.Open();
+		node.x = width - 4;
+		node.y = window.getComputedStyle(item, null).getPropertyValue("y");
+		node.Open(item);
 	}.bind(this);
+	item.onmouseleave = function(e){
+		node.Remove(false);
+	}
 	item_element.appendChild(item);
 	item_row.appendChild(item_element);
 	this.table.appendChild(item);
@@ -150,7 +153,7 @@ CtxMenu.prototype.AddItem = function(label, callback, disabled){
 	this.table.appendChild(item);
 }
 
-CtxMenu.prototype.Open = function(){
+CtxMenu.prototype.Open = function(parent){
 	CtxMenu.addEventHandler(this.element, "mousedown", this.ele_mousedown_handler);
 	CtxMenu.addEventHandler(this.dom, "mousedown", this.dom_mousedown_handler);
 	
@@ -160,7 +163,8 @@ CtxMenu.prototype.Open = function(){
 	CtxMenu.addEventHandler(this.element, "contextmenu", this.ele_contextmenu_handler);
 	CtxMenu.addEventHandler(this.dom, "contextmenu", this.dom_contextmenu_handler);
 	
-	document.body.appendChild(this.dom);
+	if (parent === undefined) parent = document.body;
+	parent.appendChild(this.dom);
 	this.dom.style.display = "inline";
 	this.dom.style.position = "absolute";
 	this.dom.style.left = this.x + "px";

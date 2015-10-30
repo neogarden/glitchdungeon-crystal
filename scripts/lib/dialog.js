@@ -77,9 +77,9 @@ Dialog.Alert = function(content, title, close_callback){
 		Dialog.removeEventHandler(window, "mousemove", Dialog.move);
 	};
 	var keyupHandler = function(e){
-		if (e.keyCode === 13 || e.keyCode === 27){
+		/*if (e.keyCode === 13 || e.keyCode === 27){
 			closeDialogButton.onclick();
-		}
+		}*/
 	}
 	closeDialogButton.onclick = function(e){
 		Dialog._close();
@@ -147,12 +147,12 @@ Dialog.Confirm = function(content, confirm_callback, title, confirm_text, close_
 		Dialog.removeEventHandler(window, "mousemove", Dialog.move);
 	};
 	var keyupHandler = function(e){
-		if (e.keyCode === 13){
+		/*if (e.keyCode === 13){
 			dialogConfirm.onclick();
 		}
 		if (e.keyCode === 27){
 			closeDialogButton.onclick();
-		}
+		}*/
 	}
 	closeDialogButton.onclick = function(e){
 		Dialog._close();

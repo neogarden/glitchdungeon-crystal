@@ -133,40 +133,26 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	//OFFSCREEN TOP
 	if (player.y + player.bb <= 0){
 		new_coords = [0, -1];
-		
-		if (player.x <= 8) player.x+=8;
-		if (player.x >= room.MAP_WIDTH * Tile.WIDTH -8) player.x -= 8;
-		player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - player.bb;
 	}
 	//OFFSCREEN BOTTOM
 	else if (player.y + player.tb >= (this.MAP_HEIGHT * Tile.HEIGHT)){
 		new_coords = [0, 1];
-		
-		if (player.x <= 8) player.x+=8;
-		if (player.x >= room.MAP_WIDTH * Tile.WIDTH -8) player.x -= 8;
-		player.y = 0 + Tile.HEIGHT/2 + player.tb;
 	}
 	
 	//OFFSCREEN LEFT
 	if (player.x <= 0){
 		new_coords = [-1, 0];
-		
-		player.facing = Facing.LEFT;
-		player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH/2 - player.rb;
 	}
 	//OFFSCREEN RIGHT
 	else if (player.x + Tile.WIDTH >= (this.MAP_WIDTH * Tile.WIDTH)){
 		new_coords = [1, 0];
-		
-		player.facing = Facing.RIGHT;
-		player.x = 0 + Tile.WIDTH/2 - player.lb;
 	}
 	
 	if (new_coords[0] !== 0 || new_coords[1] !== 0){
 		room_manager.room_index_x += new_coords[0];
 		room_manager.room_index_y += new_coords[1];		
 		
-		room_manager.ChangeRoom();
+		room_manager.ChangeRoom(new_coords[0], new_coords[1]);
 	}
 }
 
@@ -305,6 +291,23 @@ Room.prototype.GetDoor = function(door_id, door){
 }
 
 /************************EXPORTING AND IMPORTING FUNCTIONS************/
+Room.prototype.ImportOptions = function(options){
+	var width = options.width.value;
+	width = ~~(width / Tile.WIDTH) * Tile.WIDTH;
+	var height = options.height.value;
+	height = ~~(height / Tile.HEIGHT) * Tile.HEIGHT;
+	
+	this.ChangeSize(width, height);
+	this.bg_code = options.bg_code.value;
+}
+Room.prototype.ExportOptions = function(){
+	var options = {};
+	options.width = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
+	options.height = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
+	options.bg_code = new BigTextOption(this.bg_code);
+	return options;
+}
+
 Room.prototype.Export = function(){
 	var entities = [], tiles = [];
 	for (var i = 0; i < this.entities.length; i++){
@@ -385,4 +388,30 @@ Room.prototype.Import = function(room){
 	
 	this.bg_code = room.bg_code;
 	if (this.bg_code === undefined) this.bg_code = "";
+}
+
+/////////////////////boilerplate
+Room.prototype.GenerateOptions = function(){
+	var dom = document.createElement("div");
+	var opt = this.ExportOptions();
+	for (var attribute in opt){
+		var span = document.createElement("span");
+		span.innerHTML = attribute;
+		
+		var input = opt[attribute].ExportDom(attribute);
+		
+		dom.appendChild(span);
+		dom.appendChild(document.createElement("br"));
+		dom.appendChild(input);
+		dom.appendChild(document.createElement("br"));
+	}
+	
+	var submit = function(){
+		for (var attribute in opt){
+			opt[attribute].UpdateFromDom();
+		}
+		this.ImportOptions(opt);
+	}.bind(this);
+	
+	return { dom: dom, submit: submit };
 }

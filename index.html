@@ -28,6 +28,7 @@
 <!--Level editor-->
 <script src="scripts/level_editor/LevelEditManager.js"></script>
 <script src="scripts/level_editor/TextOption.js"></script>
+<script src="scripts/level_editor/BigTextOption.js"></script>
 <script src="scripts/level_editor/TextArrayOption.js"></script>
 <script src="scripts/level_editor/TextDropdown.js"></script>
 <script src="scripts/level_editor/NumberOption.js"></script>
@@ -108,11 +109,7 @@
       <div id="level_edit_buttons" style="display:none;">
 		  Room Position: <span id="house_coordinates">0 0</span><br/>
 		  Prev Room Pos: <span id="house_coordinates_old">0 0</span>
-		<div>
-			width: <input type="text" id="room_width" value="320"/>
-			<input type="submit" value="change size" onclick="ledit_change_room_size();"/><br/>
-			heght: <input type="text" id="room_height" value="240"/>
-		</div><br/>
+		<br/>
 		<input type="submit" value="save" onclick="level_edit_manager.TrueSave();"/>
 		<input type="submit" value="save as" onclick="level_edit_manager.Save(prompt('level name?'), true);"/>
 		<input type="submit" value="load" onclick="ledit_load();"/>

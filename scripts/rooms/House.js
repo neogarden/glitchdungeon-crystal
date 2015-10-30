@@ -170,7 +170,7 @@ House.prototype.GetRoom = function(){
 	else return undefined;
 }
 
-House.prototype.ChangeRoom = function(){
+House.prototype.ChangeRoom = function(cx, cy){
 	player.pressing_down = false;
 	player.pressed_down = false;
 	var glitch_type = this.glitch_type;
@@ -232,30 +232,19 @@ House.prototype.ChangeRoom = function(){
 		Glitch.TransformPlayer(room, room.glitch_type); //this.glitch);
 	}
 	//player.die_to_suffocation = true;
+
+	if (cx < 0)
+		player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH/2 - player.rb;
+	else if (cx > 0)
+		player.x = 0 + Tile.WIDTH/2 - player.lb;
 	
-	var temp_bg_name = "Rolemusic_deathOnTheBattlefield";
-	if (this.room_index_x === 5 && this.room_index_y === 0 && bg_name !== temp_bg_name){
-		bg_name = temp_bg_name;
-		if (resource_manager.play_music){
-			stopMusic();
-			startMusic();
-		}
-	}
+	if (cy < 0)
+		player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - player.bb;
+	else if (cy > 0)
+		player.y = 0 + Tile.HEIGHT/2 + player.tb;
 	
-	//END CONDITION LOL
-	if (this.room_index_x === 5 && this.room_index_y === 5){
-		Glitch.TransformPlayer(room, Glitch.GREY);
-		this.time = Math.round(((((Date.now() - this.then) / 1000) / 60) + 0.00001) * 100) / 100;
-		
-		bg_name = "RoccoW_iveGotNothing";
-		if (resource_manager.play_music){
-			stopMusic();
-			startMusic();
-		}
-		
-		room.ChangeSize(320, 120);
-		player.x = 16;
-	}
+	//if (player.x <= 8) player.x+=8;
+	//if (player.x >= room.MAP_WIDTH * Tile.WIDTH - 8) player.x -= 8;
 }
 
 House.prototype.RandomGlitch = function(){

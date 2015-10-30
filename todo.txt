@@ -1,3 +1,2 @@
 1. allow some rooms to have an "edge death" flag?
-2. allow room size changing (and fix camera probably).
-	-allow view scale changing. (and still fix camera)
+2. allow view scale changing. (and still fix camera)

@@ -19,16 +19,6 @@ function LevelEditManager(){
 
 LevelEditManager.prototype.Init = function(){
 	$("level_edit_buttons").style.display="block";
-	
-	function keypress(e){
-		var code = (e.keyCode ? e.keyCode : e.which);
-		if (code == 13) { //Enter keycode
-			e.preventDefault();
-			ledit_change_room_size();
-		}
-	}
-	$("room_width").onkeypress = keypress;
-	$("room_height").onkeypress = keypress;
 	this.enabled = true;
 	
 	var zoom = 2;
@@ -88,6 +78,18 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 		if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY)
 			Tile.DISPLAY_TYPE = Tile.COLLISION_DISPLAY;
 		else Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
+	}.bind(this));
+	
+	ctx_menu.AddDivider();
+	
+	ctx_menu.AddItem("Room properties", function(){
+		room.paused = true;
+		var options = room.GenerateOptions();
+		level_edit_manager.typing = true;
+		Dialog.Confirm("", options.submit, "edit room properties", "save",
+			function(){ room.paused = false; level_edit_manager.typing = false; }
+		);
+		Dialog.AddElement(options.dom);
 	}.bind(this));
 	
 	ctx_menu.AddDivider();
@@ -295,7 +297,7 @@ LevelEditManager.prototype.MouseDown = function(e){
 }
 
 LevelEditManager.prototype.MouseMove = function(e){
-	if (!this.enabled) return;
+	if (!this.enabled || room === undefined) return;
 	if (this.mouse_down && level_edit_object_is_tile){
 		this.MouseDown(e);
 		return;

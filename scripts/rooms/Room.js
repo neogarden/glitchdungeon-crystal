@@ -3,11 +3,10 @@ Room.GLITCH_TIME_LIMIT_ORIGINAL = 240;
 function Room(){
 	this.index_x = 0;
 	this.index_y = 0;
-	this.SCREEN_WIDTH = GAME_WIDTH;
-	this.SCREEN_HEIGHT = GAME_HEIGHT;
 	
 	this.MAP_WIDTH = ~~(GAME_WIDTH / Tile.WIDTH);
 	this.MAP_HEIGHT = ~~(GAME_HEIGHT / Tile.HEIGHT);
+	this.VIEW_SCALE = VIEW_SCALE;
 	
 	this.paused = false;
 	
@@ -256,11 +255,11 @@ Room.prototype.ChangeSize = function(width, height){
 	this.MAP_WIDTH = ~~(width / Tile.WIDTH);
 	this.MAP_HEIGHT = ~~(height / Tile.HEIGHT);
 	
-	if (this.MAP_WIDTH * Tile.WIDTH < this.SCREEN_WIDTH)
-		this.camera.screen_offset_x = (this.SCREEN_WIDTH - (this.MAP_WIDTH * Tile.WIDTH))/2;
+	if (this.MAP_WIDTH * Tile.WIDTH < GAME_WIDTH)
+		this.camera.screen_offset_x = (GAME_WIDTH - (this.MAP_WIDTH * Tile.WIDTH))/2;
 	else this.camera.screen_offset_x = 0;
-	if (this.MAP_HEIGHT * Tile.HEIGHT < this.SCREEN_HEIGHT)
-		this.camera.screen_offset_y = (this.SCREEN_HEIGHT-(this.MAP_HEIGHT*Tile.HEIGHT))/2;
+	if (this.MAP_HEIGHT * Tile.HEIGHT < GAME_WIDTH)
+		this.camera.screen_offset_y = (GAME_WIDTH-(this.MAP_HEIGHT*Tile.HEIGHT))/2;
 	else this.camera.screen_offset_y = 0;
 
 	var temp_tiles = this.tiles;

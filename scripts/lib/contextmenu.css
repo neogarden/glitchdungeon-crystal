@@ -1,4 +1,4 @@
-#context_menu_table{
+.context_menu_table{
 	border: thin solid #808080;
 	cursor: default;
 	min-width: 100px;

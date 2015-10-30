@@ -78,8 +78,8 @@ LevelEditManager.prototype.Disable = function(){
 	this.enabled = false;
 }
 
-LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
-	var ctx_menu = CtxMenu.Init(x, y, document.body);
+LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, tile_x, tile_y){
+	var ctx_menu = CtxMenu.Init(mouse_x, mouse_y, document.body);
 	ctx_menu.Open();
 	this.ctx_menu_visible = true;
 	
@@ -123,9 +123,10 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 	}
 	
 	//CREATION OPTIONS
+	var create_node = CtxMenu.InitNode(ctx_menu);
     var px = tile_x * Tile.WIDTH-8;
     var py = tile_y * Tile.HEIGHT - 8;
-	ctx_menu.AddItem("new NPC", function(){
+	create_node.AddItem("new NPC", function(){
 		room.paused = true;
 		var npc = new NPC(px, py);
 		var options = npc.GenerateOptions();
@@ -143,12 +144,12 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 		Dialog.AddElement(options.dom);
 	}.bind(this));
     
-	ctx_menu.AddItem("new Checkpoint", function(){
+	create_node.AddItem("new Checkpoint", function(){
 		var checkpoint = new Checkpoint(px, py);
 		room.entities.push(checkpoint);
 	}.bind(this));
     
-    ctx_menu.AddItem("new Powerup", function(){
+    create_node.AddItem("new Powerup", function(){
         room.paused = true;
         var powerup = new Collection(px, py, 0);
         var options = powerup.GenerateOptions();
@@ -165,7 +166,7 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
         Dialog.AddElement(options.dom);
     }.bind(this));
     
-    ctx_menu.AddItem("new Enemy", function(){
+    create_node.AddItem("new Enemy", function(){
         room.paused = true;
         var enemy = new Enemy(px, py, 0);
         var options = enemy.GenerateOptions();
@@ -182,7 +183,7 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
         Dialog.AddElement(options.dom);
     }.bind(this));
     
-    ctx_menu.AddItem("new Door", function(){
+    create_node.AddItem("new Door", function(){
 		room.paused = true;
 		var door = new Door(px, py, room_manager.room_index_x, room_manager.room_index_y, "id", false, 0);
 		var options = door.GenerateOptions();
@@ -198,6 +199,8 @@ LevelEditManager.prototype.CreateContextMenu = function(x, y, tile_x, tile_y){
 		);
 		Dialog.AddElement(options.dom);
     }.bind(this));
+	
+	ctx_menu.AddNode("Create new...", create_node);
 }
 
 LevelEditManager.prototype.DrawGrid = function(ctx, room){
@@ -333,8 +336,10 @@ LevelEditManager.prototype.MouseUp = function(e){
 	var right_click = (e.which === 3 && e.button === 2);
 	
 	var box = canvas.getBoundingClientRect();
-	var x = (e.clientX - box.left) / VIEW_SCALE + room.camera.x - room.camera.screen_offset_x;
-	var y = (e.clientY - box.top) / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
+	var mouse_x = e.clientX - box.left;
+	var mouse_y = e.clientY - box.top;
+	var x = mouse_x / VIEW_SCALE + room.camera.x - room.camera.screen_offset_x;
+	var y = mouse_y / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = x / Tile.WIDTH;
 	var tile_y = y / Tile.HEIGHT;
 	
@@ -346,7 +351,7 @@ LevelEditManager.prototype.MouseUp = function(e){
 		
 	//right click
 	if (right_click && this.ctx_menu_timer < this.ctx_menu_time_limit){
-		this.CreateContextMenu(x, y, tile_x, tile_y);
+		this.CreateContextMenu(mouse_x, mouse_y, x, y, tile_x, tile_y);
 	}
 	if (this.ctx_menu_timer_id !== undefined){
 		clearInterval(this.ctx_menu_timer_id);

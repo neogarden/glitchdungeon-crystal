@@ -1,15 +1,19 @@
-function CtxMenu(x, y, dom, table, element){
+function CtxMenu(x, y, dom, table, element, parent){
 	this.x = x;
 	this.y = y;
 	
 	this.dom = dom;
+	
 	this.table = table;
 	this.element = element;
+	this.ctx_parent = parent;
+	this.ctx_children = [];
 	
 	this.ele_mousedown_handler = function(e){
-		this.Remove();
+		this.Remove(false);
 	}.bind(this);
 	this.dom_mousedown_handler = function(e){
+		e.cancelBubble = true;
 		e.stopPropagation();
 		e.preventDefault();
 	}.bind(this);
@@ -19,22 +23,11 @@ function CtxMenu(x, y, dom, table, element){
 	this.dom_mouseup_handler = function(e){
 	}.bind(this);
 	
-	this.ele_contextmenu_handler = function(e){
-		this.ShowMe(e);
-	}.bind(this);
 	this.dom_contextmenu_handler = function(e){
+		e.cancelBubble = true;
 		e.stopPropagation();
 		e.preventDefault();
 	}.bind(this);
-	
-	CtxMenu.addEventHandler(this.element, "mousedown", this.ele_mousedown_handler);
-	CtxMenu.addEventHandler(this.dom, "mousedown", this.dom_mousedown_handler);
-	
-	CtxMenu.addEventHandler(this.element, "mouseup", this.ele_mouseup_handler);
-	CtxMenu.addEventHandler(this.dom, "mouseup", this.dom_mouseup_handler);
-	
-	CtxMenu.addEventHandler(this.element, "contextmenu", this.ele_contextmenu_handler);
-	CtxMenu.addEventHandler(this.dom, "contextmenu", this.dom_contextmenu_handler);
 }
 
 CtxMenu.removeEventHandler = function(elem,eventType,handler) {
@@ -50,27 +43,48 @@ CtxMenu.addEventHandler = function(elem,eventType,handler) {
      elem.attachEvent('on'+eventType,handler); 
 }
 
-CtxMenu.Init = function(x, y, element){
-	var dom = document.getElementById("context_menu");
-	var table = document.getElementById("context_menu_table");
-	if (dom === undefined || dom === null){
-		dom = document.createElement("div");
-		dom.id = "context_menu";
-		
-		table = document.createElement("table");
-		table.id = "context_menu_table";
-		table.border = 0;
-		table.cellpadding = 0;
-		table.cellspacing = 0;
-		
-		dom.appendChild(table);
-		document.body.appendChild(dom);
-	}
+CtxMenu.Init = function(x, y, element, parent){
+	var dom = document.createElement("div");
+	dom.className = "context_menu";
+	
+	var table = document.createElement("table");
+	table.className = "context_menu_table";
+	table.border = 0;
+	table.cellpadding = 0;
+	table.cellspacing = 0;
+	
+	dom.appendChild(table);
 	dom.style.display = "none";
 	table.innerHTML = "";
 	
-	var ctx_menu = new CtxMenu(x, y, dom, table, element);
+	var ctx_menu = new CtxMenu(x, y, dom, table, element, parent);
 	return ctx_menu;
+}
+
+CtxMenu.InitNode = function(parent){
+	var node = CtxMenu.Init(0, 0, parent.dom, parent);
+	return node;
+}
+
+CtxMenu.prototype.AddNode = function(label, node){
+	if (label === undefined) label = "";
+	this.ctx_children.push(node);
+	
+	var item_row = document.createElement("tr");
+	var item_element = document.createElement("td");
+	var item = document.createElement("div");
+	item.className = "context_menu_item";
+	item.innerHTML = label;
+	item.onclick = function(e){
+		var width = window.getComputedStyle(this.dom, null).getPropertyValue("width");
+		width = Number(width.substr(0, width.length-2));
+		node.x = (this.x + width);
+		node.y = e.clientY;
+		node.Open();
+	}.bind(this);
+	item_element.appendChild(item);
+	item_row.appendChild(item_element);
+	this.table.appendChild(item);
 }
 
 CtxMenu.prototype.MouseDown = function(e){
@@ -83,7 +97,7 @@ CtxMenu.prototype.MouseUp = function(e){
 CtxMenu.prototype.ContextMenu = function(e){
 }
 
-CtxMenu.prototype.Remove = function(){
+CtxMenu.prototype.Remove = function(bubble_up){
 	CtxMenu.removeEventHandler(this.element, "mousedown", this.ele_mousedown_handler);
 	CtxMenu.removeEventHandler(this.element, "mouseup", this.ele_mouseup_handler);
 	CtxMenu.removeEventHandler(this.element, "contextmenu", this.ele_contextmenu_handler);
@@ -92,9 +106,17 @@ CtxMenu.prototype.Remove = function(){
 	CtxMenu.removeEventHandler(this.dom, "mouseup", this.dom_mouseup_handler);
 	CtxMenu.removeEventHandler(this.dom, "contextmenu", this.dom_contextmenu_handler);
 	
-	try{
-		this.HideMe();
-	}catch(e){};
+	if (this.dom.parentNode !== null)
+		this.dom.parentNode.removeChild(this.dom);
+	
+	if (bubble_up === undefined) bubble_up = true;
+	
+	if (bubble_up && this.ctx_parent !== undefined){
+		this.ctx_parent.Remove();
+	}
+	for (var i = 0; i < this.ctx_children.length; i++){
+		this.ctx_children[i].Remove(false);
+	}
 }
 
 CtxMenu.prototype.AddDivider = function(){
@@ -115,7 +137,7 @@ CtxMenu.prototype.AddItem = function(label, callback, disabled){
 		item.style.cursor = "";
 		item.style.color = "#aaaaaa";
 		item.onclick = function(e){
-			this.Remove();
+			//this.Remove();
 		}.bind(this);
 	}else{
 		item.onclick = function(e){
@@ -128,32 +150,19 @@ CtxMenu.prototype.AddItem = function(label, callback, disabled){
 	this.table.appendChild(item);
 }
 
-CtxMenu.prototype.ShowMe = function(e){
-	var x = e.clientX + window.pageXOffset + "px";
-	var y = e.clientY + window.pageYOffset + "px";
+CtxMenu.prototype.Open = function(){
+	CtxMenu.addEventHandler(this.element, "mousedown", this.ele_mousedown_handler);
+	CtxMenu.addEventHandler(this.dom, "mousedown", this.dom_mousedown_handler);
 	
+	CtxMenu.addEventHandler(this.element, "mouseup", this.ele_mouseup_handler);
+	CtxMenu.addEventHandler(this.dom, "mouseup", this.dom_mouseup_handler);
+	
+	CtxMenu.addEventHandler(this.element, "contextmenu", this.ele_contextmenu_handler);
+	CtxMenu.addEventHandler(this.dom, "contextmenu", this.dom_contextmenu_handler);
+	
+	document.body.appendChild(this.dom);
 	this.dom.style.display = "inline";
 	this.dom.style.position = "absolute";
-	this.dom.style.left = x;
-	this.dom.style.top = y;
-	
-	e.preventDefault();
-	e.stopPropagation();
-}
-
-CtxMenu.prototype.HideMe = function(e){
-	this.dom.style.display = "none";
-	
-	e.preventDefault();
-	e.stopPropagation();
-}
-
-CtxMenu.prototype.Open = function(){
-	var e = this.element.ownerDocument.createEvent('MouseEvents');
-
-	e.initMouseEvent('contextmenu', true, true,
-		 this.element.ownerDocument.defaultView, 1, 0, 0, 0, 0, false,
-		 false, false, false, 2, null);
-
-	!this.element.dispatchEvent(e);
+	this.dom.style.left = this.x + "px";
+	this.dom.style.top = this.y + "px";
 }

@@ -4,6 +4,7 @@ function Camera(x, y){
 
 	this.x = x || 0;
 	this.y = y || 0; 
+	this.view_scale = 4;
 	this.width = GAME_WIDTH;
 	this.height = GAME_HEIGHT;
 	this.x_lim = 100;
@@ -12,8 +13,31 @@ function Camera(x, y){
 	this.instant = true;
 	this.speed = 1.5;
 }
+
+Camera.prototype.Render = function(ctx){
+	//cover up non existant parts of the room (but that are still in render view
+	ctx.fillStyle = "#000000";
+	
+	var width = room.GetWidth();
+	if (this.width > width){		
+		//left border
+		ctx.fillRect(0, 0, -this.x, this.height);
+		//right border
+		ctx.fillRect((-this.x) + room.GetWidth(), 0, -this.x, this.height);
+	}
+	var height = room.GetHeight();
+	if (this.height > height){		
+		//top border
+		ctx.fillRect(0, 0, this.width, -this.y);
+		//bottom border
+		ctx.fillRect(0, (-this.y) + room.GetHeight(), this.width, -this.y);
+	}
+}
 		
 Camera.prototype.Update = function(map){
+	this.width = WINDOW_WIDTH / this.view_scale;
+	this.height = WINDOW_HEIGHT / this.view_scale;
+	
 	//Horizontal panning RIGHT
 	if (player.x + player.rb + this.x_lim - this.x >= this.width){
 		if (this.x < map.MAP_WIDTH * Tile.WIDTH - this.width){
@@ -37,6 +61,11 @@ Camera.prototype.Update = function(map){
 			
 			if (this.x <= 0) this.x = 0;
 		}
+	}
+	//CORRECTION FOR TOO SMALL ROOM :)!
+	var width = room.GetWidth();
+	if (this.width > width){
+		this.x = -(this.width - width) / 2;
 	}
 	
 	//Vertical panning DOWN
@@ -62,5 +91,10 @@ Camera.prototype.Update = function(map){
 			
 			if (this.y <= 0) this.y = 0;
 		}
+	}
+	//CORRECTION FOR TOO SMALL ROOM :)!
+	var height = room.GetHeight();
+	if (this.height > height){
+		this.y = -(this.height - height) / 2;
 	}
 }

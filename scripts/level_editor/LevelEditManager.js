@@ -252,8 +252,8 @@ LevelEditManager.prototype.MouseDown = function(e){
 	
 	var right_click = (e.which === 3 && e.button === 2);
 	var box = canvas.getBoundingClientRect();
-	var x = (e.clientX - box.left) / VIEW_SCALE + room.camera.x - room.camera.screen_offset_x;
-	var y = (e.clientY - box.top) / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
+	var x = (e.clientX - box.left) / room.camera.view_scale + room.camera.x - room.camera.screen_offset_x;
+	var y = (e.clientY - box.top) / room.camera.view_scale + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = Math.floor(x / Tile.WIDTH);
 	var tile_y = Math.floor(y / Tile.HEIGHT);
 
@@ -304,8 +304,8 @@ LevelEditManager.prototype.MouseMove = function(e){
 	}
 	
 	var box = canvas.getBoundingClientRect();
-	var x = (e.clientX - box.left) / VIEW_SCALE + room.camera.x - room.camera.screen_offset_x;
-	var y = (e.clientY - box.top) / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
+	var x = (e.clientX - box.left) / room.camera.view_scale + room.camera.x - room.camera.screen_offset_x;
+	var y = (e.clientY - box.top) / room.camera.view_scale + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = Math.floor(x / Tile.WIDTH);
 	var tile_y = Math.floor(y / Tile.HEIGHT);
 	
@@ -340,8 +340,8 @@ LevelEditManager.prototype.MouseUp = function(e){
 	var box = canvas.getBoundingClientRect();
 	var mouse_x = e.clientX - box.left;
 	var mouse_y = e.clientY - box.top;
-	var x = mouse_x / VIEW_SCALE + room.camera.x - room.camera.screen_offset_x;
-	var y = mouse_y / VIEW_SCALE + room.camera.y - room.camera.screen_offset_y;
+	var x = mouse_x / room.camera.view_scale + room.camera.x - room.camera.screen_offset_x;
+	var y = mouse_y / room.camera.view_scale + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = x / Tile.WIDTH;
 	var tile_y = y / Tile.HEIGHT;
 	

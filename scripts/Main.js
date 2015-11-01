@@ -210,6 +210,7 @@ var render = function(){
 	
 	//draw the game
 	sharpen(ctx);
+	ctx.scale((1/VIEW_SCALE), (1/VIEW_SCALE));
 	room.Render(ctx, level_edit);
 	
 	//draw sound buttons

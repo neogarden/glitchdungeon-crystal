@@ -8,6 +8,8 @@ function Room(){
 	this.MAP_HEIGHT = ~~(GAME_HEIGHT / Tile.HEIGHT);
 	this.VIEW_SCALE = VIEW_SCALE;
 	
+	this.edge_death = false;
+	
 	this.paused = false;
 	
 	this.glitch_type = Glitch.GREY
@@ -29,6 +31,9 @@ function Room(){
 	this.CreateEntities();
 	this.InitializeTiles();
 }
+
+Room.prototype.GetWidth = function(){ return this.MAP_WIDTH * Tile.WIDTH; }
+Room.prototype.GetHeight = function(){ return this.MAP_HEIGHT * Tile.HEIGHT; }
 
 Room.prototype.CreateEntities = function(){
 	this.entities = [];
@@ -148,10 +153,15 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	}
 	
 	if (new_coords[0] !== 0 || new_coords[1] !== 0){
-		room_manager.room_index_x += new_coords[0];
-		room_manager.room_index_y += new_coords[1];		
+		//!!!
+		if (this.edge_death){
+			player.Die();
+		}else{
+			room_manager.room_index_x += new_coords[0];
+			room_manager.room_index_y += new_coords[1];		
 		
-		room_manager.ChangeRoom(new_coords[0], new_coords[1]);
+			room_manager.ChangeRoom(new_coords[0], new_coords[1]);
+		}
 	}
 }
 
@@ -206,6 +216,8 @@ Room.prototype.RenderSpeech = function(ctx){
 }
 
 Room.prototype.Render = function(ctx, level_edit){
+	ctx.scale(this.camera.view_scale, this.camera.view_scale);
+	
 	//SORT ENTITIES BY Z INDEX (descending)
 	var entities = this.entities.slice(0);
 	entities.push(player);
@@ -245,6 +257,9 @@ Room.prototype.Render = function(ctx, level_edit){
 		entities[i].Render(ctx, this.camera);
 	}
 	
+	//coverup
+	this.camera.Render(ctx);
+	
 	this.RenderSpeech(ctx);
 }
 
@@ -258,8 +273,8 @@ Room.prototype.ChangeSize = function(width, height){
 	if (this.MAP_WIDTH * Tile.WIDTH < GAME_WIDTH)
 		this.camera.screen_offset_x = (GAME_WIDTH - (this.MAP_WIDTH * Tile.WIDTH))/2;
 	else this.camera.screen_offset_x = 0;
-	if (this.MAP_HEIGHT * Tile.HEIGHT < GAME_WIDTH)
-		this.camera.screen_offset_y = (GAME_WIDTH-(this.MAP_HEIGHT*Tile.HEIGHT))/2;
+	if (this.MAP_HEIGHT * Tile.HEIGHT < GAME_HEIGHT)
+		this.camera.screen_offset_y = (GAME_HEIGHT-(this.MAP_HEIGHT*Tile.HEIGHT))/2;
 	else this.camera.screen_offset_y = 0;
 
 	var temp_tiles = this.tiles;
@@ -296,6 +311,9 @@ Room.prototype.ImportOptions = function(options){
 	var height = options.height.value;
 	height = ~~(height / Tile.HEIGHT) * Tile.HEIGHT;
 	
+	this.camera.view_scale = options.view_scale.value;
+	this.edge_death = options.edge_death.value;
+	
 	this.ChangeSize(width, height);
 	this.bg_code = options.bg_code.value;
 }
@@ -303,6 +321,8 @@ Room.prototype.ExportOptions = function(){
 	var options = {};
 	options.width = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
 	options.height = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
+	options.view_scale = new NumberOption(this.camera.view_scale);
+	options.edge_death = new CheckboxOption(this.edge_death);
 	options.bg_code = new BigTextOption(this.bg_code);
 	return options;
 }
@@ -330,6 +350,7 @@ Room.prototype.Export = function(){
 		,entities: entities
 		,tiles: tiles
 		,bg_code: this.bg_code
+		,edge_death: this.edge_death
 	};
 }
 
@@ -385,6 +406,8 @@ Room.prototype.Import = function(room){
 		this.tiles.push(row);
 	}
 	
+	this.edge_death = room.edge_death;
+	if (this.edge_death === undefined) this.edge_death = false;
 	this.bg_code = room.bg_code;
 	if (this.bg_code === undefined) this.bg_code = "";
 }

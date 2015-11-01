@@ -1,2 +1,3 @@
-1. allow some rooms to have an "edge death" flag?
-2. allow view scale changing. (and still fix camera)
+0. Implement a "save" sort of thing, that will save the player's place and "collected" abilities and current glitch?
+	-fix level saving so that it doesn't save "erased" collections that have already been collected
+1. start designing "scenarios" 

@@ -13,10 +13,10 @@ extend(GameSprite, Collection);
 //  assumes that appropriate IMPORT function has already been called
 Collection.prototype.Load = function(obj){
     this.visible = obj.visible;
-    this.Parent().Load(obj);
+    this.Parent().Load.call(this, obj);
 }
 Collection.prototype.Save = function(){
-    var obj = this.Parent().Save();
+    var obj = this.Parent().Save.call(this);
     obj.visible = this.visible;
     return obj;
 }

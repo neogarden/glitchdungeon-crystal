@@ -103,8 +103,8 @@
 		<input type="submit" value="reset room" onclick="ledit_reset();"/>
 		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>
         <br/><br/>
-        <input type="submit" value="game save" onclick="level_edit_manager.Save('main_save', true);"/>
-        <input type="submit" value="game load"/>
+        <input type="submit" value="game save" onclick="room_manager.SaveToFile();"/>
+        <input type="submit" value="game load" onclick="room_manager.Load(function(){});"/>
         <br/><br/>
         <input type="submit" value="save state"/>
         <input type="submit" value="load state"/>

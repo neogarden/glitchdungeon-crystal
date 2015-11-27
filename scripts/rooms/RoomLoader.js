@@ -1,31 +1,45 @@
-/************************EXPORTING AND IMPORTING FUNCTIONS************/
-Room.prototype.ImportOptions = function(options){
-    this.level_id = Number(options.level_id.value);
-    
-	var width = options.width.value;
-	width = ~~(width / Tile.WIDTH) * Tile.WIDTH;
-	var height = options.height.value;
-	height = ~~(height / Tile.HEIGHT) * Tile.HEIGHT;
-	
-	this.camera.view_scale = options.view_scale.value;
-	this.edge_death = options.edge_death.value;
-	
-	this.ChangeSize(width, height);
-	this.bg_code = options.bg_code.value;
+Room.prototype.Save = function(){
+    var entities = [], tiles = [];
+	for (var i = 0; i < this.entities.length; i++){
+		entities.push({type: this.entities[i].type, obj: this.entities[i].Save()});
+	}
+    //don't need to 'save' tiles
+    //only need to 'save' volatile entities
+
+	return {
+        level_id: this.level_id
+		,glitch_type: this.glitch_type
+		,glitch_sequence: this.glitch_sequence
+		,glitch_time_limit: this.glitch_time_limit
+		,can_use_spellbook: this.can_use_spellbook
+		,entities: entities
+		,bg_code: this.bg_code
+	};
 }
-Room.prototype.ExportOptions = function(){
-	var options = {};
-    options.level_id = new TextDropdown(
-        House.GetLevels(), this.level_id
-    );
-	options.width = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
-	options.height = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
-	options.view_scale = new NumberOption(this.camera.view_scale);
-	options.edge_death = new CheckboxOption(this.edge_death);
-	options.bg_code = new BigTextOption(this.bg_code);
-	return options;
+Room.prototype.Load = function(room){
+    //load level id 
+    this.level_id = room.level_id || House.Levels["dungeon"];
+    
+	this.glitch_index = 0;
+	this.glitch_time = 0;
+	this.glitch_time_limit = room.glitch_time_limit || Room.GLITCH_TIME_LIMIT_ORIGINAL;
+	this.glitch_sequence = room.glitch_sequence || [room.glitch_type];
+	this.glitch_type = this.glitch_sequence[0];
+	this.can_use_spellbook = defaultValue(room.can_use_spellbook, true);
+	Glitch.TransformPlayer(this, this.glitch_type);
+	
+	//load entities
+	this.entities = [];
+	if (room.entities){
+		for (var i = 0; i < room.entities.length; i++){
+			var entity = eval("new " + room.entities[i].type + "();");
+			entity.Load(room.entities[i].obj);
+			this.entities.push(entity);
+		}
+	}
 }
 
+/*******************************************************/
 Room.prototype.Export = function(){
 	var entities = [], tiles = [];
 	for (var i = 0; i < this.entities.length; i++){
@@ -115,6 +129,35 @@ Room.prototype.Import = function(room){
 	if (this.bg_code === undefined) this.bg_code = "";
 }
 
+/************************EXPORTING AND IMPORTING FUNCTIONS************/
+Room.prototype.ImportOptions = function(options){
+    this.level_id = Number(options.level_id.value);
+    
+	var width = options.width.value;
+	width = ~~(width / Tile.WIDTH) * Tile.WIDTH;
+	var height = options.height.value;
+	height = ~~(height / Tile.HEIGHT) * Tile.HEIGHT;
+	
+	this.camera.view_scale = options.view_scale.value;
+	this.edge_death = options.edge_death.value;
+	
+	this.ChangeSize(width, height);
+	this.bg_code = options.bg_code.value;
+}
+Room.prototype.ExportOptions = function(){
+	var options = {};
+    options.level_id = new TextDropdown(
+        House.GetLevels(), this.level_id
+    );
+	options.width = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
+	options.height = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
+	options.view_scale = new NumberOption(this.camera.view_scale);
+	options.edge_death = new CheckboxOption(this.edge_death);
+	options.bg_code = new BigTextOption(this.bg_code);
+	return options;
+}
+/********************************************************************/
+
 /////////////////////boilerplate
 Room.prototype.GenerateOptions = function(){
 	var dom = document.createElement("div");
@@ -140,3 +183,4 @@ Room.prototype.GenerateOptions = function(){
 	
 	return { dom: dom, submit: submit };
 }
+

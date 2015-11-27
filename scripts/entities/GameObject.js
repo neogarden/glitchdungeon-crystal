@@ -17,6 +17,14 @@ function GameObject(x, y, lb, tb, rb, bb){
 	this.kill_player = false;
 }
 
+/************************************************************/
+GameObject.prototype.Load = function(obj){
+    this.Import(obj);
+}
+GameObject.prototype.Save = function(){
+    return this.Export();
+}
+/************************************************************/
 GameObject.prototype.Import = function(obj){
 	this.x = obj.x;
 	this.y = obj.y;
@@ -39,11 +47,12 @@ GameObject.prototype.Export = function(){
 		kill_player: this.kill_player
 	};
 }
+/************************************************************/
 GameObject.prototype.ExportOptions = function(){
 	return {};
 }
-GameObject.prototype.ImportOptions = function(options){
-}
+GameObject.prototype.ImportOptions = function(options){}
+/************************************************************/
 
 GameObject.prototype.GenerateOptions = function(){
 	var dom = document.createElement("div");

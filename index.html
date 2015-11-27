@@ -19,11 +19,14 @@
 
 <!--Load all the scripts to be used-->
 <script src="scripts/Utils.js"></script>
+<script src="scripts/GameUtils.js"></script>
 <script src="scripts/managers/FileManager.js"></script>
 <script src="scripts/managers/KeyManager.js"></script>
 <script src="scripts/managers/InputManager.js"></script>
 <script src="scripts/managers/ResourceManager.js"></script>
+<!-- &&&&&&&&&&&&&&&&&&&& MAIN &&&&&&&&&&&-->
 <script src="scripts/Main.js"></script>
+<script src="scripts/Trophy.js"></script>
 
 <!--Level editor-->
 <script src="scripts/level_editor/LevelEditManager.js"></script>
@@ -34,9 +37,11 @@
 <script src="scripts/level_editor/NumberOption.js"></script>
 <script src="scripts/level_editor/CheckboxOption.js"></script>
 
-<!--House and Rooms-->
+<!--World and House and Rooms-->
 <script src="scripts/rooms/House.js"></script>
+<script src="scripts/rooms/HouseLoader.js"></script>
 <script src="scripts/rooms/Room.js"></script>
+<script src="scripts/rooms/RoomLoader.js"></script>
 <script src="scripts/rooms/RoomIllusion.js"></script>
 <script src="scripts/rooms/Camera.js"></script>
 
@@ -87,34 +92,32 @@
 		<input type="radio" name="collision" value="Tile.KILL_PLAYER">
 			<span style="width:32px;height:32px;background-color:#ff0000;border: 1px solid white;">&nbsp;&nbsp;</span> deadly<br/>
 	  </div>
-	  <!--<div id="etc_options" style="display:none;">
-	  <select id="glitch_options" style="position:absolute;right:10px;top:140px;">
-		<option value="Glitch.GREY">NONE</option>
-		<option value="Glitch.GREEN">FEATHER</option>
-		<option value="Glitch.RED">FLOOR</option>
-		<option value="Glitch.ZERO">INVIS</option>
-		<option value="Glitch.GOLD">WALL</option>
-		<option value="Glitch.PINK">MEMORY</option>
-		<option value="Glitch.BLUE">GRAVITY</option>
-		<option value="Glitch.NEGATIVE">WALKTHRUWALLS</option>
-	  </select>
-	  <input type="submit" value="change" style="position:absolute;right:50px;top:164px;" onclick="ledit_change_glitch()"/>
-	  <input type="submit" value="add" style="position:absolute;right:10px;top:164px;" onclick="ledit_add_glitch()"/>
-	  <select id="object_options" style="position:absolute;right:10px;top:196px;">
-		<option value="new Door(0, 0, parseInt(prompt('room x')), parseInt(prompt('room y')), parseInt(prompt('door id')))">Door</option>
-		<option value="new Door(0, 0, parseInt(prompt('room x')), parseInt(prompt('room y')), parseInt(prompt('door id')), true, parseInt(prompt('num artifacts')))">Door (Lock)</option>
-	  </select>
-	  </div>-->
 	  
       <div id="level_edit_buttons" style="display:none;">
 		  Room Position: <span id="house_coordinates">0 0</span><br/>
 		  Prev Room Pos: <span id="house_coordinates_old">0 0</span>
 		<br/>
-		<input type="submit" value="save" onclick="level_edit_manager.TrueSave();"/>
-		<input type="submit" value="save as" onclick="level_edit_manager.Save(prompt('level name?'), true);"/>
+		<input type="submit" value="save" onclick="level_edit_manager.ExportMain();"/>
+		<input type="submit" value="save as" onclick="level_edit_manager.Export(prompt('level name?'), true);"/>
 		<input type="submit" value="load" onclick="ledit_load();"/>
 		<input type="submit" value="reset room" onclick="ledit_reset();"/>
 		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>
+        <br/><br/>
+        <input type="submit" value="game save" onclick="level_edit_manager.Save('main_save', true);"/>
+        <input type="submit" value="game load"/>
+        <br/><br/>
+        <input type="submit" value="save state"/>
+        <input type="submit" value="load state"/>
+        <select id="state_id"></select>
+        <script>
+            var state_id_selector = document.getElementById("state_id");
+            for (var i = 0; i < 8; i++){
+                var option = document.createElement("option");
+                option.value = i;
+                option.innerHTML = i;
+                state_id_selector.appendChild(option);
+            }
+        </script>
 	  </div>
 </body>
 </html>

@@ -123,6 +123,8 @@ function extend(base, sub){
 		enumerable: false, 
 		value: sub 
 	});
+    
+    sub.prototype.Parent = function(){ return base.prototype; }
 }
 
 function $(id){

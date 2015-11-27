@@ -393,13 +393,13 @@ LevelEditManager.prototype.AddGlitch = function(){
 	room.glitch_time = 0;
 }
 
-LevelEditManager.prototype.TrueSave = function(){
+LevelEditManager.prototype.ExportMain = function(){
 	Dialog.Confirm("this will overwrite current main<br/>MAKE SURE EVERYTHING IS OK", function(){
-		level_edit_manager.Save('main', true)
+		level_edit_manager.Export('main', true)
 	}, "save to main?", "YES, save");
 }
 
-LevelEditManager.prototype.Save = function(level_name, should_alert){
+LevelEditManager.prototype.Export = function(level_name, should_alert){
   var path = "assets/rooms/"+level_name+"/";
   var json = room_manager.Export();
   FileManager.ensureExists(path, function(err){
@@ -426,17 +426,6 @@ LevelEditManager.prototype.Save = function(level_name, should_alert){
       Dialog.Alert("error saving level!<br/>(check console for details)");
     }
   });
-}
-
-LevelEditManager.prototype.Load = function(){
-	var obj_str = $("level_edit_export_text").value;
-	try{
-		if (obj_str !== null && obj_str !== ""){
-			room.Import(JSON.parse(obj_str));
-		}
-	}catch(e){
-		console.log(e);
-	}
 }
 
 LevelEditManager.prototype.ResetRoom = function(){

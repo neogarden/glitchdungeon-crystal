@@ -13,6 +13,7 @@ TextDropdown.prototype.ExportDom = function(att_name){
         select.appendChild(option);
     }
 	this.dom = select;
+    this.dom.value = this.value;
 	
 	return select;
 }

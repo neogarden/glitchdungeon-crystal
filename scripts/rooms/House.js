@@ -10,7 +10,6 @@ function House(){
 	this.room_index_x = 0;
 	this.room_index_y = 0;
 
-	this.num_artifacts = 0;
 	this.has_spellbook = false;
 	this.spellbook = [];
 	this.glitch_type = Glitch.GREY;
@@ -40,7 +39,6 @@ House.prototype.Restart = function(){
 	this.submitted = false;
 	//this.beat_game = false;
 
-	this.num_artifacts = 0;
 	this.has_spellbook = false;
 	this.spellbook = [];
 	this.glitch_type = Glitch.GREY;
@@ -79,8 +77,6 @@ House.prototype.Reset = function(){
 		room_y: this.room_index_y,
 		facing: player.facing
 	};
-	
-	this.num_artifacts = 0;
 	
 	this.ChangeRoom();
 }

@@ -73,6 +73,8 @@ Door.prototype.Update = function(map){
 	}
 	GameSprite.prototype.Update.call(this, map);
 	
+	var num_needed_artifacts = player.NumArtifacts();
+	
 	if (this.IsColliding(player)){
 		if (player.on_ground){
 			player.touching_door = true;
@@ -81,13 +83,13 @@ Door.prototype.Update = function(map){
 				player.vel.x = 0;
 				
 				if (this.locked){
-					if (room_manager.num_artifacts >= this.num_artifacts){
+					if (num_needed_artifacts >= this.num_artifacts){
 						this.locked = false;
 						room.Speak("door unlocked");
 						Utils.playSound("LA_Chest_Open", master_volume, 0);
 						this.talking = true;
 					}else{
-						room.Speak("door is locked\nneed " + (this.num_artifacts-room_manager.num_artifacts) + " spells more");
+						room.Speak("door is locked\nneed " + (this.num_artifacts-num_needed_artifacts) + " spells more");
 						Utils.playSound("locked", master_volume, 0);
 						this.talking = true;
 					}

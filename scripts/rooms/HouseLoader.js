@@ -16,6 +16,7 @@ House.prototype.SaveToFile = function(){
               JSON.stringify(room));
           }
         }
+		FileManager.saveFile(path + "player.json", json.player);
         FileManager.saveFile(path + "etc.json", json.etc);
         if (should_alert) Dialog.Alert("game saved!");
         return;
@@ -33,11 +34,9 @@ House.prototype.Save = function(){
     var room_jsons = [];
     var etc = {
 		checkpoint: this.checkpoint,
-		num_artifacts: this.num_artifacts,
-		has_spellbook: this.has_spellbook,
-		spellbook: this.spellbook,
 		room_indices: [],
 	};
+	var player_json = JSON.stringify(player.Save());
     for (var i in this.rooms){
         var room_row = [];
         for (var j in this.rooms[i]){
@@ -53,7 +52,7 @@ House.prototype.Save = function(){
         room_jsons.push(room_row);
     }
 
-    return {rooms: room_jsons, etc: JSON.stringify(etc)};
+    return {rooms: room_jsons, etc: JSON.stringify(etc), player: player_json};
 }
 
 House.prototype.Load = function(callback){
@@ -74,9 +73,6 @@ House.prototype.Load = function(callback){
 		}
 		
 		var etc = JSON.parse(json);
-		this.num_artifacts = etc.num_artifacts;
-		this.has_spellbook = etc.has_spellbook;
-		this.spellbook = etc.spellbook;
 		needs_loading = etc.room_indices.length;
 		
 		for (var i = 0; i < etc.room_indices.length; i++){
@@ -101,7 +97,10 @@ House.prototype.Load = function(callback){
 					this.new_checkpoint = null;
 					this.RevivePlayer(false);
 					
-					callback();
+					FileManager.loadFile(path + "player.json", function(err, json){
+						player.Load(JSON.parse(json));
+						callback();
+					}
 				}
 			}.bind(this, y, x));
 		}

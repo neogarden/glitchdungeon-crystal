@@ -7,9 +7,32 @@ function Player(x, y){
 
 	this.hat_image = resource_manager.hat_grey_sheet;
 	
+	//inventory and state
+	this.spellbook = [];
+	this.has_spellbook = false;
+	this.NumArtifacts = function(){ return this.spellbook.length; }
+	
 	this.z_index = -100;
 }
+extend(GameMover, Player);
 
+/*---------------------------------------------------------------*/
+//              FUNCTIONS TO SAVE/LOAD IN NORMAL GAMEPLAY
+//  assumes that appropriate IMPORT function has already been called
+Player.prototype.Load = function(obj){
+    this.has_spellbook = obj.has_spellbook;
+	this.spellbook = obj.spellbook;
+    this.Parent().Load.call(this, obj);
+}
+Player.prototype.Save = function(){
+    var obj = this.Parent().Save.call(this);
+    obj.has_spellbook = this.has_spellbook;
+	obj.spellbook = this.spellbook;
+    return obj;
+}
+/*---------------------------------------------------------------*/
+//              FUNCTIONS TO IMPORT/EXPORT to save level design to file
+//  includes all necessary information to create object from class template
 Player.prototype.Import = function(obj){
 	GameMover.prototype.Import.call(this, obj);
 }
@@ -19,6 +42,8 @@ Player.prototype.Export = function(){
 	obj.img_name = "player_grey_sheet";
 	return obj;
 }
+///////////////////////////////////////////////////////
+
 Player.prototype.Update = function(map){
 	this.DieToSpikesAndStuff(map);
 	GameMover.prototype.Update.call(this, map);
@@ -102,5 +127,3 @@ Player.prototype.Render = function(ctx, camera){
 		ani.frame_width, ani.frame_height
 	);
 }
-
-extend(GameMover, Player);

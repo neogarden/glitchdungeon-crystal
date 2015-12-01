@@ -9,6 +9,18 @@ function Checkpoint(x, y){
 	this.z_index = 9;
 	this.id = new Date().getTime();
 }
+//              FUNCTIONS TO IMPORT/EXPORT to save level design to file
+//  includes all necessary information to create object from class template
+Checkpoint.prototype.Import = function(obj){
+	this.Parent().Import.call(this, obj);
+	this.id = obj.id == undefined ? new Date().getTime() : obj.id;
+}
+Checkpoint.prototype.Export = function(){
+	var obj = this.Parent().Export.call(this);
+	obj.id = this.id;
+	return obj;
+}
+/////////////////////////////////////////
 
 Checkpoint.prototype.Update = function(map){
 	GameSprite.prototype.Update.call(this, map);

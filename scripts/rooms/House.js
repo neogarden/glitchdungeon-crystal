@@ -70,7 +70,7 @@ House.prototype.Restart = function(){
 House.prototype.Reset = function(){
 	this.room_index_x = 0;
 	this.room_index_y = 0;
-	room_manager.rooms = [[new Room()]];
+	this.rooms = [[new Room()]];
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {
@@ -202,8 +202,12 @@ House.prototype.RandomGlitch = function(){
 	
 }
 
-House.prototype.RevivePlayer = function(){
-	this.num_deaths++;
+House.prototype.RevivePlayer = function(has_died){
+	has_died = has_died == undefined ? true : has_died;
+	if (has_died){
+		this.num_deaths++;
+		console.log("num deaths: " + this.num_deaths);
+	}
 
 	this.room_index_x = this.checkpoint.room_x;
 	this.room_index_y = this.checkpoint.room_y;
@@ -222,7 +226,6 @@ House.prototype.RevivePlayer = function(){
 	}
 	player.facing = this.checkpoint.facing;
 	player.die_to_suffocation = true;
-	console.log("num deaths: " + this.num_deaths);
 }
 
 House.prototype.GlitchRevivePlayer = function(){

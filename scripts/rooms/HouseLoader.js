@@ -2,7 +2,7 @@ House.prototype.SaveToFile = function(){
   var should_alert = true;
   var level_name = "main_save";
   var path = "assets/rooms/"+level_name+"/";
-  var json = room_manager.Save();
+  var json = this.Save();
   FileManager.ensureExists(path, function(err){
     try{
       if (err) console.log(err);
@@ -31,7 +31,13 @@ House.prototype.SaveToFile = function(){
 
 House.prototype.Save = function(){
     var room_jsons = [];
-    var etc = {room_indices: []};
+    var etc = {
+		checkpoint: this.checkpoint,
+		num_artifacts: this.num_artifacts,
+		has_spellbook: this.has_spellbook,
+		spellbook: this.spellbook,
+		room_indices: [],
+	};
     for (var i in this.rooms){
         var room_row = [];
         for (var j in this.rooms[i]){
@@ -67,11 +73,14 @@ House.prototype.Load = function(callback){
 			return;
 		}
 		
-		this.etc = JSON.parse(json);
-		needs_loading = this.etc.room_indices.length;
+		var etc = JSON.parse(json);
+		this.num_artifacts = etc.num_artifacts;
+		this.has_spellbook = etc.has_spellbook;
+		this.spellbook = etc.spellbook;
+		needs_loading = etc.room_indices.length;
 		
-		for (var i = 0; i < this.etc.room_indices.length; i++){
-			var index = this.etc.room_indices[i];
+		for (var i = 0; i < etc.room_indices.length; i++){
+			var index = etc.room_indices[i];
 			var y = index.y;
 			var x = index.x;
 			FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){
@@ -86,14 +95,11 @@ House.prototype.Load = function(callback){
 				if (loaded === needs_loading){
 					//FINISHED LOADING ALL THE LEVELS
 					var room = this.rooms[this.room_index_y][this.room_index_x];
-					this.checkpoint = {
-						x: player.x, y: player.y,
-						room_x: this.room_index_x,
-						room_y: this.room_index_y,
-						facing: player.facing
-					};
+					
+					this.checkpoint = etc.checkpoint;
 					this.old_checkpoint = null;
 					this.new_checkpoint = null;
+					this.RevivePlayer(false);
 					
 					callback();
 				}
@@ -151,14 +157,14 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 			return;
 		}
 		
-		this.etc = JSON.parse(json);
-		needs_loading = this.etc.room_indices.length;
+		var etc = JSON.parse(json);
+		needs_loading = etc.room_indices.length;
 		
 		if (reset_rooms)
 			this.rooms = {};
 		
-		for (var i = 0; i < this.etc.room_indices.length; i++){
-			var index = this.etc.room_indices[i];
+		for (var i = 0; i < etc.room_indices.length; i++){
+			var index = etc.room_indices[i];
 			var y = index.y;
 			var x = index.x;
 			FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){

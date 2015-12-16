@@ -20,6 +20,11 @@ function Player(x, y){
 	this.glitch_type = Glitch.GREY;
 	this.glitch_index = -1;
 	
+	//inventory and state
+	this.spellbook = [];
+	this.has_spellbook = false;
+	this.NumArtifacts = function(){ return this.spellbook.length; }
+	
 	this.z_index = -100;
 	this.hat_image = resource_manager.hat_grey_sheet;
 }

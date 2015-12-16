@@ -11,6 +11,22 @@ function Door(x, y, room_x, room_y, door_id, locked, num_artifacts){
 	
 	this.z_index = 10;
 }
+extend(GameSprite, Door);
+/*---------------------------------------------------------------*/
+//              FUNCTIONS TO SAVE/LOAD IN NORMAL GAMEPLAY
+//  assumes that appropriate IMPORT function has already been called
+Door.prototype.Load = function(obj){
+    this.locked = obj.locked;
+    this.Parent().Load.call(this, obj);
+}
+Door.prototype.Save = function(){
+    var obj = this.Parent().Save.call(this);
+    obj.locked = this.locked;
+    return obj;
+}
+/*---------------------------------------------------------------*/
+//              FUNCTIONS TO IMPORT/EXPORT to save level design to file
+//  includes all necessary information to create object from class template
 Door.prototype.Import = function(obj){
 	GameSprite.prototype.Import.call(this, obj);
 	this.lb = 4;
@@ -49,7 +65,7 @@ Door.prototype.ExportOptions = function(){
 	options.num_artifacts = new NumberOption(this.num_artifacts);
 	return options;
 }
-extend(GameSprite, Door);
+///////////////////////////////////////////////////////////////////
 
 Door.prototype.Update = function(map){
     var _artifacts = player.inventory.artifacts.length;
@@ -58,6 +74,8 @@ Door.prototype.Update = function(map){
 		return;
 	}
 	GameSprite.prototype.Update.call(this, map);
+	
+	var num_needed_artifacts = player.NumArtifacts();
 	
 	if (this.IsColliding(player)){
 		if (player.on_ground){

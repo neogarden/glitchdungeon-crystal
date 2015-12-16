@@ -58,7 +58,7 @@ Collection.prototype.Update = function(map){
 		Utils.playSound("pickup", master_volume, 0);
         player.inventory.artifacts.push(this);
 		room.Speak("item get: "+this.GetName(false));
-		this.GetName(true);
+		this.GetName(true, player);
 	}
     this.UpdateAnimation();
 	
@@ -88,9 +88,9 @@ Collection.prototype.GetCollectionTypes = function(){
     return collection_types;
 }
 
-Collection.prototype.GetName = function(activate_event){
+Collection.prototype.GetName = function(activate_event, player){
 	switch (this.collection_id){
-		case 0: 
+		case 0:
             if (activate_event) 
                 this.Grimoire(); 
             return "grimoire";
@@ -163,8 +163,7 @@ Collection.prototype.InvisSpell = function(){
 }
 
 Collection.prototype.UndefinedSpell = function(){    
-    this.AddSpell(Glitch.NEGATIVE);
-    
+    this.AddSpell(Glitch.NEGATIVE);    
     bg_name = "TomWoxom_North";
     if (resource_manager.play_music){
         stopMusic();
@@ -172,6 +171,6 @@ Collection.prototype.UndefinedSpell = function(){
     }
 }
 
-Collection.prototype.MemorySpell = function(){
+Collection.prototype.MemorySpell = function(player){
     Glitch.PinkTransform();
 }

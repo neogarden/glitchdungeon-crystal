@@ -1,6 +1,2 @@
-0.  save player checkpoint O_O_
-    B. SAVE STATE: (things to save)
-        0) ***everything specified above PLUS***
-        1) current player spot
-        2) 
+0. (give the player an inventory to manage things instead of holding glitches in the level manager??)
 1. start designing "scenarios" 

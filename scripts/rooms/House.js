@@ -10,7 +10,6 @@ function House(){
 	this.room_index_x = 0;
 	this.room_index_y = 0;
 
-	this.num_artifacts = 0;
 	this.has_spellbook = false;
 	this.spellbook = [];
 	this.glitch_type = Glitch.GREY;
@@ -61,7 +60,7 @@ House.prototype.Restart = function(){
 House.prototype.Reset = function(){
 	this.room_index_x = 0;
 	this.room_index_y = 0;
-	room_manager.rooms = [[new Room()]];
+	this.rooms = [[new Room()]];
 	
 	var room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {
@@ -70,8 +69,6 @@ House.prototype.Reset = function(){
 		room_y: this.room_index_y,
 		facing: player.facing
 	};
-	
-	this.num_artifacts = 0;
 	
 	this.ChangeRoom();
 }
@@ -175,7 +172,6 @@ House.prototype.RevivePlayer = function(){
 	}
 	player.facing = this.checkpoint.facing;
 	player.die_to_suffocation = true;
-	console.log("num deaths: " + this.num_deaths);
 }
 
 House.prototype.GlitchRevivePlayer = function(){

@@ -2,7 +2,7 @@ House.prototype.SaveToFile = function(){
   var should_alert = true;
   var level_name = "main_save";
   var path = "assets/rooms/"+level_name+"/";
-  var json = room_manager.Save();
+  var json = this.Save();
   FileManager.ensureExists(path, function(err){
     try{
       if (err) console.log(err);
@@ -32,7 +32,11 @@ House.prototype.SaveToFile = function(){
 
 House.prototype.Save = function(){
     var room_jsons = [];
-    var etc = {room_indices: []};
+    var etc = {
+		checkpoint: this.checkpoint,
+		room_indices: [],
+	};
+	var player_json = JSON.stringify(player.Save());
     for (var i in this.rooms){
         var room_row = [];
         for (var j in this.rooms[i]){
@@ -157,14 +161,14 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 			return;
 		}
 		
-		this.etc = JSON.parse(json);
-		needs_loading = this.etc.room_indices.length;
+		var etc = JSON.parse(json);
+		needs_loading = etc.room_indices.length;
 		
 		if (reset_rooms)
 			this.rooms = {};
 		
-		for (var i = 0; i < this.etc.room_indices.length; i++){
-			var index = this.etc.room_indices[i];
+		for (var i = 0; i < etc.room_indices.length; i++){
+			var index = etc.room_indices[i];
 			var y = index.y;
 			var x = index.x;
 			FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){

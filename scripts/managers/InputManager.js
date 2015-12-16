@@ -32,10 +32,8 @@ InputManager.prototype.Update = function(player){
 		player.PressX();
 	}
 	
-	if (this.key_manager.keys_pressed[KeyManager.SPACE] && room_manager.has_spellbook){
-		//if (player.on_ground){
-			room_manager.RandomGlitch();
-		//}
+	if (this.key_manager.keys_pressed[KeyManager.SPACE]){
+        player.NextGlitch();
 	}
 	
 	if (this.key_manager.keys_pressed[KeyManager.DEL]){
@@ -50,7 +48,7 @@ InputManager.prototype.Update = function(player){
 		else Utils.playSound("error", master_volume, 0);
 	}
 	
-	for (var i = 0; i < KeyManager.NUMBERS.length; i++){
+	/*for (var i = 0; i < KeyManager.NUMBERS.length; i++){
 		if (this.key_manager.keys_pressed[KeyManager.NUMBERS[i]] && room_manager.has_spellbook && room_manager.spellbook.length > i){
 			var temp = room_manager.glitch_index;
 			room_manager.glitch_index = i-1;
@@ -58,16 +56,13 @@ InputManager.prototype.Update = function(player){
 			if (room_manager.glitch_index === i-1)
 				room_manager.glitch_index = temp;
 		}
-	}
+	}*/
 	
-	if (this.key_manager.keys_pressed[KeyManager.A] && room_manager.has_spellbook){
-		room_manager.glitch_index-=2;
-		if (room_manager.glitch_index < 0)
-			room_manager.glitch_index = room_manager.spellbook.length + room_manager.glitch_index;
-		room_manager.RandomGlitch();
+	if (this.key_manager.keys_pressed[KeyManager.A]){
+		player.PrevGlitch();
 	}
-	if (this.key_manager.keys_pressed[KeyManager.S] && room_manager.has_spellbook){
-		room_manager.RandomGlitch();
+	if (this.key_manager.keys_pressed[KeyManager.S]){
+		player.NextGlitch();
 	}
 	
 	

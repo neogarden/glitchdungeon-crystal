@@ -16,6 +16,7 @@ House.prototype.SaveToFile = function(){
               JSON.stringify(room));
           }
         }
+        FileManager.saveFile(path + "player.json", json.player);
         FileManager.saveFile(path + "etc.json", json.etc);
         if (should_alert) Dialog.Alert("game saved!");
         return;
@@ -47,9 +48,11 @@ House.prototype.Save = function(){
         room_jsons.push(room_row);
     }
 
-    return {rooms: room_jsons, etc: JSON.stringify(etc)};
+    return {
+        player: JSON.stringify(player.Save()),
+        rooms: room_jsons, 
+        etc: JSON.stringify(etc)};
 }
-
 House.prototype.Load = function(callback){
     var level_name = "main_save";
 	var path = this.path + "/" + level_name + "/";
@@ -59,47 +62,50 @@ House.prototype.Load = function(callback){
 	
 	if (player === undefined)
 		player = new Player(13, 64);
-	
-	FileManager.loadFile(path + "etc.json", function(err, json){
-		if (err){
-			alert("error loading level");
-			console.log(err);
-			return;
-		}
-		
-		this.etc = JSON.parse(json);
-		needs_loading = this.etc.room_indices.length;
-		
-		for (var i = 0; i < this.etc.room_indices.length; i++){
-			var index = this.etc.room_indices[i];
-			var y = index.y;
-			var x = index.x;
-			FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){
-				if (error){
-					alert("error loading level");
-					console.log(error);
-				}
-				
-				var room_save = JSON.parse(json);
-				this.rooms[y][x].Load(room_save);
-				loaded++;
-				if (loaded === needs_loading){
-					//FINISHED LOADING ALL THE LEVELS
-					var room = this.rooms[this.room_index_y][this.room_index_x];
-					this.checkpoint = {
-						x: player.x, y: player.y,
-						room_x: this.room_index_x,
-						room_y: this.room_index_y,
-						facing: player.facing
-					};
-					this.old_checkpoint = null;
-					this.new_checkpoint = null;
-					
-					callback();
-				}
-			}.bind(this, y, x));
-		}
-	}.bind(this));
+
+    FileManager.loadFile(path + "player.json", function(err, json){
+        player.Load(JSON.parse(json));
+        FileManager.loadFile(path + "etc.json", function(err, json){
+            if (err){
+                alert("error loading level");
+                console.log(err);
+                return;
+            }
+            
+            this.etc = JSON.parse(json);
+            needs_loading = this.etc.room_indices.length;
+            
+            for (var i = 0; i < this.etc.room_indices.length; i++){
+                var index = this.etc.room_indices[i];
+                var y = index.y;
+                var x = index.x;
+                FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){
+                    if (error){
+                        alert("error loading level");
+                        console.log(error);
+                    }
+                    
+                    var room_save = JSON.parse(json);
+                    this.rooms[y][x].Load(room_save);
+                    loaded++;
+                    if (loaded === needs_loading){
+                        //FINISHED LOADING ALL THE LEVELS
+                        var room = this.rooms[this.room_index_y][this.room_index_x];
+                        this.checkpoint = {
+                            x: player.x, y: player.y,
+                            room_x: this.room_index_x,
+                            room_y: this.room_index_y,
+                            facing: player.facing
+                        };
+                        this.old_checkpoint = null;
+                        this.new_checkpoint = null;
+                        
+                        callback();
+                    }
+                }.bind(this, y, x));
+            }
+        }.bind(this));
+    }.bind(this));
 }
 
 /***********************************************************************/

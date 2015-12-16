@@ -4,21 +4,60 @@ function Player(x, y){
 	this.animation.frame_height = 16;
 	this.touching_door = false;
 	this.touching_checkpoint = false;
+    
+    this.num_deaths = 0;
+	this.spells_cast = 0;
 
-	this.hat_image = resource_manager.hat_grey_sheet;
+    //INVENTORY 
+	this.inventory = {
+        spellbook: {
+            active: false,
+            spells: []
+        },
+        artifacts: []
+    };
+    
+	this.glitch_type = Glitch.GREY;
+	this.glitch_index = -1;
 	
 	this.z_index = -100;
+	this.hat_image = resource_manager.hat_grey_sheet;
 }
+extend(GameMover, Player);
 
+/*---------------------------------------------------------------*/
+//              FUNCTIONS TO SAVE/LOAD IN NORMAL GAMEPLAY
+//  assumes that appropriate IMPORT function has already been called
+Player.prototype.Load = function(obj){
+    this.inventory = obj.inventory;
+    this.glitch_type = obj.glitch_type;
+    this.glitch_index = obj.glitch_index;
+    this.num_deaths = obj.num_deaths;
+    this.spells_cast = obj.spells_cast;
+    this.Parent().Load.call(this, obj);
+}
+Player.prototype.Save = function(){
+    var obj = this.Parent().Save.call(this);
+    obj.inventory = this.inventory;
+    obj.glitch_type = this.glitch_type;
+    obj.glitch_index = this.glitch_index;
+    obj.num_deaths = this.num_deaths;
+    obj.spells_cast = this.spells_cast;
+    return obj;
+}
+/*---------------------------------------------------------------*/
+//              FUNCTIONS TO IMPORT/EXPORT to save level design to file
+//  includes all necessary information to create object from class template
 Player.prototype.Import = function(obj){
 	GameMover.prototype.Import.call(this, obj);
 }
-
 Player.prototype.Export = function(){
 	var obj = GameMover.prototype.Export.call(this);
 	obj.img_name = "player_grey_sheet";
 	return obj;
 }
+/*---------------------------------------------------------------*/
+
 Player.prototype.Update = function(map){
 	this.DieToSpikesAndStuff(map);
 	GameMover.prototype.Update.call(this, map);
@@ -27,6 +66,42 @@ Player.prototype.Update = function(map){
 }
 
 Player.prototype.PressX = function(){
+}
+
+Player.prototype.NextGlitch = function(){
+    if (!this.inventory.spellbook.active) return;
+	this.spells_cast++;
+	Utils.playSound("switchglitch", master_volume, 0);
+
+	/*var rindex = Math.floor(Math.random()*this.spellbook.length);
+	var glitch = this.spellbook[rindex];
+	while (this.spellbook.length > 1 && glitch == this.glitch_type){
+		rindex++;
+		if (rindex >= this.spellbook.length) rindex = 0;
+		glitch = this.spellbook[rindex];
+	}*/
+	this.glitch_index++;
+	if (this.glitch_index >= this.inventory.spellbook.spells.length)
+		this.glitch_index = 0; //-1;
+		
+	if (this.glitch_index < 0){
+		//room.glitch_time = room.glitch_time_limit;
+		this.glitch_type = Glitch.GREY;
+	}
+	if (this.glitch_index >= 0){
+		this.glitch_type = this.inventory.spellbook.spells[this.glitch_index];
+		room.glitch_time = 0;
+	}
+	
+	room.glitch_type = this.glitch_type;
+	Glitch.TransformPlayer(room, this.glitch_type);
+}
+
+Player.prototype.PrevGlitch = function(){
+    room_manager.glitch_index-=2;
+    if (room_manager.glitch_index < 0)
+        room_manager.glitch_index = room_manager.spellbook.length + room_manager.glitch_index;
+    this.NextGlitch();
 }
 
 Player.prototype.DieToSpikesAndStuff = function(map){
@@ -66,6 +141,7 @@ Player.prototype.DieToSpikesAndStuff = function(map){
 
 Player.prototype.Die = function(){
 	Utils.playSound("hurt", master_volume, 0);
+    this.num_deaths++;
 	room_manager.RevivePlayer();
 }
 
@@ -102,5 +178,3 @@ Player.prototype.Render = function(ctx, camera){
 		ani.frame_width, ani.frame_height
 	);
 }
-
-extend(GameMover, Player);

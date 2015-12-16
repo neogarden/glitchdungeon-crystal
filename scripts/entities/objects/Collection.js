@@ -56,7 +56,7 @@ Collection.prototype.Update = function(map){
 		//this.delete_me = true;
         this.visible = false;
 		Utils.playSound("pickup", master_volume, 0);
-		room_manager.num_artifacts++;
+        player.inventory.artifacts.push(this);
 		room.Speak("item get: "+this.GetName(false));
 		this.GetName(true);
 	}
@@ -91,35 +91,43 @@ Collection.prototype.GetCollectionTypes = function(){
 Collection.prototype.GetName = function(activate_event){
 	switch (this.collection_id){
 		case 0: 
-            if (activate_event) this.Grimoire(); 
+            if (activate_event) 
+                this.Grimoire(); 
             return "grimoire";
 		case 1: 
-            if (activate_event) this.FeatherSpell(); 
+            if (activate_event) 
+                this.FeatherSpell(); 
             return "feather spell";
 		case 2: 
-            if (activate_event) this.FloorSpell(); 
+            if (activate_event) 
+                this.FloorSpell(); 
             return "floor spell";
 		case 3: 
-            if (activate_event) this.GravitySpell();
+            if (activate_event) 
+                this.GravitySpell();
             return "gravity spell";
 		case 4: 
-            if (activate_event) this.WallSpell();
+            if (activate_event) 
+                this.WallSpell();
             return "wall spell";
 		case 5: 
-            if (activate_event) this.InvisSpell();
+            if (activate_event) 
+                this.InvisSpell();
             return "invis spell";
 		case 6: 
-            if (activate_event) this.UndefinedSpell();
+            if (activate_event) 
+                this.UndefinedSpell();
             return "undefined";
 		case 7: 
-            if (activate_event) this.MemorySpell();
+            if (activate_event) 
+                this.MemorySpell();
             return "memory spell";
 		default: return undefined;
 	}
 }
 
 Collection.prototype.Grimoire = function(){
-    room_manager.has_spellbook = true;
+    player.inventory.spellbook.active = true;
     room.bg_code = "switch (Ǥlitch_type){\n\tcase Ǥlitch.ǤREY:\n\t\tbreak;\n\tcあse Ǥlitch.RED:\n\t\tǤlitch.RedTrあnsform(mあp, mあp.plあyer, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.ǤREEN:\n\t\tǤlitch.ǤreenTrあnsform(mあp, mあp.player, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.BLUE:";
     
     bg_name = "lhommeEraseForm";
@@ -129,34 +137,33 @@ Collection.prototype.Grimoire = function(){
     }
 }
 
-Collection.prototype.FeatherSpell = function(){    
-    if (room_manager.spellbook.indexOf(Glitch.GREEN) < 0)
-        room_manager.spellbook.push(Glitch.GREEN);
+Collection.prototype.AddSpell = function(spell){
+    if (player.inventory.spellbook.spells.indexOf(spell) < 0)
+        player.inventory.spellbook.spells.push(spell);
+}
+
+Collection.prototype.FeatherSpell = function(){
+    this.AddSpell(Glitch.GREEN);
 }
 
 Collection.prototype.FloorSpell = function(){
-    if (room_manager.spellbook.indexOf(Glitch.RED) < 0)
-        room_manager.spellbook.push(Glitch.RED);
+    this.AddSpell(Glitch.RED);
 }
 
 Collection.prototype.GravitySpell = function(){
-    if (room_manager.spellbook.indexOf(Glitch.BLUE) < 0)
-        room_manager.spellbook.push(Glitch.BLUE);
+    this.AddSpell(Glitch.BLUE);
 }
 
 Collection.prototype.WallSpell = function(){
-    if (room_manager.spellbook.indexOf(Glitch.GOLD) < 0)
-        room_manager.spellbook.push(Glitch.GOLD);
+    this.AddSpell(Glitch.GOLD);
 }
 
 Collection.prototype.InvisSpell = function(){
-    if (room_manager.spellbook.indexOf(Glitch.ZERO) < 0)
-        room_manager.spellbook.push(Glitch.ZERO);
+    this.AddSpell(Glitch.ZERO);
 }
 
 Collection.prototype.UndefinedSpell = function(){    
-    if (room_manager.spellbook.indexOf(Glitch.NEGATIVE) < 0)
-        room_manager.spellbook.push(Glitch.NEGATIVE);
+    this.AddSpell(Glitch.NEGATIVE);
     
     bg_name = "TomWoxom_North";
     if (resource_manager.play_music){

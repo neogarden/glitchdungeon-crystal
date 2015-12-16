@@ -1,12 +1,4 @@
-0. Implement a "save" sort of thing, that will save the player's place and "collected" abilities and current glitch?
-    A. SAVE GAME: (things to save)
-        ****EASIEST THING TO DO:: give every object a save function        
-            ***every time a "save" is done, call an export/import and store as 'current game' or something
-            ***on top of the export, call the "SAVE" function
-        
-        1) Last recorded checkpoint (revive at that checkpoint)
-        2) All collected inventory (give the player an inventory to manage things instead of holding glitches in the level manager??)
-        3) states of collectables (collected or not)
+0.  save player checkpoint O_O_
     B. SAVE STATE: (things to save)
         0) ***everything specified above PLUS***
         1) current player spot

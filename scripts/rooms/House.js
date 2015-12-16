@@ -33,18 +33,9 @@ House.GetLevels = function(){
 
 /********************************************************************/
 House.prototype.Restart = function(){
-	this.num_deaths = 0;
-	this.spells_cast = 0;
 	this.then = Date.now();
 	this.time = 0;
 	this.submitted = false;
-	//this.beat_game = false;
-
-	this.num_artifacts = 0;
-	this.has_spellbook = false;
-	this.spellbook = [];
-	this.glitch_type = Glitch.GREY;
-	this.glitch_index = -1;
 
 	this.room_index_x = 0;
 	this.room_index_y = 0;
@@ -94,7 +85,7 @@ House.prototype.GetRoom = function(){
 House.prototype.ChangeRoom = function(cx, cy){
 	player.pressing_down = false;
 	player.pressed_down = false;
-	var glitch_type = this.glitch_type;
+	var glitch_type = player.glitch_type;
 	var could_use_spellbook = room.can_use_spellbook;
 	
 	if (this.GetRoom() === undefined){
@@ -140,14 +131,12 @@ House.prototype.ChangeRoom = function(cx, cy){
 	this.old_room_index_x = this.room_index_x;
 	this.old_room_index_y = this.room_index_y;
 	
-	player = player;
-	
 	room.Speak(null);
 	if (!room.can_use_spellbook)
 		room.Speak("a dark force prevents\nyou from casting\nspells here");
 	//MAKE SURE THE FORM CHANGE REMAINS BETWEEN ROOMS
 	if (!could_use_spellbook){
-		this.glitch_index = this.spellbook.length-1;
+		player.glitch_index = player.inventory.spellbook.spells.length-1;
 		Glitch.TransformPlayer(room, Glitch.GREY);
 	}else{
 		Glitch.TransformPlayer(room, room.glitch_type); //this.glitch);
@@ -168,43 +157,7 @@ House.prototype.ChangeRoom = function(cx, cy){
 	//if (player.x >= room.MAP_WIDTH * Tile.WIDTH - 8) player.x -= 8;
 }
 
-House.prototype.RandomGlitch = function(){
-	if (this.room_index_x === 5 && this.room_index_y === 5) return;
-	if (!this.GetRoom().can_use_spellbook){
-		Utils.playSound("error", master_volume, 0);
-		return;
-	}
-	this.spells_cast++;
-	Utils.playSound("switchglitch", master_volume, 0);
-
-	/*var rindex = Math.floor(Math.random()*this.spellbook.length);
-	var glitch = this.spellbook[rindex];
-	while (this.spellbook.length > 1 && glitch == this.glitch_type){
-		rindex++;
-		if (rindex >= this.spellbook.length) rindex = 0;
-		glitch = this.spellbook[rindex];
-	}*/
-	this.glitch_index++;
-	if (this.glitch_index >= this.spellbook.length)
-		this.glitch_index = 0; //-1;
-		
-	if (this.glitch_index < 0){
-		//room.glitch_time = room.glitch_time_limit;
-		this.glitch_type = Glitch.GREY;
-	}
-	if (this.glitch_index >= 0){
-		this.glitch_type = this.spellbook[this.glitch_index];
-		room.glitch_time = 0;
-	}
-	
-	room.glitch_type = this.glitch_type;
-	Glitch.TransformPlayer(room, this.glitch_type);
-	
-}
-
 House.prototype.RevivePlayer = function(){
-	this.num_deaths++;
-
 	this.room_index_x = this.checkpoint.room_x;
 	this.room_index_y = this.checkpoint.room_y;
 	this.ChangeRoom();

@@ -74,7 +74,9 @@ LevelEditManager.prototype.New = function(){
 	room_manager.New();
 }
 LevelEditManager.prototype.Load = function(){
-	this.level_main_name = prompt("level name?");
+	var level_name = prompt("level name?");
+	if (level_name === null || level_name === undefined) return;
+	this.level_main_name = level_name;
 	room_manager.Import(this.level_main_name, function(){
 		room_manager.ChangeRoom();
 	});
@@ -407,8 +409,9 @@ LevelEditManager.prototype.AddGlitch = function(){
 }
 
 LevelEditManager.prototype.ExportMain = function(){
+	var lmn = this.level_main_name;
 	Dialog.Confirm("this will overwrite current level: "+this.level_main_name+"<br/>MAKE SURE EVERYTHING IS OK", function(){
-		level_edit_manager.Export(this.level_main_name, true)
+		level_edit_manager.Export(lmn, true)
 	}, "save to "+this.level_main_name+"?", "YES, save");
 }
 

@@ -6,6 +6,7 @@ Glitch.BLUE = 4;
 Glitch.GOLD = 5;
 Glitch.NEGATIVE = 6;
 Glitch.PINK = 7;
+Glitch.KID = 8;
 
 Glitch.PREVIOUS = 0;
 
@@ -67,7 +68,11 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual){
 
 	var oldbb = player.bb;
 	switch (glitch_type){
+		case Glitch.KID:
+			Glitch.KidTransform(map, only_visual);
+			break;
 		case Glitch.GREY:
+			Glitch.GreyTransform(map, only_visual);
 			break;
 		case Glitch.RED:
 			Glitch.RedTransform(map, only_visual);
@@ -99,6 +104,25 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual){
 extend(GameSprite, Glitch);
 
 //******GLITCH TRANSFORMATION DEFINTIIONS***************************/
+Glitch.KidTransform = function(map, only_visual){
+	player.img_name = "player_sheet";
+	if (only_visual) return;
+	map.tilesheet_name = "tile_grey_sheet";
+	
+	player.max_run_vel = 1.2;
+	player.animation.frame_delay = 11;
+	
+	player.jump_vel = 3.0;
+	//player.StartJump = function(){}
+	//player.Jump = function(){}
+}
+
+Glitch.GreyTransform = function(map, only_visual){
+	player.img_name = "player_grey_sheet";
+	if (only_visual) return;
+	map.tilesheet_name = "tile_grey_sheet";
+}
+
 Glitch.RedTransform = function(map, only_visual){
 	player.img_name = "player_red_sheet";
 	if (only_visual) return;

@@ -15,6 +15,8 @@ function LevelEditManager(){
 	this.tile_mode = false;
 	this.tile_img_x = 0;
 	this.tile_img_y = 0;
+	
+	this.level_main_name = "main";
 }
 
 LevelEditManager.prototype.Init = function(){
@@ -67,6 +69,17 @@ LevelEditManager.prototype.Disable = function(){
 	$("level_edit_buttons").style.display="none";
 	this.enabled = false;
 }
+
+LevelEditManager.prototype.New = function(){
+	room_manager.New();
+}
+LevelEditManager.prototype.Load = function(){
+	this.level_main_name = prompt("level name?");
+	room_manager.Import(this.level_main_name, function(){
+		room_manager.ChangeRoom();
+	});
+}
+
 
 LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, tile_x, tile_y){
 	var ctx_menu = CtxMenu.Init(mouse_x, mouse_y, document.body);
@@ -394,9 +407,9 @@ LevelEditManager.prototype.AddGlitch = function(){
 }
 
 LevelEditManager.prototype.ExportMain = function(){
-	Dialog.Confirm("this will overwrite current main<br/>MAKE SURE EVERYTHING IS OK", function(){
-		level_edit_manager.Export('main', true)
-	}, "save to main?", "YES, save");
+	Dialog.Confirm("this will overwrite current level: "+this.level_main_name+"<br/>MAKE SURE EVERYTHING IS OK", function(){
+		level_edit_manager.Export(this.level_main_name, true)
+	}, "save to "+this.level_main_name+"?", "YES, save");
 }
 
 LevelEditManager.prototype.Export = function(level_name, should_alert){

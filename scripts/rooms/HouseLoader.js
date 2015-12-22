@@ -57,8 +57,11 @@ House.prototype.Save = function(){
         rooms: room_jsons, 
         etc: JSON.stringify(etc)};
 }
+
 House.prototype.Load = function(callback){
-    var level_name = "main_save";
+	this.LoadName("main_save", callback);
+}
+House.prototype.LoadName = function(level_name, callback){
 	var path = this.path + "/" + level_name + "/";
 	
 	var loaded = 0;
@@ -162,6 +165,8 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 		}
 		
 		var etc = JSON.parse(json);
+		player.x = etc.player_x || 13;
+		player.y = etc.player_y || 64;
 		needs_loading = etc.room_indices.length;
 		
 		if (reset_rooms)
@@ -177,7 +182,7 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 					console.log(error);
 				}
 				
-				var room = JSON.parse(json);
+				room = JSON.parse(json);
 				room.y = y;
 				room.x = x;
 				new_room = new Room();

@@ -99,16 +99,15 @@
 		<br/>
 		<input type="submit" value="save" onclick="level_edit_manager.ExportMain();"/>
 		<input type="submit" value="save as" onclick="level_edit_manager.Export(prompt('level name?'), true);"/>
-		<input type="submit" value="load" onclick="ledit_load();"/>
-		<input type="submit" value="reset room" onclick="ledit_reset();"/>
-		<input type="submit" value="reset house" onclick="ledit_reset_house();"/>
+		<input type="submit" value="load" onclick="level_edit_manager.Load();"/>
         <br/><br/>
         <input type="submit" value="game save" onclick="room_manager.SaveToFile();"/>
         <input type="submit" value="game load" onclick="room_manager.Load(function(){});"/>
-        <br/><br/>
         <input type="submit" value="save state"/>
         <input type="submit" value="load state"/>
         <select id="state_id"></select>
+		<br/><br/>
+		<input type="submit" value="new scenario" onclick="level_edit_manager.New();"/>
         <script>
             var state_id_selector = document.getElementById("state_id");
             for (var i = 0; i < 8; i++){

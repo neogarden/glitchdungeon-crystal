@@ -39,7 +39,7 @@ House.prototype.Restart = function(){
 	this.room_index_x = 0;
 	this.room_index_y = 0;
 	
-	var room = this.rooms[this.room_index_y][this.room_index_x];
+	room = this.rooms[this.room_index_y][this.room_index_x];
 	player.x = 20;
 	player.y = 72;
 	player.facing = Facing.RIGHT;
@@ -57,12 +57,14 @@ House.prototype.Restart = function(){
 	player = player;
 }
 
-House.prototype.Reset = function(){
+House.prototype.New = function(){
 	this.room_index_x = 0;
 	this.room_index_y = 0;
+	this.old_room_index_x = 0;
+	this.old_room_index_y = 0;
 	this.rooms = [[new Room()]];
 	
-	var room = this.rooms[this.room_index_y][this.room_index_x];
+	room = this.rooms[this.room_index_y][this.room_index_x];
 	this.checkpoint = {
 		x: player.x, y: player.y,
 		room_x: this.room_index_x,

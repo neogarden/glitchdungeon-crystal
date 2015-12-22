@@ -10,8 +10,9 @@ function ResourceManager(){
 		"player_grey_sheet",
 		"hat_grey_sheet",
 		"tile_grey_sheet",
-		"npc_sheet"
-		,"obj_sheet",
+		"player_sheet",
+		"npc_sheet",
+		"obj_sheet",
 		"player_green_sheet",
 		"tile_green_sheet",
 		"collection_sheet",
@@ -27,7 +28,7 @@ function ResourceManager(){
 		"player_negative_sheet",
 		"tile_negative_sheet",
 		"player_pink_sheet",
-		"tile_pink_sheet"
+		"tile_pink_sheet",
 	];
 	this.necessary_images = 9;
 	this.num_images = this.image_names.length;

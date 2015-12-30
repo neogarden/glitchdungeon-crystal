@@ -96,7 +96,11 @@ Room.prototype.Update = function(input){
 		if (this.entities[i].delete_me) this.entities.splice(i, 1);
 	}
 	
-	//UPDATE GLITCH SEQUENCE
+	//this.UpdateGlitchSequence();
+}
+
+Room.prototype.UpdateGlitchSequence = function(){
+    //UPDATE GLITCH SEQUENCE
 	if (room_manager && !room_manager.has_spellbook || !this.can_use_spellbook){
 		this.glitch_time++;
 		

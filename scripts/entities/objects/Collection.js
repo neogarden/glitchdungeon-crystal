@@ -2,7 +2,7 @@ function Collection(x, y, collection_id){
 	this.Parent().constructor.call(this, x, y, 2, 2, 14, 16, "collection_sheet");
 	this.type = "Collection";
 	this.collection_id = collection_id;
-	//this.animation.frame_delay = 30;
+	this.animation.frame_delay = 30;
     this.UpdateAnimation();
 	
 	this.z_index = 8;
@@ -92,8 +92,8 @@ Collection.prototype.GetName = function(activate_event, player){
 	switch (this.collection_id){
 		case 0:
             if (activate_event) 
-                this.Grimoire(); 
-            return "grimoire";
+                this.GrimoireLvl1(); 
+            return "grimoire lvl 1";
 		case 1: 
             if (activate_event) 
                 this.FeatherSpell(); 
@@ -122,12 +122,22 @@ Collection.prototype.GetName = function(activate_event, player){
             if (activate_event) 
                 this.MemorySpell();
             return "memory spell";
+        case 8:
+            if (activate_event)
+                this.GrimoireLvl0();
+            return "grimoire lvl 0";
 		default: return undefined;
 	}
 }
 
-Collection.prototype.Grimoire = function(){
+Collection.prototype.GrimoireLvl0 = function(){
     player.inventory.spellbook.active = true;
+    player.inventory.spellbook.level = 0;
+}
+
+Collection.prototype.GrimoireLvl1 = function(){
+    player.inventory.spellbook.active = true;
+    player.inventory.spellbook.level = 1;
     room.bg_code = "switch (Ǥlitch_type){\n\tcase Ǥlitch.ǤREY:\n\t\tbreak;\n\tcあse Ǥlitch.RED:\n\t\tǤlitch.RedTrあnsform(mあp, mあp.plあyer, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.ǤREEN:\n\t\tǤlitch.ǤreenTrあnsform(mあp, mあp.player, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.BLUE:";
     
     bg_name = "lhommeEraseForm";
@@ -138,8 +148,7 @@ Collection.prototype.Grimoire = function(){
 }
 
 Collection.prototype.AddSpell = function(spell){
-    if (player.inventory.spellbook.spells.indexOf(spell) < 0)
-        player.inventory.spellbook.spells.push(spell);
+    player.AddSpell(spell);
 }
 
 Collection.prototype.FeatherSpell = function(){

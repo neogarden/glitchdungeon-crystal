@@ -12,6 +12,7 @@ function Player(x, y){
 	this.inventory = {
         spellbook: {
             active: false,
+            level: 0,
             spells: []
         },
         artifacts: []
@@ -21,14 +22,30 @@ function Player(x, y){
 	this.glitch_index = -1;
 	
 	//inventory and state
-	this.spellbook = [];
-	this.has_spellbook = false;
-	this.NumArtifacts = function(){ return this.spellbook.length; }
+	this.NumArtifacts = function(){ return this.inventory.spellbook.spells.length; }
 	
 	this.z_index = -100;
 	this.hat_image = resource_manager.hat_grey_sheet;
 }
 extend(GameMover, Player);
+
+Player.prototype.AddSpell = function(spell){
+    var spellbook = this.inventory.spellbook;
+    var level = spellbook.level;
+    
+    //spellbook level 0, can only remember one spell at a time
+    if (level == 0){
+        var prev_spell = null;
+        if (spellbook.spells.length >= 1)
+            prev_spell = spellbook.spells[0];
+        spellbook.spells = [spell];
+    }
+    //spellbook level 1, can remember more than one spell
+    else if (level >= 1){
+        if (spellbook.spells.indexOf(spell) < 0)
+            spellbook.spells.push(spell);
+    }
+}
 
 /*---------------------------------------------------------------*/
 //              FUNCTIONS TO SAVE/LOAD IN NORMAL GAMEPLAY
@@ -73,40 +90,73 @@ Player.prototype.Update = function(map){
 Player.prototype.PressX = function(){
 }
 
+Player.prototype.MaintainGlitch = function(){
+    var spellbook = this.inventory.spellbook;
+    var level = spellbook.level;
+    
+    if (level == 0){
+        if (this.glitch_index == 0)
+            Glitch.TransformPlayer(room, this.glitch_type);
+        else
+            Glitch.TransformPlayer(room, room.glitch_sequence[0]);
+    }
+    else if (level == 1){
+        Glitch.TransformPlayer(room, this.glitch_type);
+    }
+}
+
 Player.prototype.NextGlitch = function(){
-    if (!this.inventory.spellbook.active) return;
+    var spellbook = this.inventory.spellbook;
+    if (!spellbook.active || spellbook.spells.length == 0) 
+        return;
 	this.spells_cast++;
 	Utils.playSound("switchglitch", master_volume, 0);
-
-	/*var rindex = Math.floor(Math.random()*this.spellbook.length);
-	var glitch = this.spellbook[rindex];
-	while (this.spellbook.length > 1 && glitch == this.glitch_type){
-		rindex++;
-		if (rindex >= this.spellbook.length) rindex = 0;
-		glitch = this.spellbook[rindex];
-	}*/
-	this.glitch_index++;
-	if (this.glitch_index >= this.inventory.spellbook.spells.length)
-		this.glitch_index = 0; //-1;
-		
-	if (this.glitch_index < 0){
-		//room.glitch_time = room.glitch_time_limit;
-		this.glitch_type = Glitch.GREY;
-	}
-	if (this.glitch_index >= 0){
-		this.glitch_type = this.inventory.spellbook.spells[this.glitch_index];
-		room.glitch_time = 0;
-	}
-	
-	room.glitch_type = this.glitch_type;
+    
+    var level = spellbook.level;
+    
+    if (level == 0){
+        this.glitch_index++;
+        if (this.glitch_index > 1)
+            this.glitch_index = 0;
+        if (this.glitch_index == 1){
+            this.glitch_type = room.glitch_sequence[0];
+        }else{
+            this.glitch_type = spellbook.spells[0];
+        }
+    }
+    else if (level == 1){
+        this.glitch_index++;
+        if (this.glitch_index >= this.inventory.spellbook.spells.length)
+            this.glitch_index = 0;
+            
+        if (this.glitch_index < 0){
+            this.glitch_type = Glitch.GREY;
+        }
+        if (this.glitch_index >= 0){
+            this.glitch_type = this.inventory.spellbook.spells[this.glitch_index];
+            room.glitch_time = 0;
+        }
+    }
+        
+    room.glitch_type = this.glitch_type;
 	Glitch.TransformPlayer(room, this.glitch_type);
 }
 
 Player.prototype.PrevGlitch = function(){
-    room_manager.glitch_index-=2;
-    if (room_manager.glitch_index < 0)
-        room_manager.glitch_index = room_manager.spellbook.length + room_manager.glitch_index;
-    this.NextGlitch();
+    var spellbook = this.inventory.spellbook;
+    if (!spellbook.active || spellbook.spells.length == 0) 
+        return;
+    var level = spellbook.level;
+    
+    if (level == 0){
+        this.NextGlitch();
+    }
+    else if (level == 1){
+        this.glitch_index-=2;
+        if (this.glitch_index < 0)
+            this.glitch_index = this.inventory.spellbook.spells.length + this.glitch_index;
+        this.NextGlitch();
+    }
 }
 
 Player.prototype.DieToSpikesAndStuff = function(map){

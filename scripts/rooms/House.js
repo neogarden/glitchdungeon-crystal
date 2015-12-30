@@ -138,7 +138,7 @@ House.prototype.ChangeRoom = function(cx, cy){
 		player.glitch_index = player.inventory.spellbook.spells.length-1;
 		Glitch.TransformPlayer(room, Glitch.GREY);
 	}else{
-		Glitch.TransformPlayer(room, room.glitch_type); //this.glitch);
+        player.MaintainGlitch();
 	}
 	//player.die_to_suffocation = true;
 

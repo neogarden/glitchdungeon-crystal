@@ -4,29 +4,29 @@ function Room(){
 	this.index_x = 0;
 	this.index_y = 0;
     this.level_id = House.Levels["dungeon"];
-	
+
 	this.MAP_WIDTH = ~~(GAME_WIDTH / Tile.WIDTH);
 	this.MAP_HEIGHT = ~~(GAME_HEIGHT / Tile.HEIGHT);
 	this.VIEW_SCALE = VIEW_SCALE;
-	
+
 	this.edge_death = false;
-	
+
 	this.paused = false;
-	
+
 	this.glitch_type = Glitch.GREY
 	this.glitch_sequence = [];
 	this.glitch_time = 0;
 	this.glitch_index = 0;
 	this.glitch_time_limit = Room.GLITCH_TIME_LIMIT_ORIGINAL;
 	this.can_use_spellbook = true;
-	
+
 	this.bg_code = "";
-	
+
 	this.spoken_text = "";
 	this.speech_display_arrow = false;
 	this.speech_timer = 0;
 	this.speech_time_limit = 0;
-	
+
 	this.tilesheet_name = "tile_grey_sheet";
 	this.camera = new Camera();
 	this.CreateEntities();
@@ -42,7 +42,7 @@ Room.prototype.CreateEntities = function(){
 
 Room.prototype.GetEntityAtXY = function(x, y){
 	if (player.IsPointColliding(x, y)) return player;
-	
+
 	for (var i = 0; i < this.entities.length; i++){
 		var entity = this.entities[i];
 		if (entity.IsPointColliding(x, y)){
@@ -60,21 +60,21 @@ Room.prototype.InitializeTiles = function(){
 			this.tiles[i].push(new Tile(j * Tile.WIDTH, i * Tile.HEIGHT));
 		}
 	}
-	
+
 	//make the top and bottom row solid
 	for (var j = 0; j < this.MAP_WIDTH; j++){
 		this.tiles[0][j].collision = Tile.SOLID;
 		this.tiles[0][j].tileset_y = 1;
-		
+
 		this.tiles[this.MAP_HEIGHT-1][j].collision = Tile.SOLID;
 		this.tiles[this.MAP_HEIGHT-1][j].tileset_y = 1;
 	}
-	
+
 	//make left and right rows solid
 	for (var i = 0; i < this.MAP_HEIGHT; i++){
 		this.tiles[i][0].collision = Tile.SOLID;
 		this.tiles[i][0].tileset_y = 1;
-		
+
 		this.tiles[i][this.MAP_WIDTH-1].collision = Tile.SOLID;
 		this.tiles[i][this.MAP_WIDTH-1].tileset_y = 1;
 	}
@@ -90,12 +90,12 @@ Room.prototype.Update = function(input){
 	player.Update(this);
 	this.TryUpdateRoomIfPlayerOffscreen();
 	this.camera.Update(this);
-	
+
 	for (var i = this.entities.length-1; i >= 0; i--){
 		this.entities[i].Update(this);
 		if (this.entities[i].delete_me) this.entities.splice(i, 1);
 	}
-	
+
 	//this.UpdateGlitchSequence();
 }
 
@@ -103,7 +103,7 @@ Room.prototype.UpdateGlitchSequence = function(){
     //UPDATE GLITCH SEQUENCE
 	if (room_manager && !room_manager.has_spellbook || !this.can_use_spellbook){
 		this.glitch_time++;
-		
+
 		if (this.glitch_sequence.length > 1
 				&& this.glitch_time > this.glitch_time_limit - 60
 				&& this.glitch_time < this.glitch_time_limit)
@@ -118,15 +118,15 @@ Room.prototype.UpdateGlitchSequence = function(){
 				Glitch.TransformPlayer(this, this.glitch_sequence[this.glitch_index], false, true);
 			}
 		}
-		
+
 		if (this.glitch_time >= this.glitch_time_limit){
 			this.glitch_time = 0;
-			
+
 			this.glitch_index++;
 			if (this.glitch_index >= this.glitch_sequence.length){
 				this.glitch_index = 0;
 			}
-			
+
 			Glitch.TransformPlayer(this, this.glitch_sequence[this.glitch_index]);
 			this.glitch_type = this.glitch_sequence[this.glitch_index];
 			if (this.glitch_sequence.length > 1){
@@ -138,7 +138,7 @@ Room.prototype.UpdateGlitchSequence = function(){
 
 Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	var new_coords = [0, 0];
-	
+
 	//OFFSCREEN TOP
 	if (player.y + player.bb <= 0){
 		new_coords = [0, -1];
@@ -147,7 +147,7 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	else if (player.y + player.tb >= (this.MAP_HEIGHT * Tile.HEIGHT)){
 		new_coords = [0, 1];
 	}
-	
+
 	//OFFSCREEN LEFT
 	if (player.x <= 0){
 		new_coords = [-1, 0];
@@ -156,15 +156,15 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	else if (player.x + Tile.WIDTH >= (this.MAP_WIDTH * Tile.WIDTH)){
 		new_coords = [1, 0];
 	}
-	
+
 	if (new_coords[0] !== 0 || new_coords[1] !== 0){
 		//!!!
 		if (this.edge_death){
 			player.Die();
 		}else{
 			room_manager.room_index_x += new_coords[0];
-			room_manager.room_index_y += new_coords[1];		
-		
+			room_manager.room_index_y += new_coords[1];
+
 			room_manager.ChangeRoom(new_coords[0], new_coords[1]);
 		}
 	}
@@ -187,16 +187,16 @@ Room.prototype.RenderSpeech = function(ctx){
 			this.Speak(null);
 			return;
 		}
-		
+
 		var h = 0;
 		if (player.y+(player.bb/2) >= GAME_HEIGHT/2)
 			h = (-1)*(GAME_HEIGHT/1.5)+Tile.HEIGHT;
-		
+
 		ctx.fillStyle = "#ffffff";
 		ctx.fillRect(Tile.WIDTH, h + GAME_HEIGHT-(Tile.HEIGHT)-speech_height, GAME_WIDTH-(Tile.WIDTH*2), speech_height);
 		ctx.fillStyle = "#000000";
 		ctx.fillRect(Tile.WIDTH+2, h + GAME_HEIGHT-(Tile.HEIGHT)-speech_height+2, GAME_WIDTH-(Tile.WIDTH*2)-4, speech_height-4);
-	
+
 		var fs = 8;
 		ctx.font = fs + "px pixelFont";
 		ctx.fillStyle = "#ffffff";
@@ -209,7 +209,7 @@ Room.prototype.RenderSpeech = function(ctx){
 				ctx.strokeText(texts[i], Tile.WIDTH*2, h + (fs*i)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height - 8, fs-2);
 			}
 		}
-		
+
 		if (this.speech_display_arrow){
 			if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))){
 				ctx.fillText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height - fs, fs*3, fs*3);
@@ -222,7 +222,7 @@ Room.prototype.RenderSpeech = function(ctx){
 
 Room.prototype.Render = function(ctx, level_edit){
 	ctx.scale(this.camera.view_scale, this.camera.view_scale);
-	
+
 	//SORT ENTITIES BY Z INDEX (descending)
 	var entities = this.entities.slice(0);
 	entities.push(player);
@@ -234,7 +234,7 @@ Room.prototype.Render = function(ctx, level_edit){
 		entities[index].Render(ctx, this.camera);
 		index++;
 	}
-	
+
 	//Draw some background code for aesthetic
 	var fs = 4;
 	ctx.font = fs + "px monospace";
@@ -253,18 +253,25 @@ Room.prototype.Render = function(ctx, level_edit){
 
 	//DRAW THE TILES OF THE ROOM
 	var tile_img = eval("resource_manager." + this.tilesheet_name);
+    var p_tile_img = eval("resource_manager." + player.tilesheet_name);
+    var left_tile = Math.floor((player.x + player.lb - 32) / Tile.WIDTH);
+    var right_tile = Math.ceil((player.x + player.rb + 17) / Tile.WIDTH);
+    var top_tile = Math.floor((player.y + player.tb - 32) / Tile.HEIGHT);
+    var bottom_tile = Math.ceil((player.y + player.bb + 17) / Tile.HEIGHT);
+
 	for (var i = 0; i < this.MAP_HEIGHT; i++){ for (var j = 0; j < this.MAP_WIDTH; j++){
-		this.tiles[i][j].Render(ctx, this.camera, tile_img);
+        if (i >= top_tile && i <= bottom_tile && j >= left_tile && j <= right_tile)
+            this.tiles[i][j].Render(ctx, this.camera, p_tile_img);
+		else this.tiles[i][j].Render(ctx, this.camera, tile_img);
 	} }
-	
+
 	//DRAW THE REMAINING ENTITIES
 	for (var i = index; i < entities.length; i++){
 		entities[i].Render(ctx, this.camera);
 	}
-	
+
 	//coverup
 	this.camera.Render(ctx);
-	
 	this.RenderSpeech(ctx);
 }
 
@@ -274,7 +281,7 @@ Room.prototype.ChangeSize = function(width, height){
 	var old_height = this.MAP_HEIGHT;
 	this.MAP_WIDTH = ~~(width / Tile.WIDTH);
 	this.MAP_HEIGHT = ~~(height / Tile.HEIGHT);
-	
+
 	if (this.MAP_WIDTH * Tile.WIDTH < GAME_WIDTH)
 		this.camera.screen_offset_x = (GAME_WIDTH - (this.MAP_WIDTH * Tile.WIDTH))/2;
 	else this.camera.screen_offset_x = 0;
@@ -284,7 +291,7 @@ Room.prototype.ChangeSize = function(width, height){
 
 	var temp_tiles = this.tiles;
 	this.InitializeTiles();
-	
+
 	for (var i = 0; i < this.MAP_HEIGHT; i++){
 		if (i >= old_height) this.tiles[i] = [];
 		for (var j = 0; j < this.MAP_WIDTH; j++){

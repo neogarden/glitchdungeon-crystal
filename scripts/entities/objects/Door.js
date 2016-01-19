@@ -91,7 +91,7 @@ Door.prototype.Update = function(map){
 						Utils.playSound("LA_Chest_Open", master_volume, 0);
 						this.talking = true;
 					}else{
-						room.Speak("door is locked\nneed " + 
+						room.Speak("door is locked\nneed " +
                             (this.num_artifacts-_artifacts) + " spells more");
 						Utils.playSound("locked", master_volume, 0);
 						this.talking = true;
@@ -117,10 +117,13 @@ Door.prototype.SwitchRooms = function(map){
 	room_manager.room_index_x = this.room_x;
 	room_manager.room_index_y = this.room_y;
 	
-	if (room_manager.room_index_y >= room_manager.rooms.length){
-		room_manager.rooms[this.room_y] = [];
+	console.log("x: " + this.room_x + ", y:" + this.room_y)
+	console.log("rooms: " + room_manager.rooms.length)
+	while (this.room_y >= room_manager.rooms.length){
+		room_manager.rooms.push([]);
+		console.log(this.room_y + ", " + room_manager.rooms.length);
 	}
-	if (room_manager.room_index_x >= room_manager.rooms[this.room_y].length){
+	while (room_manager.room_x >= room_manager.rooms[this.room_y].length){
 		room_manager.rooms[this.room_y][this.room_x] = new Room();
 	}
 	

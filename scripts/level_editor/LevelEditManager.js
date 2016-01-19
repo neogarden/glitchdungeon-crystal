@@ -53,7 +53,7 @@ LevelEditManager.prototype.setTileImg = function(tile_x, tile_y){
 	ctx.fillStyle = "#222222";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	sharpen(ctx);
-	ctx.drawImage(resource_manager[room.tilesheet_name], 
+	ctx.drawImage(resource_manager[room.tilesheet_name],
 		//SOURCE RECTANGLE
 		0, 0, 96, 96,
 		//DESTINATION RECTANGLE
@@ -153,8 +153,8 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 				room.entities.push(npc);
 			},
 			"new NPC", "create",
-			function(){ 
-				room.paused = false; 
+			function(){
+				room.paused = false;
 				level_edit_manager.typing = false;
 			}
 		);
@@ -325,10 +325,10 @@ LevelEditManager.prototype.MouseMove = function(e){
 	var tile_y = Math.floor(y / Tile.HEIGHT);
 	
 	if (this.tile_mode){
-		this.PlaceTile(tile_x, tile_y, (e.which === 3 && e.button === 2));
+		this.PlaceTile(tile_x, tile_y, (e.which === 3 || e.button === 2 || e.altKey));
 	}
 	var entity = room.GetEntityAtXY(x, y);
-	if (this.entity === undefined){		
+	if (this.entity === undefined){
 		document.body.style.cursor = "auto";
 		this.potential_entity = undefined;
 		if (entity !== undefined){

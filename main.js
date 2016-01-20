@@ -9,7 +9,7 @@ var app = http.createServer(function(request, response) {
     var filePath = '.' + request.url;
 	if (filePath == './')
 		filePath = './index.html';
-		
+
 	var extname = path.extname(filePath);
 	var contentType = 'text/html';
 	switch (extname) {
@@ -20,7 +20,7 @@ var app = http.createServer(function(request, response) {
 			contentType = 'text/css';
 			break;
 	}
-	
+
 	fs.exists(filePath, function(exists) {
 		if (exists) {
 			fs.readFile(filePath, function(error, content) {

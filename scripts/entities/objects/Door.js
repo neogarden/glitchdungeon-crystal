@@ -1,14 +1,14 @@
 function Door(x, y, room_x, room_y, door_id, locked, num_artifacts){
 	GameSprite.call(this, x, y, 4, 0, 12, 16, "obj_sheet");
 	this.type = "Door";
-	
+
 	this.room_x = room_x;
 	this.room_y = room_y;
 	this.door_id = door_id;
-	
+
 	this.locked = locked || false;
 	this.num_artifacts = num_artifacts || 0;
-	
+
 	this.z_index = 10;
 }
 extend(GameSprite, Door);
@@ -31,13 +31,13 @@ Door.prototype.Import = function(obj){
 	GameSprite.prototype.Import.call(this, obj);
 	this.lb = 4;
 	this.rb = 12;
-	
+
 	this.room_x = obj.room_x;
 	this.room_y = obj.room_y;
 	this.door_id = obj.door_id;
 	this.locked = obj.locked || false;
 	this.num_artifacts = obj.num_artifacts || 0;
-	
+
 	this.talking = false;
 }
 Door.prototype.Export = function(){
@@ -69,21 +69,21 @@ Door.prototype.ExportOptions = function(){
 
 Door.prototype.Update = function(map){
     var _artifacts = player.inventory.artifacts.length;
-    
+
 	if (this.room_x >= room_manager.house_width || this.room_y >= room_manager.house_height){
 		return;
 	}
 	GameSprite.prototype.Update.call(this, map);
-	
+
 	var num_needed_artifacts = player.NumArtifacts();
-	
+
 	if (this.IsColliding(player)){
 		if (player.on_ground){
 			player.touching_door = true;
 			if (player.pressed_down && player.pressing_down){
 				player.pressed_down = false;
 				player.vel.x = 0;
-				
+
 				if (this.locked){
 					if (_artifacts >= this.num_artifacts){
 						this.locked = false;
@@ -108,7 +108,7 @@ Door.prototype.Update = function(map){
 		this.talking = false;
 		room.Speak(null);
 	}
-	
+
 	if (this.locked) this.animation.Change(0, 1, 2);
 	else this.animation.Change(0, 0, 1);
 }
@@ -116,19 +116,16 @@ Door.prototype.Update = function(map){
 Door.prototype.SwitchRooms = function(map){
 	room_manager.room_index_x = this.room_x;
 	room_manager.room_index_y = this.room_y;
-	
-	console.log("x: " + this.room_x + ", y:" + this.room_y)
-	console.log("rooms: " + room_manager.rooms.length)
-	while (this.room_y >= room_manager.rooms.length){
-		room_manager.rooms.push([]);
-		console.log(this.room_y + ", " + room_manager.rooms.length);
-	}
-	while (room_manager.room_x >= room_manager.rooms[this.room_y].length){
-		room_manager.rooms[this.room_y][this.room_x] = new Room();
-	}
-	
+
+    if (!(this.room_y in room_manager.rooms)){
+        room_manager.rooms[this.room_y] = {};
+    }
+    if (!(this.room_x in room_manager.rooms[this.room_y])){
+        room_manager.rooms[this.room_y][this.room_x] = new Room();
+    }
+
 	room_manager.ChangeRoom();
-	
+
 	console.log("door id: " + this.door_id);
 	var door = room.GetDoor(this.door_id, this);
 	if (door !== null){

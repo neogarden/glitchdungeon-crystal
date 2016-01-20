@@ -10,33 +10,48 @@ function NPC(x, y, npc_id){
 }
 NPC.prototype.Import = function(obj){
 	GameMover.prototype.Import.call(this, obj);
+    this.name = obj.name || "NPC";
 	this.npc_id = obj.npc_id;
 	this.npc_dialog = obj.npc_dialog || [];
+    this.img_name = obj.img_name || "npc_sheet";
+	this.image = eval("resource_manager." + this.img_name);
 }
 NPC.prototype.Export = function(){
 	var obj = GameMover.prototype.Export.call(this);
+    obj.name = this.name;
 	obj.npc_id = this.npc_id;
 	obj.npc_dialog = this.npc_dialog;
+    obj.img_name = this.img_name;
 	return obj;
 }
 NPC.prototype.ImportOptions = function(options){
 	this.name = options.name.value;
 	this.npc_dialog = options.npc_dialog.value;
+    this.img_name = options.img_name.value;
+	if (this.img_name != undefined)
+		this.image = eval("resource_manager." + this.img_name);
 }
 NPC.prototype.ExportOptions = function(){
 	var options = {};
 	options.name = new TextOption(this.name);
 	var dialog = this.npc_dialog;
 	if (dialog === undefined || dialog.length <= 0)
-		dialog = [this.GetText()];	
+		dialog = [this.GetText()];
 	options.npc_dialog = new TextArrayOption(dialog, 210, 69);
+    options.img_name = new TextDropdown(
+        [
+            {name: "orange npc", value: "npc_sheet"},
+            {name: "kid player", value: "player_sheet"},
+            {name: "grey player", value: "player_grey_sheet"},
+        ], this.img_name
+    );
 	return options;
 }
 extend(GameMover, NPC);
 
 NPC.prototype.Update = function(map){
 	GameMover.prototype.Update.call(this, map);
-	
+
 	var d = 16;
 	var dy = 8;
 	var px = player.x + (player.rb/2);
@@ -48,18 +63,18 @@ NPC.prototype.Update = function(map){
 			this.facing = Facing.RIGHT;
 		}
 	}
-	
-	
+
+
 	//TALK TO PLAYER AND SUCH
 	if (this.IsRectColliding(player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
 		if (!this.talking) this.advanced = true;
 		this.talking = true;
-		
+
 		room.Speak(
 			((this.name.length > 0) ? (this.name + ": ") : ("")) + this.GetText(),
 			240,
 			this.npc_dialog.length > 1);
-		
+
 		if (player.pressing_down && !this.advanced){
 			this.incrementDialog();
 			this.advanced = true;
@@ -86,7 +101,7 @@ NPC.prototype.UpdateAnimationFromState = function(){
 	var ani_x = 0;//this.npc_id / 2;
 	var ani_y = 0;//this.npc_id % 2;
 	this.animation.Change(ani_x, ani_y, 2);
-	
+
 	if (this.facing === Facing.LEFT){
 		this.animation.abs_ani_y = 2 * this.animation.frame_height;
 	}else if (this.facing === Facing.RIGHT){
@@ -100,31 +115,31 @@ NPC.prototype.Render = function(ctx, camera){
 	var ani = this.animation;
 	var row = ani.rel_ani_y;
 	var column = ani.rel_ani_x + ani.curr_frame;
-	
-	ctx.drawImage(this.image, 
+
+	ctx.drawImage(this.image,
 		//SOURCE RECTANGLE
 		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
 		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
 		ani.frame_width, ani.frame_height,
 		//DESTINATION RECTANGLE
-		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset, 
+		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
 		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset,
 		ani.frame_width, ani.frame_height
 	);
-	
+
 	var f = -1;
 	if (this.facing === Facing.LEFT) f = 1;
 	var v = -this.animation.curr_frame;
-	
+
 	//NOW DRAW THE HAT
 	if (!room_manager.beat_game) return;
-	ctx.drawImage(resource_manager.hat_grey_sheet, 
+	ctx.drawImage(resource_manager.hat_grey_sheet,
 		//SOURCE RECTANGLE
 		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
 		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
 		ani.frame_width, ani.frame_height,
 		//DESTINATION RECTANGLE
-		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f, 
+		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,
 		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 7 + v,
 		ani.frame_width, ani.frame_height
 	);
@@ -132,9 +147,9 @@ NPC.prototype.Render = function(ctx, camera){
 
 //TEXT BABY
 NPC.prototype.GetText = function(){
-	if (this.npc_dialog && this.npc_dialog.length > 0) 
+	if (this.npc_dialog && this.npc_dialog.length > 0)
 		return this.npc_dialog[this.dialog_index];
-	
+
 	switch (this.npc_id){
 		case -1:
 			return "hold up or Z to jump higher\n\nthere is no escape";
@@ -185,7 +200,7 @@ NPC.prototype.GetText = function(){
 				Trophy.AddScore(room_manager.time + " min", room_manager.time, 29967);
 				room_manager.submitted = true;
 			}
-				
+
 			return 	"deaths: " + room_manager.num_deaths + "\n" +
 					"spells cast: " + room_manager.spells_cast + "\n" +
 					"time: " + room_manager.time + " min";

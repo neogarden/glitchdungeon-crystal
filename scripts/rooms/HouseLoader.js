@@ -45,7 +45,7 @@ House.prototype.Save = function(){
           room = room.Save();
           room.index_x = j;
           room.index_y = i;
-          
+
           room_row.push(room);
           etc.room_indices.push({x: j, y: i});
         }
@@ -54,7 +54,7 @@ House.prototype.Save = function(){
 
     return {
         player: JSON.stringify(player.Save()),
-        rooms: room_jsons, 
+        rooms: room_jsons,
         etc: JSON.stringify(etc)};
 }
 
@@ -63,10 +63,10 @@ House.prototype.Load = function(callback){
 }
 House.prototype.LoadName = function(level_name, callback){
 	var path = this.path + "/" + level_name + "/";
-	
+
 	var loaded = 0;
 	var needs_loading = 0;
-	
+
 	if (player === undefined)
 		player = new Player(13, 64);
 
@@ -78,10 +78,10 @@ House.prototype.LoadName = function(level_name, callback){
                 console.log(err);
                 return;
             }
-            
+
             this.etc = JSON.parse(json);
             needs_loading = this.etc.room_indices.length;
-            
+
             for (var i = 0; i < this.etc.room_indices.length; i++){
                 var index = this.etc.room_indices[i];
                 var y = index.y;
@@ -91,7 +91,7 @@ House.prototype.LoadName = function(level_name, callback){
                         alert("error loading level");
                         console.log(error);
                     }
-                    
+
                     var room_save = JSON.parse(json);
                     this.rooms[y][x].Load(room_save);
                     loaded++;
@@ -106,7 +106,7 @@ House.prototype.LoadName = function(level_name, callback){
                         };
                         this.old_checkpoint = null;
                         this.new_checkpoint = null;
-                        
+
                         callback();
                     }
                 }.bind(this, y, x));
@@ -127,13 +127,13 @@ House.prototype.Export = function(){
 	  room = room.Export();
       room.index_y = i;
       room.index_x = j;
-      
+
       room_row.push(room);
       etc.room_indices.push({x: j, y: i});
     }
     room_jsons.push(room_row);
   }
-  
+
   return {rooms: room_jsons, etc: JSON.stringify(etc)};
 }
 House.prototype.SoftImport = function(level_name, callback){
@@ -149,29 +149,29 @@ House.prototype.SoftImport = function(level_name, callback){
 House.prototype.Import = function(level_name, callback, reset_rooms){
 	if (reset_rooms === undefined) reset_rooms = true;
 	var path = this.path + "/" + level_name + "/";
-	
+
 	var loaded = 0;
 	var needs_loading = 0;
 	this.level_name = level_name;
-	
+
 	if (player === undefined)
 		player = new Player(13, 64);
-	
+
 	FileManager.loadFile(path + "etc.json", function(err, json){
 		if (err){
 			alert("error loading level");
 			console.log(err);
 			return;
 		}
-		
+
 		var etc = JSON.parse(json);
 		player.x = etc.player_x || 13;
 		player.y = etc.player_y || 64;
 		needs_loading = etc.room_indices.length;
-		
+
 		if (reset_rooms)
 			this.rooms = {};
-		
+
 		for (var i = 0; i < etc.room_indices.length; i++){
 			var index = etc.room_indices[i];
 			var y = index.y;
@@ -181,13 +181,13 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 					alert("error loading level");
 					console.log(error);
 				}
-				
+
 				room = JSON.parse(json);
 				room.y = y;
 				room.x = x;
 				new_room = new Room();
 				new_room.Import(room);
-				if (this.rooms[y] === undefined) this.rooms[y] = [];
+				if (this.rooms[y] === undefined) this.rooms[y] = {};
 				this.rooms[y][x] = new_room;
 				loaded++;
 				if (loaded === needs_loading){
@@ -201,7 +201,7 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 					};
 					this.old_checkpoint = null;
 					this.new_checkpoint = null;
-					
+
 					callback();
 				}
 			}.bind(this, y, x));

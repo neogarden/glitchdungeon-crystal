@@ -4,7 +4,7 @@ function Collection(x, y, collection_id){
 	this.collection_id = collection_id;
 	this.animation.frame_delay = 30;
     this.UpdateAnimation();
-	
+
 	this.z_index = 8;
 }
 extend(GameSprite, Collection);
@@ -26,7 +26,7 @@ Collection.prototype.Save = function(){
 Collection.prototype.Import = function(obj){
 	this.Parent().Import.call(this, obj);
 	this.collection_id = obj.collection_id;
-	
+
 	var ani_x = Math.floor(this.collection_id / 6) * 2;
 	var ani_y = this.collection_id % 6;
 	this.animation.Change(ani_x, ani_y, 2);
@@ -61,7 +61,7 @@ Collection.prototype.Update = function(map){
 		this.GetName(true, player);
 	}
     this.UpdateAnimation();
-	
+
 	this.Parent().Update.call(this, map);
 }
 
@@ -85,47 +85,52 @@ Collection.prototype.GetCollectionTypes = function(){
         this.collection_id = i;
         name = this.GetName(false);
     }
+		this.collection_id = old_collection_id;
     return collection_types;
 }
 
 Collection.prototype.GetName = function(activate_event, player){
 	switch (this.collection_id){
 		case 0:
-            if (activate_event) 
-                this.GrimoireLvl1(); 
+            if (activate_event)
+                this.GrimoireLvl1();
             return "grimoire lvl 1";
-		case 1: 
-            if (activate_event) 
-                this.FeatherSpell(); 
+		case 1:
+            if (activate_event)
+                this.FeatherSpell();
             return "feather spell";
-		case 2: 
-            if (activate_event) 
-                this.FloorSpell(); 
+		case 2:
+            if (activate_event)
+                this.FloorSpell();
             return "floor spell";
-		case 3: 
-            if (activate_event) 
+		case 3:
+            if (activate_event)
                 this.GravitySpell();
             return "gravity spell";
-		case 4: 
-            if (activate_event) 
+		case 4:
+            if (activate_event)
                 this.WallSpell();
             return "wall spell";
-		case 5: 
-            if (activate_event) 
+		case 5:
+            if (activate_event)
                 this.InvisSpell();
             return "invis spell";
-		case 6: 
-            if (activate_event) 
+		case 6:
+            if (activate_event)
                 this.UndefinedSpell();
             return "undefined";
-		case 7: 
-            if (activate_event) 
+		case 7:
+            if (activate_event)
                 this.MemorySpell();
             return "memory spell";
-        case 8:
+    case 8:
             if (activate_event)
                 this.GrimoireLvl0();
             return "grimoire lvl 0";
+		case 9:
+						if (activate_event)
+							this.RedCrystal();
+						return "red crystal";
 		default: return undefined;
 	}
 }
@@ -139,7 +144,7 @@ Collection.prototype.GrimoireLvl1 = function(){
     player.inventory.spellbook.active = true;
     player.inventory.spellbook.level = 1;
     room.bg_code = "switch (Ǥlitch_type){\n\tcase Ǥlitch.ǤREY:\n\t\tbreak;\n\tcあse Ǥlitch.RED:\n\t\tǤlitch.RedTrあnsform(mあp, mあp.plあyer, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.ǤREEN:\n\t\tǤlitch.ǤreenTrあnsform(mあp, mあp.player, normあlize);\n\t\tbreあk;\n\tcase Ǥlitch.BLUE:";
-    
+
     bg_name = "lhommeEraseForm";
     if (resource_manager.play_music){
         stopMusic();
@@ -171,8 +176,8 @@ Collection.prototype.InvisSpell = function(){
     this.AddSpell(Glitch.ZERO);
 }
 
-Collection.prototype.UndefinedSpell = function(){    
-    this.AddSpell(Glitch.NEGATIVE);    
+Collection.prototype.UndefinedSpell = function(){
+    this.AddSpell(Glitch.NEGATIVE);
     bg_name = "TomWoxom_North";
     if (resource_manager.play_music){
         stopMusic();
@@ -182,4 +187,8 @@ Collection.prototype.UndefinedSpell = function(){
 
 Collection.prototype.MemorySpell = function(player){
     Glitch.PinkTransform();
+}
+
+Collection.prototype.RedCrystal = function(){
+		Glitch.TransformPlayer(room, Glitch.RED);
 }

@@ -117,13 +117,6 @@ Door.prototype.SwitchRooms = function(map){
 	room_manager.room_index_x = this.room_x;
 	room_manager.room_index_y = this.room_y;
 
-    if (!(this.room_y in room_manager.rooms)){
-        room_manager.rooms[this.room_y] = {};
-    }
-    if (!(this.room_x in room_manager.rooms[this.room_y])){
-        room_manager.rooms[this.room_y][this.room_x] = new Room();
-    }
-
 	room_manager.ChangeRoom();
 
 	console.log("door id: " + this.door_id);

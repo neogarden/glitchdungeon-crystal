@@ -7,6 +7,8 @@ function NPC(x, y, npc_id){
 	this.advanced = false;
 	this.dialog_index = 0;
 	this.animation.frame_delay = 30;
+	this.on_end_conversation_event = "";
+	this.on_begin_conversation_event = "";
 }
 NPC.prototype.Import = function(obj){
 	GameMover.prototype.Import.call(this, obj);
@@ -15,21 +17,25 @@ NPC.prototype.Import = function(obj){
 	this.npc_dialog = obj.npc_dialog || [];
     this.img_name = obj.img_name || "npc_sheet";
 	this.image = eval("resource_manager." + this.img_name);
+	this.on_end_conversation_event = obj.on_end_conversation_event;
 }
 NPC.prototype.Export = function(){
 	var obj = GameMover.prototype.Export.call(this);
-    obj.name = this.name;
+  obj.name = this.name;
 	obj.npc_id = this.npc_id;
 	obj.npc_dialog = this.npc_dialog;
-    obj.img_name = this.img_name;
+  obj.img_name = this.img_name;
+	obj.on_end_conversation_event = this.on_end_conversation_event;
 	return obj;
 }
 NPC.prototype.ImportOptions = function(options){
 	this.name = options.name.value;
 	this.npc_dialog = options.npc_dialog.value;
-    this.img_name = options.img_name.value;
+
+  this.img_name = options.img_name.value;
 	if (this.img_name != undefined)
 		this.image = eval("resource_manager." + this.img_name);
+  this.on_end_conversation_event = options.on_end_conversation_event.value;
 }
 NPC.prototype.ExportOptions = function(){
 	var options = {};
@@ -38,13 +44,16 @@ NPC.prototype.ExportOptions = function(){
 	if (dialog === undefined || dialog.length <= 0)
 		dialog = [this.GetText()];
 	options.npc_dialog = new TextArrayOption(dialog, 210, 69);
-    options.img_name = new TextDropdown(
+  options.img_name = new TextDropdown(
         [
             {name: "orange npc", value: "npc_sheet"},
             {name: "kid player", value: "player_sheet"},
             {name: "grey player", value: "player_grey_sheet"},
         ], this.img_name
     );
+
+	options.on_end_conversation_event = new BigTextOption(this.on_end_conversation_event);
+
 	return options;
 }
 extend(GameMover, NPC);
@@ -87,6 +96,12 @@ NPC.prototype.Update = function(map){
 		room.Speak(null);
 		//this.incrementDialog();
 		this.advanced = false;
+
+		try{
+			eval(this.on_end_conversation_event);
+		}catch(e){
+			console.log(e);
+		}
 	}
 }
 

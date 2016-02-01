@@ -11,17 +11,17 @@ Facing.RIGHT = 1;
 function GameMover(x, y, lb, tb, rb, bb, img_name, max_run_vel, jump_vel, terminal_vel){
 	GameSprite.call(this, x, y, lb, tb, rb, bb, img_name);
 	this.type = "GameMover";
-	
+
 	this.prev_x = this.x;
 	this.prev_y = this.y;
-	this.max_run_vel = defaultValue(max_run_vel, 2.0); //pixels/second
+	this.max_run_vel = defaultValue(max_run_vel, 1.5); //pixels/second
 	this.gnd_run_acc = this.max_run_vel/3.0;
 	this.gnd_run_dec = this.max_run_vel/3.0;
 	this.air_run_acc = this.max_run_vel/3.0;
 	this.air_run_dec = this.max_run_vel/3.0;
 	this.horizontal_input = false;
 	this.mult = 0;
-	
+
 	this.left_flip_offset = 0;
 	this.horizontal_collision = false;
 	this.vertical_collision = false;
@@ -29,9 +29,9 @@ function GameMover(x, y, lb, tb, rb, bb, img_name, max_run_vel, jump_vel, termin
 	this.pressed_down = false;
 	this.has_double_jumped = false;
 	this.stuck_in_wall = false;
-	
+
 	this.vel = {x: 0, y: 0};
-	
+
 	this.original_grav_acc = 0.8;
 	this.float_grav_acc = 0.4;
 	this.grav_acc = this.original_grav_acc;//35.1; //pixels/second
@@ -40,17 +40,17 @@ function GameMover(x, y, lb, tb, rb, bb, img_name, max_run_vel, jump_vel, termin
 	this.jump_timer = 0;
 	this.jump_time_limit = 30;
 	this.terminal_vel = defaultValue(terminal_vel, 7.0);
-	this.jump_acc = 35.0; 
+	this.jump_acc = 35.0;
 	this.was_on_ground = true;
 	this.on_ground = true;
 	this.played_land_sound = true;
 	this.previous_bottom = this.y + this.bb;
-	
+
 	this.move_state = MoveState.STANDING;
 	this.prev_move_state = this.move_state;
 	this.facing = Facing.RIGHT;
 	this.original_facing = this.facing;
-	
+
 	this.die_to_suffocation = false;
 }
 extend(GameSprite, GameMover);
@@ -81,7 +81,7 @@ GameMover.prototype.ResetPosition = function(){
 GameMover.prototype.Update = function(map)
 {
 	this.DieToSuffocation(map);
-	
+
 	if (!this.stuck_in_wall){
 		this.ApplyPhysics(map);
 		this.prev_x = this.x;
@@ -94,7 +94,7 @@ GameMover.prototype.Update = function(map)
 		}
 	}
 	this.UpdateAnimationFromState();
-	
+
 	GameSprite.prototype.Update.call(this, map);
 }
 
@@ -106,7 +106,7 @@ GameMover.prototype.DieToSuffocation = function(map){
 	var right_tile = Math.floor((this.x + this.rb) / Tile.WIDTH);
 	var top_tile = Math.floor((this.y + this.tb) / Tile.HEIGHT);
 	var bottom_tile = Math.floor((this.y + this.bb) / Tile.HEIGHT);
-	
+
 	//Check all potentially colliding tiles
 	var q = 3;
 	var dead = false;
@@ -114,7 +114,7 @@ GameMover.prototype.DieToSuffocation = function(map){
 	var bottom_collision = false;
 	var left_collision = false;
 	var right_collision = false;
-	
+
 	for (var i = top_tile; i <= bottom_tile; i++){
 		for (var j = left_tile; j <= right_tile; j++){
 			if (!map.isValidTile(i, j)) continue;
@@ -122,7 +122,7 @@ GameMover.prototype.DieToSuffocation = function(map){
 			if (tile.collision !== Tile.SOLID || tile.collision !== Tile.SUPER_SOLID){
 				continue;
 			}
-			
+
 			//left collisions
 			if (this.IsRectColliding(tile, this.x + this.lb,  this.y + this.tb + q, this.x + this.lb, this.y + this.bb - q)){
 				left_collision = true;
@@ -139,7 +139,7 @@ GameMover.prototype.DieToSuffocation = function(map){
 					break;
 				}
 			}
-			
+
 			//top collisions
 			if (tile.collision != Tile.FALLTHROUGH && this.IsRectColliding(tile, this.x + this.lb + q, this.y + this.tb, this.x + this.rb - q, this.y + this.tb)){
 				top_collision = true;
@@ -148,7 +148,7 @@ GameMover.prototype.DieToSuffocation = function(map){
 					break;
 				}
 			}
-			
+
 			//bottom collisions
 			if (this.IsRectColliding(tile, this.x + this.lb + q, this.y + this.bb, this.x + this.rb - q, this.y + this.bb)){
 				bottom_collision = true;
@@ -161,8 +161,8 @@ GameMover.prototype.DieToSuffocation = function(map){
 		if (dead) break;
 	}
 	//console.log("dead: " + dead + ", left: " + left_collision + ", right: " + right_collision + ", top: " + top_collision + ", bottom: " + bottom_collision);
-	
-	if (dead){ 
+
+	if (dead){
 		this.stuck_in_wall = true;
 		//this.Die();
 	}else{
@@ -175,13 +175,13 @@ GameMover.prototype.Die = function(){}
 GameMover.prototype.ApplyPhysics = function(map)
 {
 	var prev_pos = {x: this.x, y: this.y};
-	
+
 	this.ApplyGravity();
-	
+
 	if (!this.horizontal_input) this.MoveStop();
 	this.HandleCollisionsAndMove(map);
 	this.horizontal_input = false;
-	
+
 	if (this.x == prev_pos.x) this.vel.x = 0;
 	if (this.y == prev_pos.y) this.vel.y = 0;
 	this.previous_bottom = this.y + this.bb;
@@ -192,7 +192,7 @@ GameMover.prototype.ApplyGravity = function(){
 		if (this.vel.y < this.terminal_vel)
 		{
 			this.vel.y += (this.grav_acc);
-			if (this.vel.y > this.terminal_vel) 
+			if (this.vel.y > this.terminal_vel)
 				this.vel.y = this.terminal_vel;
 		}else if (this.vel.y > this.terminal_vel){
 			this.vel.y -= (this.grav_acc);
@@ -207,14 +207,14 @@ GameMover.prototype.HandleCollisionsAndMove = function(map){
 	var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
 	var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
 	var bottom_tile = Math.ceil((this.y + this.bb + this.vel.y + 1) / Tile.HEIGHT);
-	
+
 	// Reset flag to search for ground collision.
 	this.was_on_ground = this.on_ground;
 	this.on_ground = false;
 	var q_horz = 3; //q is used to minimize height checked in horizontal collisions and etc.
 	var q_vert = 3;
 	var floor_tile = null;
-	
+
 	floor_tile = this.HandleHorizontalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_horz, floor_tile);
 	this.x += this.vel.x;
 	this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
@@ -231,14 +231,14 @@ GameMover.prototype.HandleHorizontalCollisions = function(map, left_tile, right_
 			var tile = map.tiles[i][j];
 			//don't check for collisions if potential tile is "out of bounds" or not solid
 			if (tile.collision != Tile.SOLID && tile.collision != Tile.SUPER_SOLID) continue;
-			
+
 			//Reset floor tile
-			if (floor_tile == null || (tile.y > this.y && Math.abs(tile.x-this.x) < Math.abs(floor_tile.x-this.x))){ 
+			if (floor_tile == null || (tile.y > this.y && Math.abs(tile.x-this.x) < Math.abs(floor_tile.x-this.x))){
 				floor_tile = tile;
 			}
-			
+
 			//Check for left collisions
-			if (this.vel.x < 0 && this.IsRectColliding(tile, this.x + this.lb + this.vel.x - 1, 
+			if (this.vel.x < 0 && this.IsRectColliding(tile, this.x + this.lb + this.vel.x - 1,
 			this.y + this.tb + q, this.x + this.lb, this.y + this.bb - q)){
 				//this is a negative slope (don't collide left)
 				if (tile.l_height < tile.r_height){}
@@ -249,7 +249,7 @@ GameMover.prototype.HandleHorizontalCollisions = function(map, left_tile, right_
 					this.x = tile.x + Tile.WIDTH - this.lb;
 				}
 			}
-			
+
 			//Check for Right collisions
 			if (this.vel.x > 0 && this.IsRectColliding(tile, this.x + this.rb, this.y + this.tb + q, this.x + this.rb + this.vel.x + 1, this.y + this.bb - q)){
 				//this is a positive slope (don't collide right)
@@ -278,13 +278,13 @@ GameMover.prototype.HandleVerticalCollisions = function(map, left_tile, right_ti
 				this.vel.y = 0;
 				this.y = tile.y + Tile.HEIGHT - this.tb;
 			}
-			
+
 			//Check for bottom collisions
 			if (this.vel.y >= 0 && this.IsRectColliding(tile, this.x + this.lb + q, this.y + this.bb, this.x + this.rb - q, this.y + this.bb + this.vel.y + 1)){
 				//Don't count bottom collision for fallthrough platforms if we're not at the top of it
 				if (tile.collision == Tile.FALLTHROUGH && (tile.y < this.y + this.bb || this.pressing_down))
 					continue;
-					
+
 				if (!this.played_land_sound){
 					Utils.playSound("land");
 					this.played_land_sound = true;
@@ -304,7 +304,7 @@ GameMover.prototype.UpdateAnimationFromState = function(){
 		case MoveState.STANDING:
 			this.animation.Change(0, 0, 2);
 			break;
-		case MoveState.RUNNING: 
+		case MoveState.RUNNING:
 			this.animation.Change(2, 0, 4);
 			if (this.prev_move_state == MoveState.FALLING || this.prev_move_state == MoveState.JUMPING)
 				this.animation.curr_frame = 1;
@@ -317,7 +317,7 @@ GameMover.prototype.UpdateAnimationFromState = function(){
 			break;
 		default: break;
 	}
-	
+
 	if (this.facing == Facing.LEFT){
 		this.animation.abs_ani_y = 2 * this.animation.frame_height;
 	}else if (this.facing == Facing.RIGHT){
@@ -351,7 +351,7 @@ GameMover.prototype.Move = function(mult){
 		this.move_state = MoveState.RUNNING;
 	}
 	else{ acc = this.air_run_acc; }
-	
+
 	if (Math.abs(this.vel.x) < this.max_run_vel){
 		this.vel.x += (acc * mult);
 		this.CorrectVelocity(mult);

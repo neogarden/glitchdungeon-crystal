@@ -6,7 +6,7 @@ function House(){
 	this.time = 0;
 	this.beat_game = false;
 	this.submitted = false;
-	
+
 	this.room_index_x = 0;
 	this.room_index_y = 0;
 
@@ -14,7 +14,7 @@ function House(){
 	this.spellbook = [];
 	this.glitch_type = Glitch.GREY;
 	this.glitch_index = -1;
-    
+
     //extending the rooms to levels
     this.level_spellbooks = [this.spellbook];
 }
@@ -24,7 +24,7 @@ House.Levels = {
 };
 House.GetLevels = function(){
     var levels = []
-    for (level in House.Levels){    
+    for (level in House.Levels){
         levels.push({"name": level, "value": House.Levels[level]});
     }
     return levels;
@@ -38,8 +38,8 @@ House.prototype.Restart = function(){
 
 	this.room_index_x = 0;
 	this.room_index_y = 0;
-	
-	room = this.rooms[this.room_index_y][this.room_index_x];
+
+	room = this.rooms[this.room_index_x][this.room_index_y];
 	player.x = 20;
 	player.y = 72;
 	player.facing = Facing.RIGHT;
@@ -63,21 +63,21 @@ House.prototype.New = function(){
 	this.old_room_index_x = 0;
 	this.old_room_index_y = 0;
 	this.rooms = [[new Room()]];
-	
-	room = this.rooms[this.room_index_y][this.room_index_x];
+
+	room = this.rooms[this.room_index_x][this.room_index_y];
 	this.checkpoint = {
 		x: player.x, y: player.y,
 		room_x: this.room_index_x,
 		room_y: this.room_index_y,
 		facing: player.facing
 	};
-	
+
 	this.ChangeRoom();
 }
 
 House.prototype.GetRoom = function(){
-	if (this.rooms[this.room_index_y] !== undefined)
-		return this.rooms[this.room_index_y][this.room_index_x];
+	if (this.rooms[this.room_index_x] !== undefined)
+		return this.rooms[this.room_index_x][this.room_index_y];
 	else return undefined;
 }
 
@@ -86,13 +86,14 @@ House.prototype.ChangeRoom = function(cx, cy){
 	player.pressed_down = false;
 	var glitch_type = player.glitch_type;
 	var could_use_spellbook = room.can_use_spellbook;
-	
+
 	if (this.GetRoom() === undefined){
         //create new room!!!
-        if (this.rooms[this.room_index_y] === undefined)
-            this.rooms[this.room_index_y] = {};
-        this.rooms[this.room_index_y][this.room_index_x] = new Room();
+        if (this.rooms[this.room_index_x] === undefined)
+            this.rooms[this.room_index_x] = {};
+        this.rooms[this.room_index_x][this.room_index_y] = new Room();
         //pacman wrap
+        //TODO: needs to be fixed to new [x][y] indexing scheme
 		/*if (this.rooms[this.room_index_y] !== undefined){
 			if (this.room_index_x < 0){
 				var room_row = Object.keys(this.rooms[this.room_index_y]);
@@ -107,12 +108,12 @@ House.prototype.ChangeRoom = function(cx, cy){
 				this.room_index_y = 0;
 		}*/
 	}
-		
+
 	if (this.old_room_index_x != this.room_index_x || this.old_room_index_y != this.room_index_y){
 		room = this.GetRoom();
 		room.index_x = this.room_index_x;
 		room.index_y = this.room_index_y;
-		
+
 		room.glitch_type = glitch_type;
 		if (!this.has_spellbook || !room.can_use_spellbook){
 			room.glitch_index = 0;
@@ -129,7 +130,7 @@ House.prototype.ChangeRoom = function(cx, cy){
 	}
 	this.old_room_index_x = this.room_index_x;
 	this.old_room_index_y = this.room_index_y;
-	
+
 	room.Speak(null);
 	if (!room.can_use_spellbook)
 		room.Speak("a dark force prevents\nyou from casting\nspells here");
@@ -146,12 +147,12 @@ House.prototype.ChangeRoom = function(cx, cy){
 		player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH/2 - player.rb;
 	else if (cx > 0)
 		player.x = 0 + Tile.WIDTH/2 - player.lb;
-	
+
 	if (cy < 0)
 		player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - player.bb;
 	else if (cy > 0)
 		player.y = 0 + Tile.HEIGHT/2 + player.tb;
-	
+
 	//if (player.x <= 8) player.x+=8;
 	//if (player.x >= room.MAP_WIDTH * Tile.WIDTH - 8) player.x -= 8;
 }
@@ -189,9 +190,9 @@ House.prototype.GlitchRevivePlayer = function(){
 
 House.prototype.DeactivateCheckpoints = function(){
 	var is_glitched = false;
-	for (var i in this.rooms){
-		for (var j in this.rooms[i]){
-			var room = this.rooms[i][j];
+	for (var j in this.rooms){
+		for (var i in this.rooms[j]){
+			var room = this.rooms[j][i];
 			for (var k = 0; k < room.entities.length; k++){
 				if (room.entities[k].type === "Checkpoint"){
 					if (room.entities[k].is_glitched){
@@ -207,21 +208,22 @@ House.prototype.DeactivateCheckpoints = function(){
 }
 
 House.prototype.RemoveGlitchedCheckpoint = function(){
-	for (var i in this.rooms){
-		for (var j in this.rooms[i]){
-			for (var k = 0; k < this.rooms[i][j].entities.length; k++){
-				if (this.rooms[i][j].entities[k] instanceof Checkpoint && this.rooms[i][j].entities[k].is_glitched){
-					this.rooms[i][j].entities.splice(k, 1);
+	for (var j in this.rooms){
+		for (var i in this.rooms[j]){
+            var room = this.rooms[j][i];
+			for (var k = 0; k < room.entities.length; k++){
+				if (room.entities[k] instanceof Checkpoint && room.entities[k].is_glitched){
+					room.entities.splice(k, 1);
 					k--;
 				}
-				if (this.rooms[i][j].entities[k] instanceof Residue){
-					this.rooms[i][j].entities.splice(k, 1);
+				if (room.entities[k] instanceof Residue){
+					room.entities.splice(k, 1);
 					k--;
 				}
 			}
 		}
 	}
-	
+
 	if (this.new_checkpoint != null){
 		this.new_checkpoint = null;
 	}

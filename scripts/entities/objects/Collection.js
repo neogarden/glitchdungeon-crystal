@@ -123,14 +123,18 @@ Collection.prototype.GetName = function(activate_event, player){
             if (activate_event)
                 this.MemorySpell();
             return "memory spell";
-    case 8:
+        case 8:
             if (activate_event)
                 this.GrimoireLvl0();
             return "grimoire lvl 0";
 		case 9:
-						if (activate_event)
-							this.RedCrystal();
-						return "red crystal";
+			if (activate_event)
+				this.RedCrystal();
+			return "red crystal";
+        case 10:
+            if (activate_event)
+                this.GreenCrystal();
+            return "green crystal";
 		default: return undefined;
 	}
 }
@@ -190,5 +194,10 @@ Collection.prototype.MemorySpell = function(player){
 }
 
 Collection.prototype.RedCrystal = function(){
-		Glitch.TransformPlayer(room, Glitch.RED);
+    room.glitch_sequence = [Glitch.RED];
+	Glitch.TransformPlayer(room, Glitch.RED);
+}
+Collection.prototype.GreenCrystal = function(){
+    room.glitch_sequence = [Glitch.GREEN];
+    Glitch.TransformPlayer(room, Glitch.GREEN);
 }

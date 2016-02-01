@@ -7,9 +7,9 @@ House.prototype.SaveToFile = function(){
     try{
       if (err) console.log(err);
       else{
-        for (var i = 0; i < json.rooms.length; i++){
-          for (var j = 0; j < json.rooms[i].length; j++){
-            var room = json.rooms[i][j];
+        for (var j = 0; j < json.rooms.length; j++){
+          for (var i = 0; i < json.rooms[j].length; i++){
+            var room = json.rooms[j][i];
             var ikey = room.index_y;
             var jkey = room.index_x;
             FileManager.saveFile(path + jkey + "_" + ikey + ".json",
@@ -37,19 +37,19 @@ House.prototype.Save = function(){
 		room_indices: [],
 	};
 	var player_json = JSON.stringify(player.Save());
-    for (var i in this.rooms){
-        var room_row = [];
-        for (var j in this.rooms[i]){
-          var room = this.rooms[i][j];
+    for (var j in this.rooms){
+        var room_col = [];
+        for (var i in this.rooms[j]){
+          var room = this.rooms[j][i];
           if (room instanceof RoomIllusion) continue;
           room = room.Save();
           room.index_x = j;
           room.index_y = i;
 
-          room_row.push(room);
+          room_col.push(room);
           etc.room_indices.push({x: j, y: i});
         }
-        room_jsons.push(room_row);
+        room_jsons.push(room_col);
     }
 
     return {
@@ -86,18 +86,18 @@ House.prototype.LoadName = function(level_name, callback){
                 var index = this.etc.room_indices[i];
                 var y = index.y;
                 var x = index.x;
-                FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){
+                FileManager.loadFile(path + x + "_" + y + ".json", function(x, y, error, json){
                     if (error){
                         alert("error loading level");
                         console.log(error);
                     }
 
                     var room_save = JSON.parse(json);
-                    this.rooms[y][x].Load(room_save);
+                    this.rooms[x][y].Load(room_save);
                     loaded++;
                     if (loaded === needs_loading){
                         //FINISHED LOADING ALL THE LEVELS
-                        var room = this.rooms[this.room_index_y][this.room_index_x];
+                        var room = this.rooms[this.room_index_x][this.room_index_y];
                         this.checkpoint = {
                             x: player.x, y: player.y,
                             room_x: this.room_index_x,
@@ -109,7 +109,7 @@ House.prototype.LoadName = function(level_name, callback){
 
                         callback();
                     }
-                }.bind(this, y, x));
+                }.bind(this, x, y));
             }
         }.bind(this));
     }.bind(this));
@@ -119,14 +119,14 @@ House.prototype.LoadName = function(level_name, callback){
 House.prototype.Export = function(){
   var room_jsons = [];
   var etc = {room_indices: []};
-  for (var i in this.rooms){
+  for (var j in this.rooms){
     var room_row = [];
-    for (var j in this.rooms[i]){
-      var room = this.rooms[i][j];
+    for (var i in this.rooms[j]){
+      var room = this.rooms[j][i];
       if (room instanceof RoomIllusion) continue;
 	  room = room.Export();
-      room.index_y = i;
       room.index_x = j;
+      room.index_y = i;
 
       room_row.push(room);
       etc.room_indices.push({x: j, y: i});
@@ -138,9 +138,9 @@ House.prototype.Export = function(){
 }
 House.prototype.SoftImport = function(level_name, callback){
 	this.Import(level_name, function(){
-		for (var i in this.rooms){
-			for (var j in this.rooms[i]){
-				old_rooms[i][j] = this.rooms[i][j];
+		for (var j in this.rooms){
+			for (var i in this.rooms[j]){
+				old_rooms[j][i] = this.rooms[j][i];
 			}
 		}
 		callback();
@@ -176,23 +176,23 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 			var index = etc.room_indices[i];
 			var y = index.y;
 			var x = index.x;
-			FileManager.loadFile(path + x + "_" + y + ".json", function(y, x, error, json){
+			FileManager.loadFile(path + x + "_" + y + ".json", function(x, y, error, json){
 				if (error){
 					alert("error loading level");
 					console.log(error);
 				}
 
 				room = JSON.parse(json);
-				room.y = y;
 				room.x = x;
+				room.y = y;
 				new_room = new Room();
 				new_room.Import(room);
-				if (this.rooms[y] === undefined) this.rooms[y] = {};
-				this.rooms[y][x] = new_room;
+				if (this.rooms[x] === undefined) this.rooms[x] = {};
+				this.rooms[x][y] = new_room;
 				loaded++;
 				if (loaded === needs_loading){
 					//FINISHED LOADING ALL THE LEVELS
-					var room = this.rooms[this.room_index_y][this.room_index_x];
+					var room = this.rooms[this.room_index_x][this.room_index_y];
 					this.checkpoint = {
 						x: player.x, y: player.y,
 						room_x: this.room_index_x,
@@ -204,7 +204,7 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 
 					callback();
 				}
-			}.bind(this, y, x));
+			}.bind(this, x, y));
 		}
 	}.bind(this));
 }

@@ -71,8 +71,6 @@ function ResourceManager(){
 }
 
 ResourceManager.prototype.DisplayLoadScreen = function(){
-	ctx.canvas.width = GAME_WIDTH*VIEW_SCALE;
-	ctx.canvas.height = GAME_HEIGHT*VIEW_SCALE;
 	ctx.scale(2,2);
 	
 	//Display the LOADING... screen
@@ -85,6 +83,7 @@ ResourceManager.prototype.DisplayLoadScreen = function(){
 	ctx.textBaseline = "top";
 	ctx.fillText("LOADING GAME...", 134, GAME_HEIGHT/2+25);
 	ctx.fillText("PLEASE WAIT :)", 134, GAME_HEIGHT/2+80);
+	ctx.scale(0.5, 0.5);
 }
 
 ResourceManager.prototype.ImageLoad = function(){ 

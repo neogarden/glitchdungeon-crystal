@@ -35,8 +35,8 @@ Camera.prototype.Render = function(ctx){
 }
 		
 Camera.prototype.Update = function(map){
-	this.width = WINDOW_WIDTH / this.view_scale;
-	this.height = WINDOW_HEIGHT / this.view_scale;
+	this.width = GAME_WIDTH / this.view_scale;
+	this.height = GAME_HEIGHT / this.view_scale;
 	
 	//Horizontal panning RIGHT
 	if (player.x + player.rb + this.x_lim - this.x >= this.width){

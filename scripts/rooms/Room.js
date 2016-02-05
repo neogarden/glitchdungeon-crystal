@@ -5,9 +5,8 @@ function Room(){
 	this.index_y = 0;
     this.level_id = House.Levels["dungeon"];
 
-	this.MAP_WIDTH = ~~(GAME_WIDTH / Tile.WIDTH);
-	this.MAP_HEIGHT = ~~(GAME_HEIGHT / Tile.HEIGHT);
-	this.VIEW_SCALE = VIEW_SCALE;
+	this.MAP_WIDTH = ~~(GAME_WIDTH / (Tile.WIDTH));
+	this.MAP_HEIGHT = ~~(GAME_HEIGHT / (Tile.HEIGHT));
 
 	this.edge_death = false;
 
@@ -187,6 +186,9 @@ Room.prototype.RenderSpeech = function(ctx){
 			this.Speak(null);
 			return;
 		}
+		
+		GAME_HEIGHT /= 4;
+		GAME_WIDTH /= 4;
 
 		var h = 0;
 		if (player.y+(player.bb/2) >= GAME_HEIGHT/2)
@@ -202,11 +204,12 @@ Room.prototype.RenderSpeech = function(ctx){
 		ctx.fillStyle = "#ffffff";
 		ctx.strokeStyle = "#ffffff";
 		var texts = this.spoken_text.split("\n");
+		ctx.textAlign="left"; 
 		for (var i = 0; i < texts.length; i++){
 			if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))){
-				ctx.fillText(texts[i], Tile.WIDTH*2, h + (fs*i)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height, GAME_WIDTH-(Tile.WIDTH*2), fs);
+				ctx.fillText(texts[i], Tile.WIDTH*1.5, h + (fs*i)+GAME_HEIGHT-(Tile.HEIGHT/2)-speech_height);
 			}else if (check_textRenderContext(ctx)){
-				ctx.strokeText(texts[i], Tile.WIDTH*2, h + (fs*i)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height - 8, fs-2);
+				ctx.strokeText(texts[i], Tile.WIDTH*1.5, h + (fs*i)+GAME_HEIGHT-(Tile.HEIGHT/2)-speech_height - 8, fs-2);
 			}
 		}
 
@@ -217,6 +220,9 @@ Room.prototype.RenderSpeech = function(ctx){
 				ctx.strokeText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3) + GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height-8-fs, fs, fs-2);
 			}
 		}
+		
+		GAME_HEIGHT *= 4;
+		GAME_WIDTH *= 4;
 	}
 }
 
@@ -273,6 +279,8 @@ Room.prototype.Render = function(ctx, level_edit){
 	//coverup
 	this.camera.Render(ctx);
 	this.RenderSpeech(ctx);
+	
+	ctx.scale(1/this.camera.view_scale, 1/this.camera.view_scale);
 }
 
 /********************OTHER LEVEL EDITING FUNCTIONS********************/
@@ -281,13 +289,6 @@ Room.prototype.ChangeSize = function(width, height){
 	var old_height = this.MAP_HEIGHT;
 	this.MAP_WIDTH = ~~(width / Tile.WIDTH);
 	this.MAP_HEIGHT = ~~(height / Tile.HEIGHT);
-
-	if (this.MAP_WIDTH * Tile.WIDTH < GAME_WIDTH)
-		this.camera.screen_offset_x = (GAME_WIDTH - (this.MAP_WIDTH * Tile.WIDTH))/2;
-	else this.camera.screen_offset_x = 0;
-	if (this.MAP_HEIGHT * Tile.HEIGHT < GAME_HEIGHT)
-		this.camera.screen_offset_y = (GAME_HEIGHT-(this.MAP_HEIGHT*Tile.HEIGHT))/2;
-	else this.camera.screen_offset_y = 0;
 
 	var temp_tiles = this.tiles;
 	this.InitializeTiles();

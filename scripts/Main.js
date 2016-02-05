@@ -5,11 +5,8 @@ var bg_name = "RoccoW_outOfSight";
 var tryToPlay = null;
 var click_to_start = false;
 
-var WINDOW_WIDTH = 640;
-var WINDOW_HEIGHT = 480;
-var VIEW_SCALE = 4;
-var GAME_WIDTH = WINDOW_WIDTH / VIEW_SCALE;
-var GAME_HEIGHT = WINDOW_HEIGHT / VIEW_SCALE;
+var GAME_WIDTH = 640;
+var GAME_HEIGHT = 480;
 
 var canvas;
 var ctx;
@@ -102,8 +99,9 @@ var tick = function(){
 		render();
 	}else{		
 		//Erase screen
+		ctx.scale(2.0, 2.0);
 		ctx.fillStyle = "#000000";
-		ctx.fillRect(0, 0, GAME_WIDTH*VIEW_SCALE, GAME_HEIGHT*VIEW_SCALE);
+		ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 		
 		//draw the game
 		sharpen(ctx);
@@ -112,9 +110,10 @@ var tick = function(){
 		//ctx.font = "24px pixelFont";
 		ctx.textAlign = "center";
 		ctx.textBaseline = "top";
-		ctx.fillText("WARNING: FLASHING ITEMS", 134, GAME_HEIGHT/2+25);
-		ctx.fillText("SCREEN MAY RAPIDLY CHANGE COLOR", 134, GAME_HEIGHT/2+49);
-		ctx.fillText("CLICK TO START", 134, GAME_HEIGHT/2+80);
+		ctx.fillText("WARNING: FLASHING ITEMS", 134, GAME_HEIGHT/4+25);
+		ctx.fillText("SCREEN MAY RAPIDLY CHANGE COLOR", 134, GAME_HEIGHT/4+49);
+		ctx.fillText("CLICK TO START", 134, GAME_HEIGHT/4+80);
+		ctx.scale(0.5, 0.5);
 	}
 	
 	setTimeout(function(){
@@ -124,30 +123,31 @@ var tick = function(){
 }
 
 var player;
+var erase_screen = true;
 var update = function(){
     room.Update(input_manager);
 	key_manager.ForgetKeysPressed();
 };
 
 var render = function(){
-	ctx.canvas.width = GAME_WIDTH*VIEW_SCALE;
-	ctx.canvas.height = GAME_HEIGHT*VIEW_SCALE;
-	ctx.scale(VIEW_SCALE,VIEW_SCALE);
+	//ctx.canvas.width = GAME_WIDTH*VIEW_SCALE;
+	//ctx.canvas.height = GAME_HEIGHT*VIEW_SCALE;
 	
 	//Erase screen
-	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+	if (erase_screen){
+		ctx.fillStyle = "rgb(0, 0, 0)";
+		ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+	}
 	
 	//draw the game
 	sharpen(ctx);
-	ctx.scale((1/VIEW_SCALE), (1/VIEW_SCALE));
 	room.Render(ctx, level_edit);
 	
 	//draw sound buttons
 	var ani_x = 0;
 	if (!resource_manager.play_music) ani_x = 16;
 	
-	ctx.scale(0.5, 0.5);
+	ctx.scale(2.0, 2.0);
 	ctx.drawImage(resource_manager.soundButtons, 
 		//SOURCE RECTANGLE
 		ani_x, 0, 16, 16,
@@ -163,6 +163,7 @@ var render = function(){
 		//DESTINATION RECTANGLE
 		4, 24, 16, 16
 	);
+	ctx.scale(0.5, 0.5);
 };
 
 window.onload= function(){setTimeout(init, 0);}

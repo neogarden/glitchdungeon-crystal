@@ -141,6 +141,11 @@ House.prototype.ChangeRoom = function(cx, cy){
 	}else{
         player.MaintainGlitch();
 	}
+	try{
+		eval(room.bg_code);
+	}catch(e){
+		
+	}
 	//player.die_to_suffocation = true;
 
 	if (cx < 0)

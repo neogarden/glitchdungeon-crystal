@@ -81,8 +81,8 @@ ResourceManager.prototype.DisplayLoadScreen = function(){
 	//ctx.font = "24px pixelFont";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("LOADING GAME...", 134, GAME_HEIGHT/2+25);
-	ctx.fillText("PLEASE WAIT :)", 134, GAME_HEIGHT/2+80);
+	ctx.fillText("LOADING GAME...", 64, GAME_HEIGHT/8+25-16);
+	ctx.fillText("PLEASE WAIT :)", 64, GAME_HEIGHT/8+80-16);
 	ctx.scale(0.5, 0.5);
 }
 

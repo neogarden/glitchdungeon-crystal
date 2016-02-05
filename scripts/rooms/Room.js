@@ -87,7 +87,6 @@ Room.prototype.Update = function(input){
 	input.Update(player);
 	if (this.paused) return;
 	player.Update(this);
-	this.TryUpdateRoomIfPlayerOffscreen();
 	this.camera.Update(this);
 
 	for (var i = this.entities.length-1; i >= 0; i--){
@@ -95,6 +94,7 @@ Room.prototype.Update = function(input){
 		if (this.entities[i].delete_me) this.entities.splice(i, 1);
 	}
 
+	this.TryUpdateRoomIfPlayerOffscreen();
 	//this.UpdateGlitchSequence();
 }
 
@@ -215,9 +215,9 @@ Room.prototype.RenderSpeech = function(ctx){
 
 		if (this.speech_display_arrow){
 			if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))){
-				ctx.fillText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3)+GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height - fs, fs*3, fs*3);
+				ctx.fillText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3)+GAME_HEIGHT-speech_height - fs - Tile.HEIGHT/2, fs*3, fs*3);
 			}else if (check_textRenderContext(ctx)){
-				ctx.strokeText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3) + GAME_HEIGHT+(Tile.HEIGHT/2)-speech_height-8-fs, fs, fs-2);
+				ctx.strokeText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3) + GAME_HEIGHT-speech_height-8-fs - Tile.HEIGHT/2, fs, fs-2);
 			}
 		}
 		

@@ -16,8 +16,11 @@ FileManager.saveFile = function(file_name, file_content, callback){
 		});
 	}catch(err){
 		//fallback if running without nodejs in dom
-		if (FileManager.socket === undefined)
-		  FileManager.socket = io.connect("http://localhost:"+FileManager.port);
+		if (FileManager.socket === undefined){
+		  var url = window.location.href.split(":");
+		  url = url[0] + ":" + url[1] + ":";
+		  FileManager.socket = io.connect(url+FileManager.port);
+		}
 		FileManager.socket.emit('saveFile', {file_name: file_name, file_content: file_content});
 		FileManager.socket.on('saveFileSuccess', function(data){
 		  FileManager.socket.removeAllListeners("saveFileSuccess");
@@ -50,8 +53,11 @@ FileManager.ensureExists = function(path, mask, cb) {
 		});
 	}catch(err){
 		//fallback if running without nodejs in dom
-		if (FileManager.socket === undefined)
-		  FileManager.socket = io.connect("http://localhost:"+FileManager.port);
+		if (FileManager.socket === undefined){
+		  var url = window.location.href.split(":");
+		  url = url[0] + ":" + url[1] + ":";
+		  FileManager.socket = io.connect(url+FileManager.port);
+		}
 		FileManager.socket.emit('ensureExists', {path: path, mask: mask});
 		FileManager.socket.on("ensureExistsSuccess", function(data){
 		  FileManager.socket.removeAllListeners("ensureExistsSuccess");

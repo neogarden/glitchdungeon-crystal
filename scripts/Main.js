@@ -110,9 +110,11 @@ var tick = function(){
 		//ctx.font = "24px pixelFont";
 		ctx.textAlign = "center";
 		ctx.textBaseline = "top";
-		ctx.fillText("WARNING: FLASHING ITEMS", 134, GAME_HEIGHT/4+25);
-		ctx.fillText("SCREEN MAY RAPIDLY CHANGE COLOR", 134, GAME_HEIGHT/4+49);
-		ctx.fillText("CLICK TO START", 134, GAME_HEIGHT/4+80);
+		GAME_HEIGHT/=2;
+		ctx.fillText("WARNING: FLASHING ITEMS", 134, GAME_HEIGHT/4+25-16);
+		ctx.fillText("SCREEN MAY RAPIDLY CHANGE COLOR", 134, GAME_HEIGHT/4+52-16);
+		ctx.fillText("CLICK TO START", 134, GAME_HEIGHT/4+80-16);
+		GAME_HEIGHT*=2;
 		ctx.scale(0.5, 0.5);
 	}
 	

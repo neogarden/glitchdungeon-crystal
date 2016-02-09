@@ -12,6 +12,7 @@ function ResourceManager(){
 		"tile_grey_sheet",
 		"player_sheet",
 		"npc_sheet",
+		"npc_fall_sheet",
 		"obj_sheet",
 		"player_green_sheet",
 		"tile_green_sheet",

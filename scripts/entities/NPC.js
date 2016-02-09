@@ -17,14 +17,22 @@ NPC.prototype.Import = function(obj){
 	this.npc_dialog = obj.npc_dialog || [];
     this.img_name = obj.img_name || "npc_sheet";
 	this.image = eval("resource_manager." + this.img_name);
+	this.on_init_event = obj.on_init_event;
 	this.on_end_conversation_event = obj.on_end_conversation_event;
+	
+	try{
+		eval(this.on_init_event);
+	}catch(e){
+		console.log(e);
+	}
 }
 NPC.prototype.Export = function(){
 	var obj = GameMover.prototype.Export.call(this);
-  obj.name = this.name;
+	obj.name = this.name;
 	obj.npc_id = this.npc_id;
 	obj.npc_dialog = this.npc_dialog;
-  obj.img_name = this.img_name;
+	obj.img_name = this.img_name;
+	obj.on_init_event = this.on_init_event;
 	obj.on_end_conversation_event = this.on_end_conversation_event;
 	return obj;
 }
@@ -35,6 +43,7 @@ NPC.prototype.ImportOptions = function(options){
   this.img_name = options.img_name.value;
 	if (this.img_name != undefined)
 		this.image = eval("resource_manager." + this.img_name);
+  this.on_init_event = options.on_init_event.value;
   this.on_end_conversation_event = options.on_end_conversation_event.value;
 }
 NPC.prototype.ExportOptions = function(){
@@ -47,11 +56,13 @@ NPC.prototype.ExportOptions = function(){
   options.img_name = new TextDropdown(
         [
             {name: "orange npc", value: "npc_sheet"},
+			{name: "orangenpc lying", value: "npc_fall_sheet"},
             {name: "kid player", value: "player_sheet"},
             {name: "grey player", value: "player_grey_sheet"},
         ], this.img_name
     );
 
+	options.on_init_event = new BigTextOption(this.on_init_event);
 	options.on_end_conversation_event = new BigTextOption(this.on_end_conversation_event);
 
 	return options;

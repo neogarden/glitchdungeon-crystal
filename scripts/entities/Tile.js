@@ -73,7 +73,9 @@ Tile.prototype.SetLRHeights = function(){
 }
 
 Tile.prototype.Render = function(ctx, camera, image){
-	if (image === null || (this.tileset_x == 0 && this.tileset_y == 0)) return;
+	if ((image === null || (this.tileset_x == 0 && this.tileset_y == 0)) 
+		&& Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY) 
+			return;
 	var row = this.tileset_y;
 	var column = this.tileset_x;
 	

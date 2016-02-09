@@ -5,8 +5,8 @@ function Room(){
 	this.index_y = 0;
     this.level_id = House.Levels["dungeon"];
 
-	this.MAP_WIDTH = ~~(GAME_WIDTH / (Tile.WIDTH));
-	this.MAP_HEIGHT = ~~(GAME_HEIGHT / (Tile.HEIGHT));
+	this.MAP_WIDTH = ~~(GAME_WIDTH / (Tile.WIDTH*4));
+	this.MAP_HEIGHT = ~~(GAME_HEIGHT / (Tile.HEIGHT*4));
 
 	this.edge_death = false;
 

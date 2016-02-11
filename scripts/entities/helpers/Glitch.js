@@ -8,6 +8,9 @@ Glitch.NEGATIVE = 6;
 Glitch.PINK = 7;
 Glitch.KID = 8;
 
+Glitch.NEGATIVE_COLOR = 100;
+Glitch.ERASE_SCREEN = 101;
+
 Glitch.PREVIOUS = 0;
 
 function Glitch(){};
@@ -31,6 +34,10 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual, tran
 
     var prev_tileset = map.tilesheet_name;
 	if (normalize){
+	    erase_color = true;
+	    canvas.style.filter = "invert(0)";
+	    canvas.style.webkitFilter = "invert(0)";
+	
 		var facing = player.facing;
 		var vel = player.vel;
 		var is_jumping = player.is_jumping;
@@ -98,6 +105,12 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual, tran
 		case Glitch.PINK:
 			Glitch.PinkTransform(map, only_visual);
 			break;
+		case Glitch.NEGATIVE_COLOR:
+		    Glitch.NegativeColorTransform(map, only_visual);
+		    break;
+		case Glitch.ERASE_SCREEN:
+		    Glitch.EraseScreenTransform(map, only_visual);
+		    break;
 		default: break;
 	}
     player.tilesheet_name = map.tilesheet_name;
@@ -446,7 +459,7 @@ Glitch.NegativeTransform = function(map, only_visual){
 	player.DieToSuffocation = function(map){};
 }
 
-Glitch.PinkTransform = function(map){
+Glitch.PinkTransform = function(map, only_visual){
 	//player.img_name = "player_pink_sheet";
 	//if (only_visual) return;
 	//map.tilesheet_name = "tile_pink_sheet";
@@ -478,4 +491,13 @@ Glitch.PinkTransform = function(map){
 			}
 		}
 	}
+}
+
+Glitch.NegativeColorTransform = function(map, only_visual){
+    canvas.style.filter = "invert(1)";
+    canvas.style.webkitFilter = "invert(1)";
+}
+
+Glitch.EraseScreenTransform = function(map, only_visual){
+    erase_screen = false;
 }

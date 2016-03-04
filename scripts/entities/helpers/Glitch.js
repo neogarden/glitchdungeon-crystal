@@ -157,6 +157,7 @@ Glitch.RedTransform = function(map, only_visual){
 		// Reset flag to search for ground collision.
 		this.was_on_ground = this.on_ground;
 		//this.on_ground = false;
+		this.true_on_ground = false;
 		var q_horz = 3; //q is used to minimize height checked in horizontal collisions and etc.
 		var q_vert = 3;
 		var floor_tile = null;
@@ -166,6 +167,7 @@ Glitch.RedTransform = function(map, only_visual){
 		this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
 		this.y += this.vel.y;
 		if (this.vel.y != 0) this.played_land_sound = false;
+		if (!this.true_on_ground) this.y+=0.05;
 	}
 }
 

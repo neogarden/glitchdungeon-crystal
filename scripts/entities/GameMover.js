@@ -43,6 +43,7 @@ function GameMover(x, y, lb, tb, rb, bb, img_name, max_run_vel, jump_vel, termin
 	this.terminal_vel = defaultValue(terminal_vel, 7.0);
 	this.jump_acc = 35.0;
 	this.was_on_ground = true;
+	this.true_on_ground = true;
 	this.on_ground = true;
 	this.played_land_sound = true;
 	this.previous_bottom = this.y + this.bb;
@@ -211,6 +212,7 @@ GameMover.prototype.HandleCollisionsAndMove = function(map){
 	// Reset flag to search for ground collision.
 	this.was_on_ground = this.on_ground;
 	this.on_ground = false;
+	this.true_on_ground = false;
 	var q_horz = 3; //q is used to minimize height checked in horizontal collisions and etc.
 	var q_vert = 3;
 	var floor_tile = null;
@@ -291,6 +293,7 @@ GameMover.prototype.HandleVerticalCollisions = function(map, left_tile, right_ti
 				}
 				this.vel.y = 0;
 				this.on_ground = true;
+				this.true_on_ground = true;
 				this.has_double_jumped = false;
 				this.has_triple_jumped = false;
 				this.y = tile.y - this.bb;

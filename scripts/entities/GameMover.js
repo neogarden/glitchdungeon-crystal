@@ -28,6 +28,7 @@ function GameMover(x, y, lb, tb, rb, bb, img_name, max_run_vel, jump_vel, termin
 	this.pressing_down = false;
 	this.pressed_down = false;
 	this.has_double_jumped = false;
+	this.has_triple_jumped = false;
 	this.stuck_in_wall = false;
 
 	this.vel = {x: 0, y: 0};
@@ -180,7 +181,6 @@ GameMover.prototype.ApplyPhysics = function(map)
 
 	if (!this.horizontal_input) this.MoveStop();
 	this.HandleCollisionsAndMove(map);
-	this.horizontal_input = false;
 
 	if (this.x == prev_pos.x) this.vel.x = 0;
 	if (this.y == prev_pos.y) this.vel.y = 0;
@@ -292,6 +292,7 @@ GameMover.prototype.HandleVerticalCollisions = function(map, left_tile, right_ti
 				this.vel.y = 0;
 				this.on_ground = true;
 				this.has_double_jumped = false;
+				this.has_triple_jumped = false;
 				this.y = tile.y - this.bb;
 			}
 		}

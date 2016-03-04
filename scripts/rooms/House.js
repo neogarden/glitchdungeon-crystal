@@ -137,7 +137,7 @@ House.prototype.ChangeRoom = function(cx, cy){
 	//MAKE SURE THE FORM CHANGE REMAINS BETWEEN ROOMS
 	if (!could_use_spellbook){
 		player.glitch_index = player.inventory.spellbook.spells.length-1;
-		Glitch.TransformPlayer(room, Glitch.GREY);
+		Glitch.TransformPlayer(room, Glitch.GREY, true, false, true);
 	}else{
         player.MaintainGlitch();
 	}

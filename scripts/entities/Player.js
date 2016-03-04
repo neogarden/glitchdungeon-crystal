@@ -99,10 +99,10 @@ Player.prototype.MaintainGlitch = function(){
         if (this.glitch_index == 0)
             Glitch.TransformPlayer(room, this.glitch_type, true, false, false);
         else
-            Glitch.TransformPlayer(room, room.glitch_sequence[0]);
+            Glitch.TransformPlayer(room, room.glitch_sequence[0], true, false, true);
     }
     else if (level == 1){
-        Glitch.TransformPlayer(room, this.glitch_type);
+        Glitch.TransformPlayer(room, this.glitch_type, true, false, true);
     }
     this.tilesheet_name = tileset;
 }

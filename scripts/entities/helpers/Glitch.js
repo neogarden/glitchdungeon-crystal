@@ -37,7 +37,7 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual, tran
 	    erase_color = true;
 	    canvas.style.filter = "invert(0)";
 	    canvas.style.webkitFilter = "invert(0)";
-	
+
 		var facing = player.facing;
 		var vel = player.vel;
 		var is_jumping = player.is_jumping;
@@ -61,7 +61,7 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual, tran
 		player.vel = vel;
 		player.is_jumping = is_jumping;
 		player.jump_timer = jump_timer;
-		player.jump_time_limit = jump_time_limit;
+		player.jump_time_limit = 30;
 		player.on_ground = on_ground;
 		if (player.is_jumping)
 			player.grav_acc = player.float_grav_acc;
@@ -176,15 +176,47 @@ Glitch.GreenTransform = function(map, only_visual){
 
 	player.gnd_run_acc = player.max_run_vel/5.0;
 	player.gnd_run_dec = player.max_run_vel/15.0;
-	player.air_run_acc = player.max_run_vel/10.0;
+	player.air_run_acc = player.max_run_vel/20.0;
 	player.air_run_dec = player.max_run_vel/30.0;
 
 	player.terminal_vel = 1.0;
 	player.original_grav_acc = 0.2;
-	player.float_grav_acc = 0.2;
+	player.float_grav_acc = 0.025;
 	player.grav_acc = player.original_grav_acc;
-	player.jump_time_limit = 60;
-	player.jump_vel = 3.3;
+	player.jump_time_limit = 10;
+	player.jump_vel = 2.0;
+	player.has_double_jumped = false;
+	player.has_triple_jumped = false;
+
+	player.StartJump = function(){
+		if (this.on_ground || !this.has_double_jumped || !this.has_triple_jumped){
+			if (this.on_ground){
+				this.has_triple_jumped = true;
+			}
+			Utils.playSound("jump");
+			this.vel.y = -this.jump_vel;
+			this.is_jumping = true;
+			this.jump_timer = 0;
+			if (!this.on_ground){
+				this.vel.y *= 3;
+				this.vel.y /= 4;
+				if (this.has_double_jumped)
+					this.has_triple_jumped = true;
+				this.has_double_jumped = true;
+				if (this.horizontal_input){
+
+					var vel = this.max_run_vel;
+					if (this.facing == Facing.LEFT && this.vel.x > -vel){
+						this.vel.x = -vel;
+					}
+					if (this.facing == Facing.RIGHT && this.vel.x < vel){
+						this.vel.x = vel;
+					}
+				}
+			}
+			this.on_ground = false;
+		}
+	}
 
 	player.Move = function(mult){
 		this.mult = mult;

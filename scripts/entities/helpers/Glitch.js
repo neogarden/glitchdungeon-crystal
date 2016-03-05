@@ -11,6 +11,19 @@ Glitch.KID = 8;
 Glitch.NEGATIVE_COLOR = 100;
 Glitch.ERASE_SCREEN = 101;
 
+Glitch.glitch_types = [
+	"grey", "red", "green", "zero", "blue", "gold", "negative", "pink", "kid"
+];
+
+Glitch.GetGlitchTypes = function(){
+    var glitch_types = [];
+    for (var i = 0; i < Glitch.glitch_types.length; i++){
+        glitch_types.push({name: Glitch.glitch_types[i], value: i});
+        i++;
+    }
+    return glitch_types;
+}
+
 Glitch.PREVIOUS = 0;
 
 function Glitch(){};
@@ -27,12 +40,11 @@ Glitch.TransformPlayer = function(map, glitch_type, normalize, only_visual, tran
 	}
 	if (room_manager) room_manager.glitch_type = glitch_type;
 	normalize = defaultValue(normalize, true);
-    transform_true_map = defaultValue(transform_true_map, true);
+  transform_true_map = defaultValue(transform_true_map, true);
 	only_visual = only_visual || false;
 
 	//Normalize the player before transforming
-
-    var prev_tileset = map.tilesheet_name;
+  var prev_tileset = map.tilesheet_name;
 	if (normalize){
 	    erase_color = true;
 	    canvas.style.filter = "invert(0)";

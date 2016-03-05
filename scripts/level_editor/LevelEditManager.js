@@ -5,38 +5,38 @@ function LevelEditManager(){
 	this.entity = undefined;
 	this.entity_grav_acc = 0;
 	this.typing = false;
-	
+
 	this.ctx_menu_visible = false;
 	this.ctx_menu_timer = 0;
 	this.ctx_menu_time_limit = 3;
-	
+
 	this.offset_x = 0;
 	this.offset_y = 0;
 	this.tile_mode = false;
 	this.tile_img_x = 0;
 	this.tile_img_y = 0;
-	
+
 	this.level_main_name = "main";
 }
 
 LevelEditManager.prototype.Init = function(){
 	$("level_edit_buttons").style.display="block";
 	this.enabled = true;
-	
+
 	var zoom = 2;
 	var canvas = $("tileset_canvas");
 	var ctx = canvas.getContext("2d");
 	ctx.canvas.width = 96*zoom;
 	ctx.canvas.height = 96*zoom;
 	ctx.scale(zoom, zoom);
-	
+
 	canvas.onmousedown = function(e){
 		var box = canvas.getBoundingClientRect();
 		var x = (e.clientX - box.left) / 2;
 		var y = (e.clientY - box.top) / 2;
 		var tile_x = Math.floor(x / Tile.WIDTH);
 		var tile_y = Math.floor(y / Tile.HEIGHT);
-		
+
 		this.setTileImg(tile_x, tile_y);
 	}.bind(this);
 }
@@ -48,8 +48,8 @@ LevelEditManager.prototype.setTileImg = function(tile_x, tile_y){
 	this.tile_img_y = tile_y;
 	canvas.width = canvas.width;
 	var zoom = canvas.width / 96;
-	
-	
+
+
 	ctx.fillStyle = "#222222";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	sharpen(ctx);
@@ -87,16 +87,16 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 	var ctx_menu = CtxMenu.Init(mouse_x, mouse_y, document.body);
 	ctx_menu.Open();
 	this.ctx_menu_visible = true;
-	
+
 	//MODE OPTIONS
 	ctx_menu.AddItem("toggle tile mode", function(){
 		if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY)
 			Tile.DISPLAY_TYPE = Tile.COLLISION_DISPLAY;
 		else Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
 	}.bind(this));
-	
+
 	ctx_menu.AddDivider();
-	
+
 	ctx_menu.AddItem("Room properties", function(){
 		room.paused = true;
 		var options = room.GenerateOptions();
@@ -106,9 +106,9 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 		);
 		Dialog.AddElement(options.dom);
 	}.bind(this));
-	
+
 	ctx_menu.AddDivider();
-	
+
 	var entity = room.GetEntityAtXY(x, y);
 	var name = "";
 	var index = 0;
@@ -116,7 +116,7 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 		name = entity.constructor.name;
 		index = room.entities.indexOf(entity);
 	}
-	
+
 	if (entity !== undefined){
 		//EDIT options
 		ctx_menu.AddItem("edit " + name, function(){
@@ -135,14 +135,14 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 			Dialog.Confirm("are you sure you wish to delete this " + name + "?", function(){ room.entities.splice(index, 1); }, "delete " + name, "delete", function(){ room.paused = false; }
 			);
 		}.bind(entity));
-		
+
 		ctx_menu.AddDivider();
 	}
-	
+
 	//CREATION OPTIONS
 	var create_node = CtxMenu.InitNode(ctx_menu);
-    var px = tile_x * Tile.WIDTH-8;
-    var py = tile_y * Tile.HEIGHT - 8;
+  var px = tile_x * Tile.WIDTH-8;
+  var py = tile_y * Tile.HEIGHT - 8;
 	create_node.AddItem("new NPC", function(){
 		room.paused = true;
 		var npc = new NPC(px, py);
@@ -160,47 +160,47 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 		);
 		Dialog.AddElement(options.dom);
 	}.bind(this));
-    
+
 	create_node.AddItem("new Checkpoint", function(){
 		var checkpoint = new Checkpoint(px, py);
 		room.entities.push(checkpoint);
 	}.bind(this));
-    
-    create_node.AddItem("new Powerup", function(){
-        room.paused = true;
-        var powerup = new Collection(px, py, 0);
-        var options = powerup.GenerateOptions();
-        level_edit_manager.typing = true;
-        Dialog.Confirm("", function(){
-                options.submit();
-                room.entities.push(powerup);
-            }, "new Powerup", "create",
-            function(){
-                room.paused = false;
-                level_edit_manager.typing = false;
-            }
-        );
-        Dialog.AddElement(options.dom);
-    }.bind(this));
-    
-    create_node.AddItem("new Enemy", function(){
-        room.paused = true;
-        var enemy = new Enemy(px, py, 0);
-        var options = enemy.GenerateOptions();
-        level_edit_manager.typing = true;
-        Dialog.Confirm("", function(){
-                options.submit();
-                room.entities.push(enemy);
-            }, "new Enemy", "create",
-            function(){
-                room.paused = false;
-                level_edit_manager.typing = false;
-            }
-        );
-        Dialog.AddElement(options.dom);
-    }.bind(this));
-    
-    create_node.AddItem("new Door", function(){
+
+  create_node.AddItem("new Powerup", function(){
+      room.paused = true;
+      var powerup = new Collection(px, py, 0);
+      var options = powerup.GenerateOptions();
+      level_edit_manager.typing = true;
+      Dialog.Confirm("", function(){
+              options.submit();
+              room.entities.push(powerup);
+          }, "new Powerup", "create",
+          function(){
+              room.paused = false;
+              level_edit_manager.typing = false;
+          }
+      );
+      Dialog.AddElement(options.dom);
+  }.bind(this));
+
+  create_node.AddItem("new Enemy", function(){
+      room.paused = true;
+      var enemy = new Enemy(px, py, 0);
+      var options = enemy.GenerateOptions();
+      level_edit_manager.typing = true;
+      Dialog.Confirm("", function(){
+              options.submit();
+              room.entities.push(enemy);
+          }, "new Enemy", "create",
+          function(){
+              room.paused = false;
+              level_edit_manager.typing = false;
+          }
+      );
+      Dialog.AddElement(options.dom);
+  }.bind(this));
+
+  create_node.AddItem("new Door", function(){
 		room.paused = true;
 		var door = new Door(px, py, room_manager.room_index_x, room_manager.room_index_y, "id", false, 0);
 		var options = door.GenerateOptions();
@@ -215,22 +215,39 @@ LevelEditManager.prototype.CreateContextMenu = function(mouse_x, mouse_y, x, y, 
 			}
 		);
 		Dialog.AddElement(options.dom);
-    }.bind(this));
-	
+  }.bind(this));
+
+	create_node.AddItem("new Switcher", function(){
+		room.paused = true;
+		var switcher = new Switcher(px, py);
+		var options = switcher.GenerateOptions();
+		level_edit_manager.typing = true;
+		Dialog.Confirm("", function(){
+				options.submit();
+				room.entities.push(switcher);
+			}, "new Switcher", "create",
+			function(){
+				room.paused = false;
+				level_edit_manager.typing = false;
+			}
+		);
+		Dialog.AddElement(options.dom);
+	}.bind(this));
+
 	ctx_menu.AddNode("Create new...", create_node);
 }
 
 LevelEditManager.prototype.DrawGrid = function(ctx, room){
 	return;
-	
+
 	var color = "#000000";
-	
+
 	var ax = (-room.camera.x + room.camera.screen_offset_x) % Tile.WIDTH;
 	var ay = (-room.camera.y + room.camera.screen_offset_y) % Tile.HEIGHT;
 	for (var i = 1; i < ~~(GAME_WIDTH/Tile.WIDTH)+1; i++){
 		drawLine(ctx, color, ax+ i * Tile.WIDTH, 0, ax + i * Tile.WIDTH, room.SCREEN_HEIGHT, 0.5);
 	}
-	
+
 	for (var i = 1; i < ~~(GAME_HEIGHT/Tile.HEIGHT)+1; i++){
 		drawLine(ctx, color, 0, ay + i * Tile.HEIGHT, room.SCREEN_WIDTH, ay + i * Tile.HEIGHT, 0.5);
 	}
@@ -238,7 +255,7 @@ LevelEditManager.prototype.DrawGrid = function(ctx, room){
 
 function TileSetMouseDown(e){
 	if(!level_edit) return;
-	
+
 	e.preventDefault();
 	var box = $("tileset_canvas").getBoundingClientRect();
 	var x = (e.clientX - box.left);
@@ -251,9 +268,9 @@ function TileSetMouseDown(e){
 function LeditSetTileImage(tile_x, tile_y){
 	level_edit_tile_img_x = tile_x;
 	level_edit_tile_img_y = tile_y;
-	
+
 	level_edit_tileset_ctx.canvas.width = level_edit_tileset_ctx.canvas.width;
-	
+
 	level_edit_tileset_ctx.lineWidth="1";
 	level_edit_tileset_ctx.strokeStyle = "#ffffff";
 	level_edit_tileset_ctx.rect(tile_x * Tile.WIDTH, tile_y * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
@@ -264,7 +281,7 @@ LevelEditManager.prototype.MouseDown = function(e){
 	if (!this.enabled) return;
 	e.preventDefault();
 	level_edit_mouse_down = true;
-	
+
 	var right_click = (e.which === 3 && e.button === 2);
 	var box = canvas.getBoundingClientRect();
 	var x = (e.clientX - box.left) / room.camera.view_scale + room.camera.x - room.camera.screen_offset_x;
@@ -279,13 +296,13 @@ LevelEditManager.prototype.MouseDown = function(e){
 		this.entity.grav_acc = 0;
 		potential_level_edit_entity = undefined;
 		document.body.style.cursor = "-webkit-grabbing";
-		
+
 		this.offset_x = this.entity.x - x;
 		this.offset_y = this.entity.y - y;
 	}
-	
+
 	var timer_callback = function(){};
-	
+
 	if (this.potential_entity === undefined){
 		timer_callback = function(){
 			//TILE MODE!!!
@@ -293,7 +310,7 @@ LevelEditManager.prototype.MouseDown = function(e){
 			this.PlaceTile(tile_x, tile_y, right_click);
 		}.bind(this);
 	}
-	
+
 	if (right_click){
 		this.ctx_menu_timer = 0;
 		this.ctx_menu_timer_id = setInterval(function(){
@@ -317,13 +334,13 @@ LevelEditManager.prototype.MouseMove = function(e){
 		this.MouseDown(e);
 		return;
 	}
-	
+
 	var box = canvas.getBoundingClientRect();
 	var x = (e.clientX - box.left) / room.camera.view_scale + room.camera.x - room.camera.screen_offset_x;
 	var y = (e.clientY - box.top) / room.camera.view_scale + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = Math.floor(x / Tile.WIDTH);
 	var tile_y = Math.floor(y / Tile.HEIGHT);
-	
+
 	if (this.tile_mode){
 		this.PlaceTile(tile_x, tile_y, (e.which === 3 || e.button === 2 || e.altKey));
 	}
@@ -340,7 +357,7 @@ LevelEditManager.prototype.MouseMove = function(e){
 		this.entity.x *= (Tile.WIDTH / 2);
 		this.entity.y = ~~((y + this.offset_y) / (Tile.HEIGHT / 2));
 		this.entity.y *= (Tile.HEIGHT / 2);
-		
+
 		this.entity.original_x = this.entity.x;
 		this.entity.original_y = this.entity.y;
 	}
@@ -351,7 +368,7 @@ LevelEditManager.prototype.MouseUp = function(e){
 	this.mouse_down = false;
 	this.tile_mode = false;
 	var right_click = (e.which === 3 && e.button === 2);
-	
+
 	var box = canvas.getBoundingClientRect();
 	var mouse_x = e.clientX - box.left;
 	var mouse_y = e.clientY - box.top;
@@ -359,13 +376,13 @@ LevelEditManager.prototype.MouseUp = function(e){
 	var y = mouse_y / room.camera.view_scale + room.camera.y - room.camera.screen_offset_y;
 	var tile_x = x / Tile.WIDTH;
 	var tile_y = y / Tile.HEIGHT;
-	
+
 	if (this.entity !== undefined){
 		document.body.cursor = "auto";
 		this.entity.grav_acc = this.entity_grav_acc;
 		this.entity = undefined;
 	}
-		
+
 	//right click
 	if (right_click && this.ctx_menu_timer < this.ctx_menu_time_limit){
 		this.CreateContextMenu(mouse_x, mouse_y, x, y, tile_x, tile_y);
@@ -469,7 +486,7 @@ function ledit_select(box, obj_type){
 	}
 
 	box.className = "selected_object_box";
-	
+
 	level_edit_object_is_tile = false;
 	switch (obj_type){
 		case Tile.SOLID:
@@ -500,7 +517,7 @@ function ledit_select(box, obj_type){
 		default:
 			level_edit_object = obj_type;
 	}
-	
+
 	if (level_edit_object_is_tile){
 		$("tileset_canvas").style.display="block";
 	}

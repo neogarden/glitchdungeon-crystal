@@ -61,6 +61,7 @@
 <script src="scripts/entities/objects/Checkpoint.js"></script>
 <script src="scripts/entities/objects/Residue.js"></script>
 <script src="scripts/entities/objects/Collection.js"></script>
+<script src="scripts/entities/objects/Switcher.js"></script>
 
 <script>
 	level_edit = true;
@@ -79,20 +80,20 @@
 		<span>tile collision selection:</span><br/>
 		<input type="radio" name="collision" value="Tile.GHOST">
 			<span style="width:32px;height:32px;background-color:#000000;border: 1px solid white;">&nbsp;&nbsp;</span> no collision<br/>
-		
+
 		<input type="radio" name="collision" value="Tile.SOLID" checked>
 			<span style="width:32px;height:32px;background-color:#aaaaaa;border: 1px solid white;">&nbsp;&nbsp;</span> solid<br/>
-		
+
 		<input type="radio" name="collision" value="Tile.SUPER_SOLID">
 			<span style="width:32px;height:32px;background-color:#ffffff;border: 1px solid white;">&nbsp;&nbsp;</span> super solid<br/>
-		
+
 		<input type="radio" name="collision" value="Tile.FALLTHROUGH">
 			<span style="width:32px;height:32px;background-color:#00ffff;border: 1px solid white;">&nbsp;&nbsp;</span> fallthrough<br/>
-			
+
 		<input type="radio" name="collision" value="Tile.KILL_PLAYER">
 			<span style="width:32px;height:32px;background-color:#ff0000;border: 1px solid white;">&nbsp;&nbsp;</span> deadly<br/>
 	  </div>
-	  
+
       <div id="level_edit_buttons" style="display:none;">
 		  Room Position: <span id="house_coordinates">0 0</span><br/>
 		  Prev Room Pos: <span id="house_coordinates_old">0 0</span>

@@ -1,1 +1,8 @@
-hard mode: don't use default glitches: traverse dungeon on foot + artifacts?
+environments & things:
+
+-shapeshifting memory:
+    -glitch/player that moves around the room randomly and repeats words/phrases that the user has seen before
+        -(each text that the user sees is checked and added to a GameData.TextSet object that is saved and selected from)
+        -this creature will randomly shapeshift to different npc/player/creature tilesets
+        -follows behind the player, but when you talk to it it will jump and move around/away?
+

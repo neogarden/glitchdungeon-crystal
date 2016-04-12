@@ -179,7 +179,7 @@ Glitch.RedTransform = function(map, only_visual){
 		this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
 		this.y += this.vel.y;
 		if (this.vel.y != 0) this.played_land_sound = false;
-		if (!this.true_on_ground) this.y+=0.05;
+		//if (!this.true_on_ground) this.y+=0.05;
 	}
 }
 
@@ -198,39 +198,9 @@ Glitch.GreenTransform = function(map, only_visual){
 	player.float_grav_acc = 0.025;
 	player.grav_acc = player.original_grav_acc;
 	player.jump_time_limit = 10;
-	player.jump_vel = 2.0;
+	player.jump_vel = 3.0;
 	player.has_double_jumped = false;
 	player.has_triple_jumped = false;
-
-	player.StartJump = function(){
-		if (this.on_ground || !this.has_double_jumped || !this.has_triple_jumped){
-			if (this.on_ground){
-				this.has_triple_jumped = true;
-			}
-			Utils.playSound("jump");
-			this.vel.y = -this.jump_vel;
-			this.is_jumping = true;
-			this.jump_timer = 0;
-			if (!this.on_ground){
-				this.vel.y *= 3;
-				this.vel.y /= 4;
-				if (this.has_double_jumped)
-					this.has_triple_jumped = true;
-				this.has_double_jumped = true;
-				if (this.horizontal_input){
-
-					var vel = this.max_run_vel;
-					if (this.facing == Facing.LEFT && this.vel.x > -vel){
-						this.vel.x = -vel;
-					}
-					if (this.facing == Facing.RIGHT && this.vel.x < vel){
-						this.vel.x = vel;
-					}
-				}
-			}
-			this.on_ground = false;
-		}
-	}
 
 	player.Move = function(mult){
 		this.mult = mult;

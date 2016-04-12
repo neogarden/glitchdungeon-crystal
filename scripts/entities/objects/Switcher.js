@@ -60,7 +60,7 @@ Switcher.prototype.ExportOptions = function(){
 }
 ///////////////////////////////////////////////////////////////////
 
-Switcher.prototype.Render = function(ctx, camera){
+/*Switcher.prototype.Render = function(ctx, camera){
 	ctx.save();
 
 	ctx.clearRect(this.x, this.y, 16, 16);
@@ -70,4 +70,4 @@ Switcher.prototype.Render = function(ctx, camera){
 	ctx.fillRect(this.x, this.y, 16, 16);
 	ctx.globalCompositeOperation = "source-over";
 	ctx.restore();
-}
+}*/

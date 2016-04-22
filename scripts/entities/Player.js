@@ -4,6 +4,7 @@ function Player(x, y){
 	this.animation.frame_height = 16;
 	this.touching_door = false;
 	this.touching_checkpoint = false;
+    this.speaking = false;
 
     this.num_deaths = 0;
 	this.spells_cast = 0;
@@ -217,8 +218,8 @@ Player.prototype.Render = function(ctx, camera){
 
 	ctx.drawImage(this.image,
 		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
-		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
+		ani.frame_width * column + ani.abs_ani_x,
+		ani.frame_height * row + ani.abs_ani_y,
 		ani.frame_width, ani.frame_height,
 		//DESTINATION RECTANGLE
 		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
@@ -233,8 +234,8 @@ Player.prototype.Render = function(ctx, camera){
 	if (!room_manager.beat_game) return;
 	ctx.drawImage(this.hat_image,
 		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
-		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
+		ani.frame_width * column + ani.abs_ani_x,
+		ani.frame_height * row + ani.abs_ani_y,
 		ani.frame_width, ani.frame_height,
 		//DESTINATION RECTANGLE
 		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,

@@ -33,7 +33,7 @@ function ResourceManager(){
 	];
 	this.necessary_images = 9;
 	this.num_images = this.image_names.length;
-	
+
 	//SOUND VARIABLE DECLARATION
 	this.play_sound = true;
 	this.play_music = true;
@@ -73,11 +73,11 @@ function ResourceManager(){
 
 ResourceManager.prototype.DisplayLoadScreen = function(){
 	ctx.scale(2,2);
-	
+
 	//Display the LOADING... screen
 	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	
+
 	ctx.fillStyle = "rgb(255,255,255)";
 	//ctx.font = "24px pixelFont";
 	ctx.textAlign = "left";
@@ -87,13 +87,13 @@ ResourceManager.prototype.DisplayLoadScreen = function(){
 	ctx.scale(0.5, 0.5);
 }
 
-ResourceManager.prototype.ImageLoad = function(){ 
+ResourceManager.prototype.ImageLoad = function(){
 	this.images_loaded++;
-	this.CheckLoadedResources(); 
+	this.CheckLoadedResources();
 }
-ResourceManager.prototype.SoundLoad = function(){ 
-	this.sounds_loaded++; 
-	this.CheckLoadedResources(); 
+ResourceManager.prototype.SoundLoad = function(){
+	this.sounds_loaded++;
+	this.CheckLoadedResources();
 }
 
 //LOAD ALL THE RESOURCES
@@ -107,11 +107,11 @@ ResourceManager.prototype.LoadResources = function(ctx){
 			self[img].onload = self.ImageLoad();
 			self[img].src = img_path + img + ".png";
 		})(this, this.image_names[i]);
-		
+
 		setTimeout(timeoutCallback, 0);
 	}
-	
-	if (this.audio_context === null || !this.can_play_sound){ 
+
+	if (this.audio_context === null || !this.can_play_sound){
 		this.sounds_loaded = this.sound_names.length;
 		return;
 	}
@@ -121,7 +121,7 @@ ResourceManager.prototype.LoadResources = function(ctx){
 			var snd = self.sound_names[i];
 			self.loadBuffer(snd_path + snd + ".wav", snd);
 		})(this);
-		
+
 		setTimeout(timeoutCallback, 0);
 	}
 }
@@ -135,7 +135,7 @@ ResourceManager.prototype.loadBuffer = function(url, index) {
   var loader = this;
 
   request.onload = function() {
-  
+
     // Asynchronously decode the audio file data in request.response
     loader.audio_context.decodeAudioData(
       request.response,
@@ -163,7 +163,7 @@ ResourceManager.prototype.loadBuffer = function(url, index) {
 }
 
 ResourceManager.prototype.CheckLoadedResources = function(){
-	if (this.images_loaded >= this.necessary_images 
+	if (this.images_loaded >= this.necessary_images
 		&& this.sounds_loaded >= this.necessary_sounds){
 		if (!game_started) startGame();
 	}

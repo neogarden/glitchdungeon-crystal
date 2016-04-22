@@ -4,11 +4,15 @@ function NPC(x, y, npc_id){
 	this.name = "NPC";
 	this.npc_id = npc_id;
 	this.npc_dialog = [];
+    this.dialog_image = resource_manager.collection_sheet;
+    this.dialog_animation = new Animation(2, 20, 16, 16, 6, 3);
 	this.advanced = false;
 	this.dialog_index = 0;
-	this.animation.frame_delay = 30;
+	this.animation.frame_delay = 40;
 	this.on_end_conversation_event = "";
 	this.on_begin_conversation_event = "";
+
+    this.speaking = false;
 }
 NPC.prototype.Import = function(obj){
 	GameMover.prototype.Import.call(this, obj);
@@ -19,7 +23,7 @@ NPC.prototype.Import = function(obj){
 	this.image = eval("resource_manager." + this.img_name);
 	this.on_init_event = obj.on_init_event;
 	this.on_end_conversation_event = obj.on_end_conversation_event;
-	
+
 	try{
 		eval(this.on_init_event);
 	}catch(e){
@@ -53,7 +57,7 @@ NPC.prototype.ExportOptions = function(){
 	if (dialog === undefined || dialog.length <= 0)
 		dialog = [this.GetText()];
 	options.npc_dialog = new TextArrayOption(dialog, 210, 69);
-  options.img_name = new TextDropdown(
+    options.img_name = new TextDropdown(
         [
             {name: "orange npc", value: "npc_sheet"},
 			{name: "orangenpc lying", value: "npc_fall_sheet"},
@@ -71,6 +75,7 @@ extend(GameMover, NPC);
 
 NPC.prototype.Update = function(map){
 	GameMover.prototype.Update.call(this, map);
+    this.dialog_animation.Update();
 
 	var d = 16;
 	var dy = 8;
@@ -84,16 +89,29 @@ NPC.prototype.Update = function(map){
 		}
 	}
 
+    //If i'm touching the player and the player presses down, speak!
+    if (this.IsRectColliding(player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
+        if (player.pressed_down){
+            this.speaking = true;
+            player.speaking = true;
+        }
+
+        if (!this.speaking)
+            this.render_notification = true;
+        else this.render_notification = false;
+    }
 
 	//TALK TO PLAYER AND SUCH
-	if (this.IsRectColliding(player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
+	if (this.speaking){
 		if (!this.talking) this.advanced = true;
 		this.talking = true;
 
 		room.Speak(
-			((this.name.length > 0) ? (this.name + ": ") : ("")) + this.GetText(),
-			240,
-			this.npc_dialog.length > 1);
+			this.GetText(),
+				{speech_time: 240,
+				 display_arrow: this.npc_dialog.length > 1,
+				 avatar: this.getAvatar()}
+			);
 
 		if (player.pressing_down && !this.advanced){
 			this.incrementDialog();
@@ -104,8 +122,7 @@ NPC.prototype.Update = function(map){
 	}
 	else if (this.talking){
 		this.talking = false;
-		room.Speak(null);
-		//this.incrementDialog();
+		room.Speak(null, {});
 		this.advanced = false;
 
 		try{
@@ -114,6 +131,27 @@ NPC.prototype.Update = function(map){
 			console.log(e);
 		}
 	}
+}
+
+NPC.prototype.getAvatar = function(){
+    var facing = this.facing;
+    this.facing = Facing.RIGHT;
+    this.UpdateAnimationFromState();
+	if (this.avatar === undefined || this.avatar === null){
+		var ani = this.animation;
+		this.avatar = {
+			image: this.image,
+			src_rect: [
+				ani.abs_ani_x,
+				ani.abs_ani_y,
+				ani.frame_width,
+				ani.frame_height - 2,
+			]
+		}
+	}
+    this.facing = facing;
+    this.UpdateAnimationFromState();
+	return this.avatar;
 }
 
 NPC.prototype.incrementDialog = function(){
@@ -142,15 +180,18 @@ NPC.prototype.Render = function(ctx, camera){
 	var row = ani.rel_ani_y;
 	var column = ani.rel_ani_x + ani.curr_frame;
 
+    //draw myself
 	ctx.drawImage(this.image,
 		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
-		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
-		ani.frame_width, ani.frame_height,
+		ani.frame_width * column + ani.abs_ani_x,
+		ani.frame_height * row + ani.abs_ani_y,
+		ani.frame_width,
+		ani.frame_height,
 		//DESTINATION RECTANGLE
 		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
 		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset,
-		ani.frame_width, ani.frame_height
+		ani.frame_width,
+		ani.frame_height
 	);
 
 	var f = -1;
@@ -158,17 +199,38 @@ NPC.prototype.Render = function(ctx, camera){
 	var v = -this.animation.curr_frame;
 
 	//NOW DRAW THE HAT
-	if (!room_manager.beat_game) return;
-	ctx.drawImage(resource_manager.hat_grey_sheet,
-		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
-		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
-		ani.frame_width, ani.frame_height,
-		//DESTINATION RECTANGLE
-		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,
-		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 7 + v,
-		ani.frame_width, ani.frame_height
-	);
+	if (room_manager.beat_game){
+    	ctx.drawImage(resource_manager.hat_grey_sheet,
+    		//SOURCE RECTANGLE
+    		ani.frame_width * column + ani.abs_ani_x,
+    		ani.frame_height * row + ani.abs_ani_y,
+    		ani.frame_width, ani.frame_height,
+    		//DESTINATION RECTANGLE
+    		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,
+    		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 7 + v,
+    		ani.frame_width, ani.frame_height
+    	);
+    }
+
+    //draw the speech notification dialog if applicable
+    ani = this.dialog_animation;
+    row = ani.rel_ani_y;
+	column = ani.rel_ani_x + ani.curr_frame;
+    if (this.render_notification){
+        //draw myself
+    	ctx.drawImage(this.dialog_image,
+    		//SOURCE RECTANGLE
+    		ani.frame_width * column + ani.abs_ani_x,
+    		ani.frame_height * row + ani.abs_ani_y,
+    		ani.frame_width,
+    		ani.frame_height,
+    		//DESTINATION RECTANGLE
+    		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
+    		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 18,
+    		ani.frame_width,
+    		ani.frame_height
+    	);
+    }
 }
 
 //TEXT BABY

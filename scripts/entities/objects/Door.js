@@ -87,12 +87,12 @@ Door.prototype.Update = function(map){
 				if (this.locked){
 					if (_artifacts >= this.num_artifacts){
 						this.locked = false;
-						room.Speak("door unlocked");
+						room.Speak("door unlocked", {});
 						Utils.playSound("LA_Chest_Open", master_volume, 0);
 						this.talking = true;
 					}else{
 						room.Speak("door is locked\nneed " +
-                            (this.num_artifacts-_artifacts) + " spells more");
+                            (this.num_artifacts-_artifacts) + " spells more", {});
 						Utils.playSound("locked", master_volume, 0);
 						this.talking = true;
 					}
@@ -106,7 +106,7 @@ Door.prototype.Update = function(map){
 	}
 	else if (this.talking){
 		this.talking = false;
-		room.Speak(null);
+		room.Speak(null, {});
 	}
 
 	if (this.locked) this.animation.Change(0, 1, 2);

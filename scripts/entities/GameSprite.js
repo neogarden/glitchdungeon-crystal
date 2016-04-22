@@ -6,8 +6,6 @@ function GameSprite(x, y, lb, tb, rb, bb, img_name){
 		this.image = eval("resource_manager." + this.img_name);
 	else this.image = null;
 	this.animation = new Animation(1, 8);
-	this.base_ani_x = 0;
-	this.base_ani_y = 0;
 	this.visible = true;
 }
 extend(GameObject, GameSprite);
@@ -38,8 +36,8 @@ GameSprite.prototype.Render = function(ctx, camera){
 
 	ctx.drawImage(this.image,
 		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x + this.base_ani_x,
-		ani.frame_height * row + ani.abs_ani_y + this.base_ani_y,
+		ani.frame_width * column + ani.abs_ani_x,
+		ani.frame_height * row + ani.abs_ani_y,
 		ani.frame_width, ani.frame_height,
 		//DESTINATION RECTANGLE
 		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,

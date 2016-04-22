@@ -169,11 +169,13 @@ Room.prototype.TryUpdateRoomIfPlayerOffscreen = function(){
 	}
 }
 
-Room.prototype.Speak = function(text, speech_time, display_arrow){
+Room.prototype.Speak = function(text, opts){
 	this.spoken_text = text;
 	this.speech_time = 0;
-	this.speech_time_limit = speech_time || 240;
-	this.speech_display_arrow = display_arrow || false;
+    opts = opts || {}
+	this.speech_time_limit = opts.speech_time || 240;
+	this.speech_display_arrow = opts.display_arrow || false;
+	this.speech_avatar = opts.avatar || null;
 }
 
 Room.prototype.RenderSpeech = function(ctx){
@@ -186,41 +188,56 @@ Room.prototype.RenderSpeech = function(ctx){
 			this.Speak(null);
 			return;
 		}
-		
+
 		GAME_HEIGHT /= 4;
 		GAME_WIDTH /= 4;
 
 		var h = 0;
 		if (player.y+(player.bb/2) >= GAME_HEIGHT/2)
-			h = (-1)*(GAME_HEIGHT/1.5)+Tile.HEIGHT;
+			h = (-1)*(GAME_HEIGHT/1.5)+Tile.HEIGHT-8;
+        h += GAME_HEIGHT-(Tile.HEIGHT)-speech_height;
 
+		//RENDER THE SPEECH BOX
 		ctx.fillStyle = "#ffffff";
-		ctx.fillRect(Tile.WIDTH, h + GAME_HEIGHT-(Tile.HEIGHT)-speech_height, GAME_WIDTH-(Tile.WIDTH*2), speech_height);
+		ctx.fillRect(Tile.WIDTH/2, h + (Tile.HEIGHT/2), GAME_WIDTH-(Tile.WIDTH*1), speech_height);
 		ctx.fillStyle = "#000000";
-		ctx.fillRect(Tile.WIDTH+2, h + GAME_HEIGHT-(Tile.HEIGHT)-speech_height+2, GAME_WIDTH-(Tile.WIDTH*2)-4, speech_height-4);
+		ctx.fillRect(Tile.WIDTH/2+2, h + (Tile.HEIGHT/2) + 2, GAME_WIDTH-(Tile.WIDTH*1)-4, speech_height-4);
 
+		//RENDER THE ACTUAL TEXT
 		var fs = 8;
 		ctx.font = fs + "px pixelFont";
 		ctx.fillStyle = "#ffffff";
 		ctx.strokeStyle = "#ffffff";
 		var texts = this.spoken_text.split("\n");
-		ctx.textAlign="left"; 
+		ctx.textAlign="left";
 		for (var i = 0; i < texts.length; i++){
 			if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))){
-				ctx.fillText(texts[i], Tile.WIDTH*1.5, h + (fs*i)+GAME_HEIGHT-(Tile.HEIGHT/2)-speech_height);
+				ctx.fillText(texts[i], Tile.WIDTH*1.5+24, h + (fs*i)+(Tile.HEIGHT/2) + 4);
 			}else if (check_textRenderContext(ctx)){
-				ctx.strokeText(texts[i], Tile.WIDTH*1.5, h + (fs*i)+GAME_HEIGHT-(Tile.HEIGHT/2)-speech_height - 8, fs-2);
+				ctx.strokeText(texts[i], Tile.WIDTH*1.5+24, h + (fs*i)+(Tile.HEIGHT/2) - 4, fs-2);
 			}
 		}
 
+		//RENDER THE SPEAKERS AVATAR IF APPLICABLE
+		if (this.speech_avatar !== null && this.speech_avatar !== undefined){
+            var src_rect = this.speech_avatar.src_rect;
+			ctx.drawImage(this.speech_avatar.image,
+				//SOURCE RECTANGLE
+				src_rect[0], src_rect[1], src_rect[2], src_rect[3],
+				//DESTINATION RECTANGLE
+				1, h+3, src_rect[2]*2, src_rect[3]*2
+			);
+		}
+
+		//RENDER THE "PRESS DOWN TO CONTINUE" NOTIFIER IF APPLICABLE
 		if (this.speech_display_arrow){
 			if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))){
-				ctx.fillText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3)+GAME_HEIGHT-speech_height - fs - Tile.HEIGHT/2, fs*3, fs*3);
+				ctx.fillText("(v)", GAME_WIDTH - (Tile.WIDTH*2) - fs, h + (fs*3) - fs, fs*3, fs*3);
 			}else if (check_textRenderContext(ctx)){
-				ctx.strokeText("(v)", GAME_WIDTH-(Tile.WIDTH*2) - fs, h + (fs*3) + GAME_HEIGHT-speech_height-8-fs - Tile.HEIGHT/2, fs, fs-2);
+				ctx.strokeText("(v)", GAME_WIDTH - (Tile.WIDTH*2) - fs, h - 8 - fs, fs, fs-2);
 			}
 		}
-		
+
 		GAME_HEIGHT *= 4;
 		GAME_WIDTH *= 4;
 	}
@@ -279,7 +296,7 @@ Room.prototype.Render = function(ctx, level_edit){
 	//coverup
 	this.camera.Render(ctx);
 	this.RenderSpeech(ctx);
-	
+
 	ctx.scale(1/this.camera.view_scale, 1/this.camera.view_scale);
 }
 

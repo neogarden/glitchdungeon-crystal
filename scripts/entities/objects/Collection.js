@@ -57,7 +57,7 @@ Collection.prototype.Update = function(map){
         this.visible = false;
 		Utils.playSound("pickup", master_volume, 0);
         player.inventory.artifacts.push(this);
-		room.Speak("item get: "+this.GetName(false));
+		room.Speak("item get: "+this.GetName(false), {});
 		this.GetName(true, player);
 	}
     this.UpdateAnimation();

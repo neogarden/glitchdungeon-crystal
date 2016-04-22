@@ -53,11 +53,12 @@ io.on('connection', function(socket) {
       var file_content = data.file_content;
   		fs.writeFile(file_name, file_content, function(err){
 			if (err){
+				console.log("error saving file "+file_name);
 				console.log(err);
 				io.sockets.emit("saveFileFailure", {err: err});
 			}
 			else{
-			  console.log("file " +file_name+" saved.");
+			  //console.log("file " +file_name+" saved.");
 			  io.sockets.emit("saveFileSuccess", {});
 			}
 		});

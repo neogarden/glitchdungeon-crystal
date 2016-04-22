@@ -13,7 +13,7 @@ function Animation(max_frame, frame_delay, frame_width, frame_height, rel_ani_x,
 	this.animation_end = false;
 	this.frame_change = false;
 	this.repeat = true;
-	
+
 	this.Restart();
 }
 
@@ -36,7 +36,7 @@ Animation.prototype.Change = function(rax, ray, mf){
 Animation.prototype.Update = function(){
 	this.frame_change = false;
 	this.animation_end = false;
-	
+
 	this.frame_count++;
 	if (this.frame_count >= this.frame_delay){
 		if (this.curr_frame < this.max_frame) this.curr_frame++;

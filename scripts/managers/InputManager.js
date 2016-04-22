@@ -3,7 +3,13 @@ function InputManager(key_manager){
 }
 
 InputManager.prototype.Update = function(player){
-//	console.log(this.key_manager.keys_down);
+    if (player.speaking)
+        this.SpeakingUpdate(player);
+    else this.NormalUpdate(player);
+}
+
+InputManager.prototype.NormalUpdate = function(player){
+    //	console.log(this.key_manager.keys_down);
 	if (this.key_manager.keys_down[KeyManager.RIGHT]){
 		player.MoveRight();
 	}
@@ -24,9 +30,10 @@ InputManager.prototype.Update = function(player){
 	}
 
 	if (this.key_manager.keys_pressed[KeyManager.DOWN]){
-		player.PressDown();
-	}
-	else if(this.key_manager.keys_up[KeyManager.DOWN]){
+		player.StartPressingDown();
+	}else if (this.key_manager.keys_down[KeyManager.DOWN]){
+        player.PressDown();
+    }else if(this.key_manager.keys_up[KeyManager.DOWN]){
 		player.StopPressingDown();
 	}
 
@@ -71,6 +78,16 @@ InputManager.prototype.Update = function(player){
 	//Restart the game
 	if ((this.key_manager.keys_pressed[KeyManager.SHIFT] && this.key_manager.keys_down[KeyManager.R]) || (this.key_manager.keys_down[KeyManager.SHIFT] && this.key_manager.keys_pressed[KeyManager.R])){
 		InputManager.RestartGame();
+	}
+}
+
+InputManager.prototype.SpeakingUpdate = function(){
+    if (this.key_manager.keys_pressed[KeyManager.DOWN] || this.key_manager.keys_pressed[KeyManager.SPACE]){
+        player.pressed_down = false;
+        player.speaking = false;
+        room.entities.forEach(function(entity){
+            entity.speaking = false;
+        });
 	}
 }
 

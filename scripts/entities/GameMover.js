@@ -426,12 +426,18 @@ GameMover.prototype.StopJump = function(){
 	this.grav_acc = this.original_grav_acc;
 }
 
+GameMover.prototype.StartPressingDown = function(){
+    this.pressed_down = true;
+    this.pressing_down = true;
+}
+
 GameMover.prototype.PressDown = function(){
+    this.pressed_down = false;
 	this.pressing_down = true;
-	this.pressed_down = true;
 	this.on_ground = false;
 }
 
 GameMover.prototype.StopPressingDown = function(){
 	this.pressing_down = false;
+    this.pressed_down = false;
 }

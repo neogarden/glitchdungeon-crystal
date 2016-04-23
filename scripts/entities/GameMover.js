@@ -254,7 +254,7 @@ GameMover.prototype.HandleRightCollision = function(object, q){
     if (this.vel.x > 0 && this.IsRectColliding(object,
         this.x + this.rb,
         this.y + this.tb + q,
-        this.x + this.rb + this.vel.x + 1,
+        this.x + this.rb + this.vel.x + 2,
         this.y + this.bb - q)){
 
             this.vel.x = 0;
@@ -305,7 +305,7 @@ GameMover.prototype.HandleBottomCollision = function(object, q){
         this.x + this.lb + q,
         this.y + this.bb,
         this.x + this.rb - q,
-        this.y + this.bb + this.vel.y + 1)){
+        this.y + this.bb + this.vel.y + 2)){
 
             if (!this.played_land_sound){
                 Utils.playSound("land");

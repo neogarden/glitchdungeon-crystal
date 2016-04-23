@@ -29,7 +29,7 @@ function Tile(x, y, collision, slope){
 	this.slope = slope;
 	this.tileset_x = 0;
 	this.tileset_y = 0;
-	
+
 	this.SetLRHeights();
 }
 extend(GameObject, Tile);
@@ -39,7 +39,7 @@ Tile.prototype.Import = function(obj){
 	this.collision = obj.collision;
 	this.slope = obj.slope;
 	this.SetLRHeights();
-	
+
 	this.tileset_x = obj.tileset_x;
 	this.tileset_y = obj.tileset_y;
 }
@@ -48,7 +48,7 @@ Tile.prototype.Export = function(){
 	obj = {};
 	obj.collision = this.collision;
 	obj.slope = this.slope;
-	
+
 	obj.tileset_x = this.tileset_x;
 	obj.tileset_y = this.tileset_y;
 	return obj;
@@ -73,18 +73,18 @@ Tile.prototype.SetLRHeights = function(){
 }
 
 Tile.prototype.Render = function(ctx, camera, image){
-	if ((image === null || (this.tileset_x == 0 && this.tileset_y == 0)) 
-		&& Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY) 
+	if ((image === null || (this.tileset_x == 0 && this.tileset_y == 0))
+		&& Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY)
 			return;
 	var row = this.tileset_y;
 	var column = this.tileset_x;
-	
+
 	if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY){
-		ctx.drawImage(image, 
+		ctx.drawImage(image,
 			//SOURCE RECTANGLE
 			Tile.WIDTH * column, Tile.HEIGHT * row, Tile.WIDTH, Tile.HEIGHT,
 			//DESTINATION RECTANGLE
-			~~(this.x-camera.x+camera.screen_offset_x+0.5), 
+			~~(this.x-camera.x+camera.screen_offset_x+0.5),
 			~~(this.y-camera.y+camera.screen_offset_y+0.5),
 			Tile.WIDTH, Tile.HEIGHT
 		);

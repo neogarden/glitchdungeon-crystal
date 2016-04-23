@@ -215,91 +215,134 @@ GameMover.prototype.HandleCollisionsAndMove = function(map){
 	this.true_on_ground = false;
 	var q_horz = 3; //q is used to minimize height checked in horizontal collisions and etc.
 	var q_vert = 3;
-	var floor_tile = null;
 
-	floor_tile = this.HandleHorizontalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_horz, floor_tile);
+    var tiles = [];
+    for (var i = top_tile; i <= bottom_tile; i++){
+        for (var j = left_tile; j <= right_tile; j++){
+            if (!map.isValidTile(i, j))
+                continue;
+            if (map.tiles[i][j].collision == Tile.GHOST ||
+                map.tiles[i][j].collision == Tile.KILL_PLAYER)
+                continue;
+            tiles.push(map.tiles[i][j]);
+        }
+    }
+
+	this.HandleHorizontalCollisions(tiles, map.entities, q_horz);
 	this.x += this.vel.x;
-	this.HandleVerticalCollisions(map, left_tile, right_tile, top_tile, bottom_tile, q_vert);
+	this.HandleVerticalCollisions(tiles, map.entities, q_vert);
 	this.y += this.vel.y;
-	if (this.vel.y != 0) this.played_land_sound = false;
+
+	if (this.vel.y != 0)
+        this.played_land_sound = false;
 }
 
-GameMover.prototype.HandleHorizontalCollisions = function(map, left_tile, right_tile, top_tile, bottom_tile, q, floor_tile){
+GameMover.prototype.HandleLeftCollision = function(object, q){
+    if (this.vel.x < 0 && this.IsRectColliding(object,
+        this.x + this.lb + this.vel.x - 1,
+        this.y + this.tb + q,
+        this.x + this.lb,
+        this.y + this.bb - q)){
+
+            this.vel.x = 0;
+            this.horizontal_collision = true;
+            this.x = object.x + object.rb - this.lb;
+    }
+}
+
+GameMover.prototype.HandleRightCollision = function(object, q){
+    if (this.vel.x > 0 && this.IsRectColliding(object,
+        this.x + this.rb,
+        this.y + this.tb + q,
+        this.x + this.rb + this.vel.x + 1,
+        this.y + this.bb - q)){
+
+            this.vel.x = 0;
+            this.horizontal_collision = true;
+            this.x = object.x - this.rb;
+    }
+}
+
+GameMover.prototype.HandleHorizontalCollisions = function(tiles, entities, q){
 	this.horizontal_collision = false;
+
 	//Check all potentially colliding tiles
-	for (var i = top_tile; i <= bottom_tile; i++){
-		for (var j = left_tile; j <= right_tile; j++){
-			if (!map.isValidTile(i, j)) continue;
-			var tile = map.tiles[i][j];
-			//don't check for collisions if potential tile is "out of bounds" or not solid
-			if (tile.collision != Tile.SOLID && tile.collision != Tile.SUPER_SOLID) continue;
+	for (var i = 0; i < tiles.length; i++){
+		var tile = tiles[i];
+		//don't check for collisions if potential tile is not solid
+		if (tile.collision != Tile.SOLID &&
+            tile.collision != Tile.SUPER_SOLID)
+            continue;
 
-			//Reset floor tile
-			if (floor_tile == null || (tile.y > this.y && Math.abs(tile.x-this.x) < Math.abs(floor_tile.x-this.x))){
-				floor_tile = tile;
-			}
-
-			//Check for left collisions
-			if (this.vel.x < 0 && this.IsRectColliding(tile, this.x + this.lb + this.vel.x - 1,
-			this.y + this.tb + q, this.x + this.lb, this.y + this.bb - q)){
-				//this is a negative slope (don't collide left)
-				if (tile.l_height < tile.r_height){}
-				//okay we're colliding with a solid to our left
-				else{
-					this.vel.x = 0;
-					this.horizontal_collision = true;
-					this.x = tile.x + Tile.WIDTH - this.lb;
-				}
-			}
-
-			//Check for Right collisions
-			if (this.vel.x > 0 && this.IsRectColliding(tile, this.x + this.rb, this.y + this.tb + q, this.x + this.rb + this.vel.x + 1, this.y + this.bb - q)){
-				//this is a positive slope (don't collide right)
-				if (tile.r_height < tile.l_height){}
-				//okay we're colliding with a solid to our right
-				else{
-					this.vel.x = 0;
-					this.horizontal_collision = true;
-					this.x = tile.x - this.rb;
-				}
-			}
-		}
+		this.HandleLeftCollision(tile, q);
+        this.HandleRightCollision(tile, q);
 	}
+
+    for (i = 0; i < entities.length; i++){
+        if (!entities[i].solid) continue;
+        if (entities[i] === this) continue;
+
+        this.HandleLeftCollision(entities[i], q);
+        this.HandleRightCollision(entities[i], q);
+    }
 }
 
-GameMover.prototype.HandleVerticalCollisions = function(map, left_tile, right_tile, top_tile, bottom_tile, q){
+GameMover.prototype.HandleTopCollision = function(object, q){
+    if (this.vel.y < 0 && this.IsRectColliding(object,
+        this.x + this.lb + q,
+        this.y + this.tb + this.vel.y-1,
+        this.x + this.rb - q,
+        this.y + this.tb)){
+
+            this.vel.y = 0;
+            this.y = object.y + object.bb - this.tb;
+    }
+}
+
+GameMover.prototype.HandleBottomCollision = function(object, q){
+    //Check for bottom collisions
+    if (this.vel.y >= 0 && this.IsRectColliding(object,
+        this.x + this.lb + q,
+        this.y + this.bb,
+        this.x + this.rb - q,
+        this.y + this.bb + this.vel.y + 1)){
+
+            if (!this.played_land_sound){
+                Utils.playSound("land");
+                this.played_land_sound = true;
+            }
+            this.vel.y = 0;
+            this.on_ground = true;
+            this.true_on_ground = true;
+            this.has_double_jumped = false;
+            this.has_triple_jumped = false;
+            this.y = object.y - this.bb;
+    }
+}
+
+GameMover.prototype.HandleVerticalCollisions = function(tiles, entities, q){
 	//Check all potentially colliding tiles
-	for (var i = top_tile; i <= bottom_tile; i++){
-		for (var j = left_tile; j <= right_tile; j++){
-			if (!map.isValidTile(i, j)) continue;
-			var tile = map.tiles[i][j];
-			//don't check for collisions if potential tile is "out of bounds" or not solid
-			if (tile.collision == Tile.GHOST || tile.collision == Tile.KILL_PLAYER) continue;
-			//Check for top collisions
-			if (this.vel.y < 0 && tile.collision != Tile.FALLTHROUGH && this.IsRectColliding(tile, this.x + this.lb + q, this.y + this.tb + this.vel.y-1, this.x + this.rb - q, this.y + this.tb)){
-				this.vel.y = 0;
-				this.y = tile.y + Tile.HEIGHT - this.tb;
-			}
+	for (var i = 0; i < tiles.length; i++){
+		var tile = tiles[i];
 
-			//Check for bottom collisions
-			if (this.vel.y >= 0 && this.IsRectColliding(tile, this.x + this.lb + q, this.y + this.bb, this.x + this.rb - q, this.y + this.bb + this.vel.y + 1)){
-				//Don't count bottom collision for fallthrough platforms if we're not at the top of it
-				if (tile.collision == Tile.FALLTHROUGH && (tile.y < this.y + this.bb || this.pressing_down))
-					continue;
+		//Check for top collisions
+        if (tile.collision != Tile.FALLTHROUGH)
+            this.HandleTopCollision(tile, q);
 
-				if (!this.played_land_sound){
-					Utils.playSound("land");
-					this.played_land_sound = true;
-				}
-				this.vel.y = 0;
-				this.on_ground = true;
-				this.true_on_ground = true;
-				this.has_double_jumped = false;
-				this.has_triple_jumped = false;
-				this.y = tile.y - this.bb;
-			}
-		}
+        //Don't count bottom collision for fallthrough platforms if we're not at the top of it
+        if (tile.collision == Tile.FALLTHROUGH &&
+            (tile.y < this.y + this.bb || this.pressing_down))
+                continue;
+        this.HandleBottomCollision(tile, q);
 	}
+
+    for (i = 0; i < entities.length; i++){
+        if (!entities[i].solid) continue;
+        if (entities[i] === this) continue;
+
+        this.HandleTopCollision(entities[i], q);
+        this.HandleBottomCollision(entities[i], q);
+    }
 }
 
 /******************RENDER AND ANIMATION FUNCTIONS***********************/

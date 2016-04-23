@@ -4,6 +4,7 @@ function NPC(x, y, npc_id){
 	this.name = "NPC";
 	this.npc_id = npc_id;
 	this.npc_dialog = [];
+    this.solid = true;
     this.dialog_image = resource_manager.collection_sheet;
     this.dialog_animation = new Animation(2, 20, 16, 16, 6, 3);
 	this.advanced = false;
@@ -95,10 +96,6 @@ NPC.prototype.Update = function(map){
             this.speaking = true;
             player.speaking = true;
         }
-
-        if (!this.speaking)
-            this.render_notification = true;
-        else this.render_notification = false;
     }
 
 	//TALK TO PLAYER AND SUCH
@@ -209,26 +206,6 @@ NPC.prototype.Render = function(ctx, camera){
     		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,
     		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 7 + v,
     		ani.frame_width, ani.frame_height
-    	);
-    }
-
-    //draw the speech notification dialog if applicable
-    ani = this.dialog_animation;
-    row = ani.rel_ani_y;
-	column = ani.rel_ani_x + ani.curr_frame;
-    if (this.render_notification){
-        //draw myself
-    	ctx.drawImage(this.dialog_image,
-    		//SOURCE RECTANGLE
-    		ani.frame_width * column + ani.abs_ani_x,
-    		ani.frame_height * row + ani.abs_ani_y,
-    		ani.frame_width,
-    		ani.frame_height,
-    		//DESTINATION RECTANGLE
-    		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
-    		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 18,
-    		ani.frame_width,
-    		ani.frame_height
     	);
     }
 }

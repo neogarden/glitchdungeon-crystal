@@ -11,9 +11,10 @@ function GameObject(x, y, lb, tb, rb, bb){
 	this.width = rb - lb;
 	this.height = bb - tb;
 	this.delete_me = false;
-	
+    this.solid = false;
+
 	this.z_index = 0;
-	
+
 	this.kill_player = false;
 }
 
@@ -60,22 +61,22 @@ GameObject.prototype.GenerateOptions = function(){
 	for (var attribute in opt){
 		var span = document.createElement("span");
 		span.innerHTML = attribute;
-		
+
 		var input = opt[attribute].ExportDom(attribute);
-		
+
 		dom.appendChild(span);
 		dom.appendChild(document.createElement("br"));
 		dom.appendChild(input);
 		dom.appendChild(document.createElement("br"));
 	}
-	
+
 	var submit = function(){
 		for (var attribute in opt){
 			opt[attribute].UpdateFromDom();
 		}
 		this.ImportOptions(opt);
 	}.bind(this);
-	
+
 	return { dom: dom, submit: submit };
 }
 GameObject.prototype.ResetPosition = function(){
@@ -92,7 +93,7 @@ GameObject.ZIndexSort = function(a,b){
 /**************************COLLISION DETECTION*************************************/
 //object is of type GameObject
 GameObject.prototype.IsColliding = function(object){
-	return this.IsRectColliding(object, this.x+this.lb, this.y+this.tb, 
+	return this.IsRectColliding(object, this.x+this.lb, this.y+this.tb,
 		this.x+this.rb, this.y+this.bb);
 }
 

@@ -9,6 +9,9 @@ function Player(x, y){
     this.num_deaths = 0;
 	this.spells_cast = 0;
 
+    this.is_moving_to_spot = false;
+    this.spot_to_move_to = {x: 0, y: 0};
+
     //INVENTORY
 	this.inventory = {
         spellbook: {
@@ -86,6 +89,30 @@ Player.prototype.Update = function(map){
 	GameMover.prototype.Update.call(this, map);
 	this.touching_door = false;
 	this.touching_checkpoint = false;
+
+    if (this.is_moving_to_spot){
+        if (this.spot_to_move_to.x < this.x)
+            this.x--;
+        else if (this.spot_to_move_to.x > this.x)
+            this.x++;
+        else
+            this.is_moving_to_spot = false;
+        this.x = ~~this.x;
+    }
+}
+
+Player.prototype.MoveToConversationSpot = function(npc){
+    this.StartJump();
+
+    this.is_moving_to_spot = true;
+    this.spot_to_move_to.y = npc.y;
+    if (npc.facing === Facing.LEFT){
+        this.spot_to_move_to.x = npc.x + npc.lb - this.rb;
+        this.facing = Facing.RIGHT;
+    }else{
+        this.spot_to_move_to.x = npc.x + npc.rb - this.lb;
+        this.facing = Facing.LEFT;
+    }
 }
 
 Player.prototype.PressX = function(){

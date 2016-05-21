@@ -43,13 +43,14 @@ NPC.prototype.Export = function(){
 }
 NPC.prototype.ImportOptions = function(options){
 	this.name = options.name.value;
+    this.solid = options.is_solid.value;
 	this.npc_dialog = options.npc_dialog.value;
 
-  this.img_name = options.img_name.value;
+    this.img_name = options.img_name.value;
 	if (this.img_name != undefined)
 		this.image = eval("resource_manager." + this.img_name);
-  this.on_init_event = options.on_init_event.value;
-  this.on_end_conversation_event = options.on_end_conversation_event.value;
+    this.on_init_event = options.on_init_event.value;
+    this.on_end_conversation_event = options.on_end_conversation_event.value;
 }
 NPC.prototype.ExportOptions = function(){
 	var options = {};
@@ -57,6 +58,7 @@ NPC.prototype.ExportOptions = function(){
 	var dialog = this.npc_dialog;
 	if (dialog === undefined || dialog.length <= 0)
 		dialog = [this.GetText()];
+    options.is_solid = new CheckboxOption(this.solid);
 	options.npc_dialog = new TextArrayOption(dialog, 210, 69);
     options.img_name = new TextDropdown(
         [
@@ -64,8 +66,8 @@ NPC.prototype.ExportOptions = function(){
 			{name: "orangenpc lying", value: "npc_fall_sheet"},
             {name: "kid player", value: "player_sheet"},
             {name: "grey player", value: "player_grey_sheet"},
-        ], this.img_name
-    );
+        ],
+        this.img_name);
 
 	options.on_init_event = new BigTextOption(this.on_init_event);
 	options.on_end_conversation_event = new BigTextOption(this.on_end_conversation_event);
@@ -91,8 +93,14 @@ NPC.prototype.Update = function(map){
 	}
 
     //If i'm touching the player and the player presses down, speak!
-    if (this.IsRectColliding(player, this.x+this.lb-Tile.WIDTH, this.y+this.tb, this.x+this.rb+Tile.WIDTH, this.y+this.bb)){
+    if (this.IsRectColliding(player,
+        this.x+this.lb-Tile.WIDTH, this.y+this.tb-Tile.WIDTH/2,
+        this.x+this.rb+Tile.WIDTH, this.y+this.bb+Tile.WIDTH/2)){
+
         if (player.pressed_down){
+            if (!this.speaking){
+                player.MoveToConversationSpot(this);
+            }
             this.speaking = true;
             player.speaking = true;
         }

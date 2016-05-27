@@ -1,10 +1,10 @@
-window.requestAnimFrame = function(){
+window['requestAnimFrame'] = function(){
     return (
-        window.requestAnimationFrame       || 
-        window.webkitRequestAnimationFrame || 
-        window.mozRequestAnimationFrame    || 
-        window.oRequestAnimationFrame      || 
-        window.msRequestAnimationFrame     || 
+        window['requestAnimationFrame']       ||
+        window['webkitRequestAnimationFrame'] ||
+        window['mozRequestAnimationFrame']    ||
+        window['oRequestAnimationFrame']      ||
+        window['msRequestAnimationFrame']     ||
         function(callback){
             window.setTimeout(callback, 1000 / 60);
         }
@@ -45,10 +45,10 @@ var SoundMouseDown = function(){
 var SoundMouseUp = function(e){
 	click_to_start = true;
 	var box = canvas.getBoundingClientRect();
-	
+
 	var x = (e.clientX - box.left) / 2;
 	var y = (e.clientY - box.top) / 2;
-	
+
 	if (x >= 4 && x <= 20){
 		if (y >= 4 && y <= 20){
 			if (resource_manager.play_music){
@@ -57,7 +57,7 @@ var SoundMouseUp = function(e){
 				startMusic();
 			}
 		}
-		
+
 		else if (y >= 24 && y <= 40){
 			if (resource_manager.play_sound){
 				stopSound();

@@ -1,1 +1,5 @@
-var RoomIllusion = function(){};
+var RoomIllusion = (function () {
+    function RoomIllusion() {
+    }
+    return RoomIllusion;
+}());

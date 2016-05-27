@@ -136,16 +136,6 @@ House.prototype.Export = function(){
 
   return {rooms: room_jsons, etc: JSON.stringify(etc)};
 }
-House.prototype.SoftImport = function(level_name, callback){
-	this.Import(level_name, function(){
-		for (var j in this.rooms){
-			for (var i in this.rooms[j]){
-				old_rooms[j][i] = this.rooms[j][i];
-			}
-		}
-		callback();
-	}, false);
-}
 House.prototype.Import = function(level_name, callback, reset_rooms){
 	if (reset_rooms === undefined) reset_rooms = true;
 	var path = this.path + "/" + level_name + "/";
@@ -185,7 +175,7 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 				room = JSON.parse(json);
 				room.x = x;
 				room.y = y;
-				new_room = new Room();
+				var new_room = new Room();
 				new_room.Import(room);
 				if (this.rooms[x] === undefined) this.rooms[x] = {};
 				this.rooms[x][y] = new_room;

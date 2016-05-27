@@ -1,1 +1,1 @@
-var RoomIllusion = function(){};
+class RoomIllusion{}

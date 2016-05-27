@@ -17,9 +17,9 @@ Room.prototype.Save = function(){
 	};
 }
 Room.prototype.Load = function(room){
-    //load level id 
+    //load level id
     this.level_id = room.level_id || House.Levels["dungeon"];
-    
+
 	this.glitch_index = 0;
 	this.glitch_time = 0;
 	this.glitch_time_limit = room.glitch_time_limit || Room.GLITCH_TIME_LIMIT_ORIGINAL;
@@ -27,7 +27,7 @@ Room.prototype.Load = function(room){
 	this.glitch_type = this.glitch_sequence[0];
 	this.can_use_spellbook = defaultValue(room.can_use_spellbook, true);
 	Glitch.TransformPlayer(this, this.glitch_type);
-	
+
 	//load entities
 	this.entities = [];
 	if (room.entities){
@@ -88,9 +88,9 @@ Room.Import = function(file_name){
 }
 
 Room.prototype.Import = function(room){
-    //import level id 
+    //import level id
     this.level_id = room.level_id || House.Levels["dungeon"];
-    
+
 	this.ChangeSize(room.width, room.height);
 	this.glitch_index = 0;
 	this.glitch_time = 0;
@@ -99,7 +99,7 @@ Room.prototype.Import = function(room){
 	this.glitch_type = this.glitch_sequence[0];
 	this.can_use_spellbook = defaultValue(room.can_use_spellbook, true);
 	Glitch.TransformPlayer(this, this.glitch_type);
-	
+
 	//import entities
 	this.entities = [];
 	if (room.entities){
@@ -109,7 +109,7 @@ Room.prototype.Import = function(room){
 			this.entities.push(entity);
 		}
 	}
-	
+
 	//Import tiles!!!
 	this.tiles = [];
 	this.MAP_WIDTH = room.tiles[0].length;
@@ -122,7 +122,7 @@ Room.prototype.Import = function(room){
 		}
 		this.tiles.push(row);
 	}
-	
+
 	this.edge_death = room.edge_death;
 	if (this.edge_death === undefined) this.edge_death = false;
 	this.bg_code = room.bg_code;
@@ -132,28 +132,28 @@ Room.prototype.Import = function(room){
 /************************EXPORTING AND IMPORTING FUNCTIONS************/
 Room.prototype.ImportOptions = function(options){
     this.level_id = Number(options.level_id.value);
-    
+
 	var width = options.width.value;
 	width = ~~(width / Tile.WIDTH) * Tile.WIDTH;
 	var height = options.height.value;
 	height = ~~(height / Tile.HEIGHT) * Tile.HEIGHT;
-	
+
 	this.camera.view_scale = options.view_scale.value;
 	this.edge_death = options.edge_death.value;
-	
+
 	this.ChangeSize(width, height);
 	this.bg_code = options.bg_code.value;
 }
 Room.prototype.ExportOptions = function(){
 	var options = {};
-    options.level_id = new TextDropdown(
+    options['level_id'] = new TextDropdown(
         House.GetLevels(), this.level_id
     );
-	options.width = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
-	options.height = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
-	options.view_scale = new NumberOption(this.camera.view_scale);
-	options.edge_death = new CheckboxOption(this.edge_death);
-	options.bg_code = new BigTextOption(this.bg_code);
+	options['width'] = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
+	options['height'] = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
+	options['view_scale'] = new NumberOption(this.camera.view_scale);
+	options['edge_death'] = new CheckboxOption(this.edge_death);
+	options['bg_code'] = new BigTextOption(this.bg_code);
 	return options;
 }
 /********************************************************************/
@@ -165,22 +165,21 @@ Room.prototype.GenerateOptions = function(){
 	for (var attribute in opt){
 		var span = document.createElement("span");
 		span.innerHTML = attribute;
-		
+
 		var input = opt[attribute].ExportDom(attribute);
-		
+
 		dom.appendChild(span);
 		dom.appendChild(document.createElement("br"));
 		dom.appendChild(input);
 		dom.appendChild(document.createElement("br"));
 	}
-	
+
 	var submit = function(){
 		for (var attribute in opt){
 			opt[attribute].UpdateFromDom();
 		}
 		this.ImportOptions(opt);
 	}.bind(this);
-	
+
 	return { dom: dom, submit: submit };
 }
-

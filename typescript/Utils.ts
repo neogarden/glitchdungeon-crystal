@@ -1,50 +1,50 @@
-function Utils(){}
+class Utils{
+    public static gup(name){
+    	//http://stackoverflow.com/questions/8460265/get-a-variable-from-url-parameter-using-javascript
+    	name = RegExp ('[?&]' + name.replace (/([[\]])/, '\\$1') + '=([^&#]*)');
+    	return (window.location.href.match (name) || ['', ''])[1];
+    }
 
-Utils.gup = function(name){
-	//http://stackoverflow.com/questions/8460265/get-a-variable-from-url-parameter-using-javascript
-	name = RegExp ('[?&]' + name.replace (/([[\]])/, '\\$1') + '=([^&#]*)');
-	return (window.location.href.match (name) || ['', ''])[1];
-}
+    public static playSound(sound_name, volume = 1.0, time = 0, loop = false){
+    	tryToPlay = null;
+    	loop = loop;
 
-Utils.playSound = function(sound_name, volume, time, loop){
-	tryToPlay = null;
-	loop = defaultValue(loop, false);
+    	if (!resource_manager.can_play_sound || (!resource_manager.play_sound || (!resource_manager.play_music && loop)))
+    		return;
+    	//if the bg music isn't loaded, give it a second
+    	if (loop){
+    		if (resource_manager[sound_name] === undefined || resource_manager[sound_name] === null){
+    			tryToPlay = window.setTimeout(function(){bg_music = Utils.playSound(sound_name, volume, time, loop);}, 100);
+    			return;
+    		}
+    	}
 
-	if (!resource_manager.can_play_sound || (!resource_manager.play_sound || (!resource_manager.play_music && loop))) 
-		return;
-	//if the bg music isn't loaded, give it a second
-	if (loop){
-		if (resource_manager[sound_name] === undefined || resource_manager[sound_name] === null){
-			tryToPlay = window.setTimeout(function(){bg_music = Utils.playSound(sound_name, volume, time, loop);}, 100);
-			return;
-		}
-	}
-	
-	if (!resource_manager[sound_name]) return;
+    	if (!resource_manager[sound_name]) return;
 
-	//http://www.html5rocks.com/en/tutorials/webaudio/intro/
-	var source = resource_manager.audio_context.createBufferSource(); //creates a sound source
-	source.buffer = resource_manager[sound_name]; //tell the source which sound to play
-	source.loop = loop;
-	
-	var v = volume || 1.0;
-	//Create a gain node
-	var gain_node = resource_manager.audio_context.createGain();
-	source.connect(gain_node);
-	gain_node.connect(resource_manager.audio_context.destination); //connect source to the speakers
-	
-	//Set the volume
-	gain_node.gain.value = v;
+    	//http://www.html5rocks.com/en/tutorials/webaudio/intro/
+    	var source = resource_manager.audio_context.createBufferSource(); //creates a sound source
+    	source.buffer = resource_manager[sound_name]; //tell the source which sound to play
+    	source.loop = loop;
 
-	
-	var t = time || 0;
-	if (source.start)
-		source.start(t); 
-	//NOTE: on older systems, may have to use deprecated noteOn(time);
-	else
-		source.noteOn(t);
-		
-	return source;
+    	var v = volume;
+    	//Create a gain node
+    	var gain_node = resource_manager.audio_context.createGain();
+    	source.connect(gain_node);
+    	gain_node.connect(resource_manager.audio_context.destination); //connect source to the speakers
+
+    	//Set the volume
+    	gain_node.gain.value = v;
+
+
+    	var t = time;
+    	if (source.start)
+    		source.start(t);
+    	//NOTE: on older systems, may have to use deprecated noteOn(time);
+    	else
+    		source.noteOn(t);
+
+    	return source;
+    }
 }
 
 function readTextFile(file){
@@ -85,7 +85,7 @@ function readTextFileAsync(file, callback){
 		}
 		rawFile.send(null);
 	}catch(e){
-		
+
 	}
 }
 
@@ -107,7 +107,7 @@ function extend(base, sub){
 	// Avoid instantiating the base class just to setup inheritance
 	// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create
 	// for a polyfill
-	// Also, do a recursive merge of two prototypes, so we don't overwrite 
+	// Also, do a recursive merge of two prototypes, so we don't overwrite
 	// the existing prototype, but still maintain the inheritance chain
 	// Thanks to @ccnokes
 	var origProto = sub.prototype;
@@ -119,11 +119,11 @@ function extend(base, sub){
 	sub.prototype.constructor = sub;
 	// In ECMAScript5+ (all modern browsers), you can make the constructor property
 	// non-enumerable if you define it like this instead
-	Object.defineProperty(sub.prototype, 'constructor', { 
-		enumerable: false, 
-		value: sub 
+	Object.defineProperty(sub.prototype, 'constructor', {
+		enumerable: false,
+		value: sub
 	});
-    
+
     sub.prototype.Parent = function(){ return base.prototype; }
 }
 
@@ -142,7 +142,7 @@ function sharpen(ctx){
 	ctx.imageSmoothingEnabled = false;
 }
 
-function drawLine(ctx, color, x1, y1, x2, y2, thickness, cap){
+function drawLine(ctx, color, x1, y1, x2, y2, thickness, cap = undefined){
     cap = cap || "round";
     ctx.beginPath();
     ctx.moveTo(x1,y1);

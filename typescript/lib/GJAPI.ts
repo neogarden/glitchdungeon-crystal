@@ -1,4 +1,4 @@
-function GJAPI(){}
-
-GJAPI.game_id = "";
-GJAPI.private_token = "";
+class GJAPI{
+    public static game_id = "";
+    public static private_token = "";
+}

@@ -1,279 +1,277 @@
-function Player(x, y){
-	GameMover.call(this, x, y, 2, 2, 14, 16, "player_grey_sheet");
-	this.type = "Player";
-	this.animation.frame_height = 16;
-	this.touching_door = false;
-	this.touching_checkpoint = false;
-    this.speaking = false;
+class Player extends GameMover{
+    public touching_door: boolean = false;
+    public touching_checkpoint: boolean = false;
+    public speaking: boolean = false;
+    public num_deaths: number = 0;
+    public spells_cast: number = 0;
+    public is_moving_to_spot: boolean = false;
+    public spot_to_move_to: Point = new Point(0, 0);
+    public inventory: Object;
 
-    this.num_deaths = 0;
-	this.spells_cast = 0;
+    public glitch_type: number = Glitch.GREY;
+    public glitch_index: number = -1;
+    public tilesheet_name: string;
 
-    this.is_moving_to_spot = false;
-    this.spot_to_move_to = {x: 0, y: 0};
+    public constructor(x, y){
+        super(x, y, 2, 2, 14, 16, "player_grey_sheet");
+    	this.type = "Player";
+    	this.animation.frame_height = 16;
 
-    //INVENTORY
-	this.inventory = {
-        spellbook: {
-            active: false,
-            level: 0,
-            spells: []
-        },
-        artifacts: []
-    };
+        //INVENTORY
+    	this.inventory = {
+            spellbook: {
+                active: false,
+                level: 0,
+                spells: []
+            },
+            artifacts: []
+        };
 
-	this.glitch_type = Glitch.GREY;
-	this.glitch_index = -1;
-
-	//inventory and state
-	this.NumArtifacts = function(){ return this.inventory.spellbook.spells.length; }
-
-	this.z_index = -100;
-	this.hat_image = resource_manager.hat_grey_sheet;
-}
-extend(GameMover, Player);
-
-Player.prototype.AddSpell = function(spell){
-    var spellbook = this.inventory.spellbook;
-    var level = spellbook.level;
-
-    //spellbook level 0, can only remember one spell at a time
-    if (level == 0){
-        var prev_spell = null;
-        if (spellbook.spells.length >= 1)
-            prev_spell = spellbook.spells[0];
-        spellbook.spells = [spell];
+    	this.z_index = -100;
     }
-    //spellbook level 1, can remember more than one spell
-    else if (level >= 1){
-        if (spellbook.spells.indexOf(spell) < 0)
-            spellbook.spells.push(spell);
+
+    public Load(obj){
+        super.Load(obj);
+
+        this.inventory = obj.inventory;
+        this.glitch_type = obj.glitch_type;
+        this.glitch_index = obj.glitch_index;
+        this.num_deaths = obj.num_deaths;
+        this.spells_cast = obj.spells_cast;
     }
-}
+    public Save(){
+        var obj = super.Save();
+        obj.inventory = this.inventory;
+        obj.glitch_type = this.glitch_type;
+        obj.glitch_index = this.glitch_index;
+        obj.num_deaths = this.num_deaths;
+        obj.spells_cast = this.spells_cast;
+        return obj;
+    }
+    public Import(obj){
+    	super.Import(obj);
+    }
+    public Export(){
+    	var obj = super.Export();
+    	obj.img_name = "player_grey_sheet";
+    	return obj;
+    }
+    /*---------------------------------------------------------------*/
 
-/*---------------------------------------------------------------*/
-//              FUNCTIONS TO SAVE/LOAD IN NORMAL GAMEPLAY
-//  assumes that appropriate IMPORT function has already been called
-Player.prototype.Load = function(obj){
-    this.inventory = obj.inventory;
-    this.glitch_type = obj.glitch_type;
-    this.glitch_index = obj.glitch_index;
-    this.num_deaths = obj.num_deaths;
-    this.spells_cast = obj.spells_cast;
-    this.Parent().Load.call(this, obj);
-}
-Player.prototype.Save = function(){
-    var obj = this.Parent().Save.call(this);
-    obj.inventory = this.inventory;
-    obj.glitch_type = this.glitch_type;
-    obj.glitch_index = this.glitch_index;
-    obj.num_deaths = this.num_deaths;
-    obj.spells_cast = this.spells_cast;
-    return obj;
-}
-/*---------------------------------------------------------------*/
-//              FUNCTIONS TO IMPORT/EXPORT to save level design to file
-//  includes all necessary information to create object from class template
-Player.prototype.Import = function(obj){
-	GameMover.prototype.Import.call(this, obj);
-}
-Player.prototype.Export = function(){
-	var obj = GameMover.prototype.Export.call(this);
-	obj.img_name = "player_grey_sheet";
-	return obj;
-}
-/*---------------------------------------------------------------*/
+    //inventory and state
+    public NumArtifacts(){
+        return this.inventory['spellbook'].spells.length;
+    }
 
-Player.prototype.Update = function(map){
-	this.DieToSpikesAndStuff(map);
-	GameMover.prototype.Update.call(this, map);
-	this.touching_door = false;
-	this.touching_checkpoint = false;
+    public AddSpell(spell){
+        var spellbook = this.inventory['spellbook'];
+        var level = spellbook.level;
 
-    if (this.is_moving_to_spot){
-        this.move_state = MoveState.RUNNING;
-        this.horizontal_input = true;
-
-        if (this.spot_to_move_to.x < this.x)
-            this.x--;
-        else if (this.spot_to_move_to.x > this.x)
-            this.x++;
-        else{
-            this.is_moving_to_spot = false;
-            this.move_state = MoveState.STANDING;
-            this.horizontal_input = false;
+        //spellbook level 0, can only remember one spell at a time
+        if (level == 0){
+            var prev_spell = null;
+            if (spellbook.spells.length >= 1)
+                prev_spell = spellbook.spells[0];
+            spellbook.spells = [spell];
         }
-        this.x = ~~this.x;
+        //spellbook level 1, can remember more than one spell
+        else if (level >= 1){
+            if (spellbook.spells.indexOf(spell) < 0)
+                spellbook.spells.push(spell);
+        }
     }
-}
 
-Player.prototype.MoveToConversationSpot = function(npc){
-    this.vel.x = 0;
+    public Update(map){
+    	this.DieToSpikesAndStuff(map);
+    	super.Update(map);
+    	this.touching_door = false;
+    	this.touching_checkpoint = false;
 
-    var prev_facing = this.facing;
-    this.is_moving_to_spot = true;
-    this.spot_to_move_to.y = npc.y;
-    if (npc.facing === Facing.LEFT){
-        this.spot_to_move_to.x = npc.x + npc.lb - this.rb;
-        this.facing = Facing.RIGHT;
-    }else{
-        this.spot_to_move_to.x = npc.x + npc.rb - this.lb;
-        this.facing = Facing.LEFT;
+        if (this.is_moving_to_spot){
+            this.move_state = MoveState.RUNNING;
+            this.horizontal_input = true;
+
+            if (this.spot_to_move_to.x < this.x)
+                this.x--;
+            else if (this.spot_to_move_to.x > this.x)
+                this.x++;
+            else{
+                this.is_moving_to_spot = false;
+                this.speaking = false;
+                this.move_state = MoveState.STANDING;
+                this.horizontal_input = false;
+            }
+            this.x = ~~this.x;
+        }
     }
-}
 
-Player.prototype.PressX = function(){
-}
+    public MoveToConversationSpot(npc){
+        this.vel.x = 0;
 
-Player.prototype.MaintainGlitch = function(){
-    var spellbook = this.inventory.spellbook;
-    var level = spellbook.level;
-    var tileset = this.tilesheet_name;
-
-    if (level == 0){
-        if (this.glitch_index == 0)
-            Glitch.TransformPlayer(room, this.glitch_type, true, false, false);
-        else
-            Glitch.TransformPlayer(room, room.glitch_sequence[0], true, false, true);
-    }
-    else if (level == 1){
-        Glitch.TransformPlayer(room, this.glitch_type, true, false, true);
-    }
-    this.tilesheet_name = tileset;
-}
-
-Player.prototype.NextGlitch = function(){
-    var spellbook = this.inventory.spellbook;
-    if (!spellbook.active || spellbook.spells.length == 0)
-        return;
-	this.spells_cast++;
-	Utils.playSound("switchglitch", master_volume, 0);
-
-    var level = spellbook.level;
-
-    if (level == 0){
-        this.glitch_index++;
-        if (this.glitch_index > 1)
-            this.glitch_index = 0;
-        if (this.glitch_index == 1){
-            this.glitch_type = room.glitch_sequence[0];
+        var prev_facing = this.facing;
+        this.is_moving_to_spot = true;
+        this.spot_to_move_to.y = npc.y;
+        if (npc.facing === Facing.LEFT){
+            this.spot_to_move_to.x = npc.x + npc.lb - this.rb;
+            this.facing = Facing.RIGHT;
         }else{
-            this.glitch_type = spellbook.spells[0];
-        }
-    }
-    else if (level == 1){
-        this.glitch_index++;
-        if (this.glitch_index >= this.inventory.spellbook.spells.length)
-            this.glitch_index = 0;
-
-        if (this.glitch_index < 0){
-            this.glitch_type = Glitch.GREY;
-        }
-        if (this.glitch_index >= 0){
-            this.glitch_type = this.inventory.spellbook.spells[this.glitch_index];
-            room.glitch_time = 0;
+            this.spot_to_move_to.x = npc.x + npc.rb - this.lb;
+            this.facing = Facing.LEFT;
         }
     }
 
-    room.glitch_type = this.glitch_type;
-    var spellbook = this.inventory.spellbook;
-    var level = spellbook.level;
+    public PressX(){}
 
-    if (level == 0 && this.glitch_index == 0){
-        Glitch.TransformPlayer(room, this.glitch_type, true, false, false);
-    }else{
-	       Glitch.TransformPlayer(room, this.glitch_type);
+    public MaintainGlitch(){
+        var spellbook = this.inventory['spellbook'];
+        var level = spellbook.level;
+        var tileset = this.tilesheet_name;
+
+        if (level == 0){
+            if (this.glitch_index == 0)
+                Glitch.TransformPlayer(room, this.glitch_type, true, false, false);
+            else
+                Glitch.TransformPlayer(room, room.glitch_sequence[0], true, false, true);
+        }
+        else if (level == 1){
+            Glitch.TransformPlayer(room, this.glitch_type, true, false, true);
+        }
+        this.tilesheet_name = tileset;
     }
-}
 
-Player.prototype.PrevGlitch = function(){
-    var spellbook = this.inventory.spellbook;
-    if (!spellbook.active || spellbook.spells.length == 0)
-        return;
-    var level = spellbook.level;
+    public NextGlitch(){
+        var spellbook = this.inventory['spellbook'];
+        if (!spellbook.active || spellbook.spells.length == 0)
+            return;
+    	this.spells_cast++;
+    	Utils.playSound("switchglitch", master_volume, 0);
 
-    if (level == 0){
-        this.NextGlitch();
+        var level = spellbook.level;
+
+        if (level == 0){
+            this.glitch_index++;
+            if (this.glitch_index > 1)
+                this.glitch_index = 0;
+            if (this.glitch_index == 1){
+                this.glitch_type = room.glitch_sequence[0];
+            }else{
+                this.glitch_type = spellbook.spells[0];
+            }
+        }
+        else if (level == 1){
+            this.glitch_index++;
+            if (this.glitch_index >= this.inventory['spellbook'].spells.length)
+                this.glitch_index = 0;
+
+            if (this.glitch_index < 0){
+                this.glitch_type = Glitch.GREY;
+            }
+            if (this.glitch_index >= 0){
+                this.glitch_type = this.inventory['spellbook'].spells[this.glitch_index];
+                room.glitch_time = 0;
+            }
+        }
+
+        room.glitch_type = this.glitch_type;
+        var spellbook = this.inventory['spellbook'];
+        var level = spellbook.level;
+
+        if (level == 0 && this.glitch_index == 0){
+            Glitch.TransformPlayer(room, this.glitch_type, true, false, false);
+        }else{
+    	       Glitch.TransformPlayer(room, this.glitch_type);
+        }
     }
-    else if (level == 1){
-        this.glitch_index-=2;
-        if (this.glitch_index < 0)
-            this.glitch_index = this.inventory.spellbook.spells.length + this.glitch_index;
-        this.NextGlitch();
+
+    public PrevGlitch(){
+        var spellbook = this.inventory['spellbook'];
+        if (!spellbook.active || spellbook.spells.length == 0)
+            return;
+        var level = spellbook.level;
+
+        if (level == 0){
+            this.NextGlitch();
+        }
+        else if (level == 1){
+            this.glitch_index-=2;
+            if (this.glitch_index < 0)
+                this.glitch_index += this.inventory['spellbook'].spells.length;
+            this.NextGlitch();
+        }
     }
-}
 
-Player.prototype.DieToSpikesAndStuff = function(map){
-	var q = 3;
-	var x = this.x;
-	var y = this.y;
-	var lb = this.lb;
-	var tb = this.tb;
-	var rb = this.rb;
-	var bb = this.bb;
-	for (var i = 0; i < map.entities.length; i++){
-		if (map.entities[i].kill_player && (this.IsRectColliding(map.entities[i], x+lb+q, y+tb+q,x+rb-q,y+bb-q))){
-			this.Die();
-			return;
-		}
-	}
+    public DieToSpikesAndStuff(map){
+    	var q = 3;
+    	var x = this.x;
+    	var y = this.y;
+    	var lb = this.lb;
+    	var tb = this.tb;
+    	var rb = this.rb;
+    	var bb = this.bb;
+    	for (var i = 0; i < map.entities.length; i++){
+    		if (map.entities[i].kill_player && (this.IsRectColliding(map.entities[i], x+lb+q, y+tb+q,x+rb-q,y+bb-q))){
+    			this.Die();
+    			return;
+    		}
+    	}
 
-	//Colliding with spikes
-	var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
-	var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
-	var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
-	var bottom_tile = Math.ceil((this.y + this.bb + this.vel.y + 1) / Tile.HEIGHT);
+    	//Colliding with spikes
+    	var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
+    	var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
+    	var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
+    	var bottom_tile = Math.ceil((this.y + this.bb + this.vel.y + 1) / Tile.HEIGHT);
 
-	for (var i = top_tile; i <= bottom_tile; i++){
-		for (var j = left_tile; j <= right_tile; j++){
-			if (!map.isValidTile(i, j)) continue;
-			var tile = map.tiles[i][j];
-			if (tile.collision != Tile.KILL_PLAYER && !tile.kill_player) continue;
+    	for (var i = top_tile; i <= bottom_tile; i++){
+    		for (var j = left_tile; j <= right_tile; j++){
+    			if (!map.isValidTile(i, j)) continue;
+    			var tile = map.tiles[i][j];
+    			if (tile.collision != Tile.KILL_PLAYER && !tile.kill_player) continue;
 
-			if (this.IsRectColliding(tile, x+lb+q, y+tb+q,x+rb-q,y+bb-q)){
-				this.Die();
-				return;
-			}
-		}
-	}
-}
+    			if (this.IsRectColliding(tile, x+lb+q, y+tb+q,x+rb-q,y+bb-q)){
+    				this.Die();
+    				return;
+    			}
+    		}
+    	}
+    }
 
-Player.prototype.Die = function(){
-	Utils.playSound("hurt", master_volume, 0);
-    this.num_deaths++;
-	room_manager.RevivePlayer();
-}
+    public Die(){
+    	Utils.playSound("hurt", master_volume, 0);
+        this.num_deaths++;
+    	room_manager.RevivePlayer();
+    }
 
-Player.prototype.Render = function(ctx, camera){
-	if (this.image === null || !this.visible) return;
-	var ani = this.animation;
-	var row = ani.rel_ani_y;
-	var column = ani.rel_ani_x + ani.curr_frame;
+    public Render(ctx, camera){
+    	if (this.image === null || !this.visible) return;
+    	var ani = this.animation;
+    	var row = ani.rel_ani_y;
+    	var column = ani.rel_ani_x + ani.curr_frame;
 
-	ctx.drawImage(this.image,
-		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x,
-		ani.frame_height * row + ani.abs_ani_y,
-		ani.frame_width, ani.frame_height,
-		//DESTINATION RECTANGLE
-		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
-		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset,
-		ani.frame_width, ani.frame_height
-	);
+    	ctx.drawImage(this.image,
+    		//SOURCE RECTANGLE
+    		ani.frame_width * column + ani.abs_ani_x,
+    		ani.frame_height * row + ani.abs_ani_y,
+    		ani.frame_width, ani.frame_height,
+    		//DESTINATION RECTANGLE
+    		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset,
+    		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset,
+    		ani.frame_width, ani.frame_height
+    	);
 
-	var f = -1;
-	if (this.facing === Facing.LEFT) f = 1;
+    	var f = -1;
+    	if (this.facing === Facing.LEFT) f = 1;
 
-	//NOW DRAW THE HAT
-	if (!room_manager.beat_game) return;
-	ctx.drawImage(this.hat_image,
-		//SOURCE RECTANGLE
-		ani.frame_width * column + ani.abs_ani_x,
-		ani.frame_height * row + ani.abs_ani_y,
-		ani.frame_width, ani.frame_height,
-		//DESTINATION RECTANGLE
-		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,
-		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 6,
-		ani.frame_width, ani.frame_height
-	);
+    	//NOW DRAW THE HAT
+    	if (!room_manager.beat_game) return;
+    	ctx.drawImage(resource_manager.hat_grey_sheet,
+    		//SOURCE RECTANGLE
+    		ani.frame_width * column + ani.abs_ani_x,
+    		ani.frame_height * row + ani.abs_ani_y,
+    		ani.frame_width, ani.frame_height,
+    		//DESTINATION RECTANGLE
+    		~~(this.x-camera.x+camera.screen_offset_x+0.5) + ani.x_offset + f,
+    		~~(this.y-camera.y+camera.screen_offset_y+0.5)+ani.y_offset - 6,
+    		ani.frame_width, ani.frame_height
+    	);
+    }
 }

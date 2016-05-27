@@ -1,3 +1,4 @@
+var level_edit = true;
 var master_volume = 0.5;
 
 var bg_music = null;
@@ -31,7 +32,7 @@ var init = function(){
 	//comment out if not allowing level editing
 	level_edit_manager.Init();
 	console.log("init");
-	
+
 	canvas = $("game_canvas");
 	canvas.tabIndex = 1;
 	canvas.width = GAME_WIDTH;
@@ -39,26 +40,26 @@ var init = function(){
 	ctx = canvas.getContext("2d");
 	set_textRenderContext(ctx);
 	click_to_start = false;
-	
+
 	canvas.onmousedown = function(e){
-		level_edit_manager.MouseDown(e); 
-		SoundMouseDown(e)
+		level_edit_manager.MouseDown(e);
+		SoundMouseDown()
 	}.bind(this);
-	canvas.onmousemove = function(e){ 
-		level_edit_manager.MouseMove(e); 
+	canvas.onmousemove = function(e){
+		level_edit_manager.MouseMove(e);
 	};
-	canvas.onmouseup = function(e){ 
-		level_edit_manager.MouseUp(e); 
-		SoundMouseUp(e); 
+	canvas.onmouseup = function(e){
+		level_edit_manager.MouseUp(e);
+		SoundMouseUp(e);
 	};
-	
+
 	//Handle keyboard controls
 	key_manager = new KeyManager();
 	window.onkeydown = key_manager.KeyDown.bind(key_manager);
 	window.onkeyup = key_manager.KeyUp.bind(key_manager);
-	
+
 	input_manager = new InputManager(key_manager);
-	
+
 	//When load resources is finished, it will trigger startGame
 	setTimeout(function(){
 		resource_manager = new ResourceManager();
@@ -74,15 +75,15 @@ var startGame = function(){
 	room_manager.Import("main", function(){
 		room = room_manager.GetRoom();
 		level_edit_manager.setTileImg(0, 1);
-		
+
 		//Let's play the game!
 		console.log("start");
 		then = Date.now();
-		
+
 		bg_name = "RoccoW_outOfSight";
 		stopMusic();
 		startMusic();
-		requestAnimFrame(tick);
+		window['requestAnimFrame'](tick);
 	}.bind(this));
 };
 
@@ -92,20 +93,20 @@ var tick = function(){
 	var elapsed = now - then;
 	var timeout_time = update_time - elapsed;
 	if (timeout_time < 0) timeout_time = 0;
-	
+
 	if (click_to_start){
 		stopMusic();
 		update();
 		render();
-	}else{		
+	}else{
 		//Erase screen
 		ctx.scale(2.0, 2.0);
 		ctx.fillStyle = "#000000";
 		ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-		
+
 		//draw the game
 		sharpen(ctx);
-		
+
 		ctx.fillStyle = "rgb(255,255,255)";
 		//ctx.font = "24px pixelFont";
 		ctx.textAlign = "center";
@@ -117,9 +118,9 @@ var tick = function(){
 		GAME_HEIGHT*=2;
 		ctx.scale(0.5, 0.5);
 	}
-	
+
 	setTimeout(function(){
-		requestAnimFrame(tick);
+		window['requestAnimFrame'](tick);
 	}, timeout_time);
 	then = now;
 }
@@ -134,32 +135,32 @@ var update = function(){
 var render = function(){
 	//ctx.canvas.width = GAME_WIDTH*VIEW_SCALE;
 	//ctx.canvas.height = GAME_HEIGHT*VIEW_SCALE;
-	
+
 	//Erase screen
 	if (erase_screen){
 		ctx.fillStyle = "rgb(0, 0, 0)";
 		ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 	}
-	
+
 	//draw the game
 	sharpen(ctx);
 	room.Render(ctx, level_edit);
-	
+
 	//draw sound buttons
 	var ani_x = 0;
 	if (!resource_manager.play_music) ani_x = 16;
-	
+
 	ctx.scale(2.0, 2.0);
-	ctx.drawImage(resource_manager.soundButtons, 
+	ctx.drawImage(resource_manager.soundButtons,
 		//SOURCE RECTANGLE
 		ani_x, 0, 16, 16,
 		//DESTINATION RECTANGLE
 		4, 4, 16, 16
 	);
-	
+
 	ani_x = 0;
 	if (!resource_manager.play_sound) ani_x = 16;
-	ctx.drawImage(resource_manager.soundButtons, 
+	ctx.drawImage(resource_manager.soundButtons,
 		//SOURCE RECTANGLE
 		ani_x, 16, 16, 16,
 		//DESTINATION RECTANGLE

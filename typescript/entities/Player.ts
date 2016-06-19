@@ -88,18 +88,20 @@ class Player extends GameMover{
     	this.touching_checkpoint = false;
 
         if (this.is_moving_to_spot){
+            this.spot_to_move_to.x = ~~this.spot_to_move_to.x;
             this.move_state = MoveState.RUNNING;
             this.horizontal_input = true;
 
-            if (this.spot_to_move_to.x < this.x)
+            if (this.spot_to_move_to.x + 0.5 < this.x)
                 this.x--;
-            else if (this.spot_to_move_to.x > this.x)
+            else if (this.spot_to_move_to.x - 0.5 > this.x)
                 this.x++;
             else{
                 this.is_moving_to_spot = false;
                 this.speaking = false;
                 this.move_state = MoveState.STANDING;
                 this.horizontal_input = false;
+                console.log("DONE!");
             }
             this.x = ~~this.x;
         }

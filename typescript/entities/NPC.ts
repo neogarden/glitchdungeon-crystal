@@ -101,14 +101,14 @@ class NPC extends GameMover{
             this.x+this.rb+Tile.WIDTH, this.y+this.bb+Tile.WIDTH/2)){
 
             if (player.pressed_down){
-                if (!this.speaking){
-                    player.MoveToConversationSpot(this);
-                }
-                this.speaking = true;
                 player.speaking = true;
+                player.pressed_down = false;
+                player.MoveToConversationSpot(this);
+                this.speaking = true;
             }
-            player.pressed_down = false;
         }else{
+            if (this.speaking)
+                player.speaking = false;
             this.speaking = false;
         }
 
@@ -126,7 +126,6 @@ class NPC extends GameMover{
     		}
     	}
     	else if (this.was_speaking){
-    		this.was_speaking = false;
     		room.Speak(null, {});
 
     		try{

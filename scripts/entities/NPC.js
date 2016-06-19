@@ -91,15 +91,15 @@ var NPC = (function (_super) {
         }
         if (this.IsRectColliding(player, this.x + this.lb - Tile.WIDTH, this.y + this.tb - Tile.WIDTH / 2, this.x + this.rb + Tile.WIDTH, this.y + this.bb + Tile.WIDTH / 2)) {
             if (player.pressed_down) {
-                if (!this.speaking) {
-                    player.MoveToConversationSpot(this);
-                }
-                this.speaking = true;
                 player.speaking = true;
+                player.pressed_down = false;
+                player.MoveToConversationSpot(this);
+                this.speaking = true;
             }
-            player.pressed_down = false;
         }
         else {
+            if (this.speaking)
+                player.speaking = false;
             this.speaking = false;
         }
         if (this.speaking) {
@@ -111,7 +111,6 @@ var NPC = (function (_super) {
             }
         }
         else if (this.was_speaking) {
-            this.was_speaking = false;
             room.Speak(null, {});
             try {
                 eval(this.on_end_conversation_event);

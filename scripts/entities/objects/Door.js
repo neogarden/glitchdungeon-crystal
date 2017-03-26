@@ -13,7 +13,7 @@ var Door = (function (_super) {
     function Door(x, y, room_x, room_y, door_id, locked, num_artifacts) {
         if (locked === void 0) { locked = false; }
         if (num_artifacts === void 0) { num_artifacts = 0; }
-        var _this = _super.call(this, x, y, 4, 0, 12, 16, "obj_sheet") || this;
+        var _this = _super.call(this, x, y, 4, 4, 12, 16, "obj_sheet") || this;
         _this.talking = false;
         _this.type = "Door";
         _this.room_x = room_x;
@@ -37,6 +37,8 @@ var Door = (function (_super) {
         _super.prototype.Import.call(this, obj);
         this.lb = 4;
         this.rb = 12;
+        // TODO(jakeonaut) shouldn't have to do this... Importing old objects overwrites new constants in constructor. Lame
+        this.tb = 4;
         this.room_x = obj.room_x;
         this.room_y = obj.room_y;
         this.door_id = obj.door_id;

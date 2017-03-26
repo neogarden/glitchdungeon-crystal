@@ -1,4 +1,4 @@
-class Door extends GameSprite{
+class Door extends GameSprite {
     public room_x: number;
     public room_y: number;
     public door_id: number;
@@ -7,7 +7,7 @@ class Door extends GameSprite{
     public talking: boolean = false;
 
     public constructor(x, y, room_x, room_y, door_id, locked = false, num_artifacts = 0){
-    	super(x, y, 4, 0, 12, 16, "obj_sheet");
+    	super(x, y, 4, 4, 12, 16, "obj_sheet");
     	this.type = "Door";
 
     	this.room_x = room_x;
@@ -35,6 +35,8 @@ class Door extends GameSprite{
     	super.Import(obj);
     	this.lb = 4;
     	this.rb = 12;
+      // TODO(jakeonaut) shouldn't have to do this... Importing old objects overwrites new constants in constructor. Lame
+      this.tb = 4;
 
     	this.room_x = obj.room_x;
     	this.room_y = obj.room_y;

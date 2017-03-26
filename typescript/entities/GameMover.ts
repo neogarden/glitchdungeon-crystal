@@ -233,8 +233,8 @@ class GameMover extends GameSprite{
     	this.was_on_ground = this.on_ground;
     	this.on_ground = false;
     	this.true_on_ground = false;
-    	var q_horz = 3; //q is used to minimize height checked in horizontal collisions and etc.
-    	var q_vert = 3;
+    	var q_horz = 2; //q is used to minimize height checked in horizontal collisions and etc.
+    	var q_vert = 2;
 
         var tiles = [];
         for (var i = top_tile; i <= bottom_tile; i++){

@@ -9,7 +9,7 @@ Glitch.GoldTransform = function (map, only_visual) {
             this.horizontal_collision = true;
             this.x = object.x + object.rb - this.lb;
             // NEW ADDITIONS
-            this.vel.y = -1;
+            this.vel.y = -1.25;
             this.move_state = MoveState.RUNNING;
             this.on_ground = true;
         }
@@ -20,7 +20,7 @@ Glitch.GoldTransform = function (map, only_visual) {
             this.horizontal_collision = true;
             this.x = object.x - this.rb;
             // NEW ADDITIONS
-            this.vel.y = -1;
+            this.vel.y = -1.25;
             this.move_state = MoveState.RUNNING;
             this.on_ground = true;
         }

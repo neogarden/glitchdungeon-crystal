@@ -47,7 +47,11 @@ var LevelEditManager = (function () {
         ctx.fillStyle = "#222222";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         sharpen(ctx);
-        ctx.drawImage(resource_manager[room.tilesheet_name], 0, 0, 96, 96, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(resource_manager[room.tilesheet_name], 
+        //SOURCE RECTANGLE
+        0, 0, 96, 96, 
+        //DESTINATION RECTANGLE
+        0, 0, canvas.width, canvas.height);
         ctx.lineWidth = 1;
         ctx.strokeStyle = "#ffffff";
         ctx.rect(tile_x * Tile.WIDTH * zoom, tile_y * Tile.HEIGHT * zoom, Tile.WIDTH * zoom, Tile.HEIGHT * zoom);
@@ -73,6 +77,7 @@ var LevelEditManager = (function () {
         var ctx_menu = CtxMenu.Init(mouse_x, mouse_y, document.body);
         ctx_menu.Open();
         this.ctx_menu_visible = true;
+        //MODE OPTIONS
         ctx_menu.AddItem("toggle tile mode", function () {
             if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY)
                 Tile.DISPLAY_TYPE = Tile.COLLISION_DISPLAY;
@@ -96,6 +101,7 @@ var LevelEditManager = (function () {
             index = room.entities.indexOf(entity);
         }
         if (entity !== undefined) {
+            //EDIT options
             ctx_menu.AddItem("edit " + name, function () {
                 room.paused = true;
                 var options = this.GenerateOptions();
@@ -103,12 +109,14 @@ var LevelEditManager = (function () {
                 Dialog.Confirm("", options.submit, "edit " + name, "edit", function () { room.paused = false; level_edit_manager.typing = false; });
                 Dialog.AddElement(options.dom);
             }.bind(entity));
+            //DELETE OPTIONS
             ctx_menu.AddItem("delete " + name, function () {
                 room.paused = true;
                 Dialog.Confirm("are you sure you wish to delete this " + name + "?", function () { room.entities.splice(index, 1); }, "delete " + name, "delete", function () { room.paused = false; });
             }.bind(entity));
             ctx_menu.AddDivider();
         }
+        //CREATION OPTIONS
         var create_node = CtxMenu.InitNode(ctx_menu);
         var px = tile_x * Tile.WIDTH - 8;
         var py = tile_y * Tile.HEIGHT - 8;
@@ -230,6 +238,7 @@ var LevelEditManager = (function () {
         var y = (e.clientY - box.top) / room.camera.view_scale + room.camera.y - room.camera.screen_offset_y;
         var tile_x = Math.floor(x / Tile.WIDTH);
         var tile_y = Math.floor(y / Tile.HEIGHT);
+        //NON TILE MODE!!! !ENTITY MODE!!!
         if (!right_click && this.potential_entity !== undefined) {
             this.entity = this.potential_entity;
             this.entity_grav_acc = this.entity['grav_acc'];
@@ -242,6 +251,7 @@ var LevelEditManager = (function () {
         var timer_callback = function () { };
         if (this.potential_entity === undefined) {
             timer_callback = function () {
+                //TILE MODE!!!
                 this.tile_mode = true;
                 this.PlaceTile(tile_x, tile_y, right_click);
             }.bind(this);
@@ -314,6 +324,7 @@ var LevelEditManager = (function () {
             this.entity['grav_acc'] = this.entity_grav_acc;
             this.entity = undefined;
         }
+        //right click
         if (right_click && this.ctx_menu_timer < this.ctx_menu_time_limit) {
             this.CreateContextMenu(mouse_x, mouse_y, x, y, tile_x, tile_y);
         }

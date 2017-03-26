@@ -1,17 +1,23 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Switcher = (function (_super) {
     __extends(Switcher, _super);
     function Switcher(x, y) {
-        _super.call(this, x, y, 4, 5, 12, 16, "obj_sheet");
-        this.glitch_type = 0;
-        this.id = new Date().getTime();
-        this.type = "Switcher";
-        this.animation.Change(0, 2, 6);
-        this.z_index = 9;
+        var _this = _super.call(this, x, y, 4, 5, 12, 16, "obj_sheet") || this;
+        _this.glitch_type = 0;
+        _this.id = new Date().getTime();
+        _this.type = "Switcher";
+        _this.animation.Change(0, 2, 6);
+        _this.z_index = 9;
+        return _this;
     }
     Switcher.prototype.Load = function (obj) {
         _super.prototype.Load.call(this, obj);

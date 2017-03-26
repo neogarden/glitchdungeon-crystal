@@ -1,22 +1,28 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Door = (function (_super) {
     __extends(Door, _super);
     function Door(x, y, room_x, room_y, door_id, locked, num_artifacts) {
         if (locked === void 0) { locked = false; }
         if (num_artifacts === void 0) { num_artifacts = 0; }
-        _super.call(this, x, y, 4, 0, 12, 16, "obj_sheet");
-        this.talking = false;
-        this.type = "Door";
-        this.room_x = room_x;
-        this.room_y = room_y;
-        this.door_id = door_id;
-        this.locked = locked;
-        this.num_artifacts = num_artifacts;
-        this.z_index = 10;
+        var _this = _super.call(this, x, y, 4, 0, 12, 16, "obj_sheet") || this;
+        _this.talking = false;
+        _this.type = "Door";
+        _this.room_x = room_x;
+        _this.room_y = room_y;
+        _this.door_id = door_id;
+        _this.locked = locked;
+        _this.num_artifacts = num_artifacts;
+        _this.z_index = 10;
+        return _this;
     }
     Door.prototype.Load = function (obj) {
         _super.prototype.Load.call(this, obj);
@@ -63,6 +69,7 @@ var Door = (function (_super) {
         options['num_artifacts'] = new NumberOption(this.num_artifacts);
         return options;
     };
+    ///////////////////////////////////////////////////////////////////
     Door.prototype.Update = function (map) {
         var _artifacts = player.inventory.artifacts.length;
         if (this.room_x >= room_manager.house_width || this.room_y >= room_manager.house_height) {

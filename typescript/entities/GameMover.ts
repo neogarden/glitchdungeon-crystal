@@ -209,7 +209,7 @@ class GameMover extends GameSprite{
     }
 
     public ApplyGravity(){
-        if (!this.on_ground){
+      if (!this.on_ground){
     		if (this.vel.y < this.terminal_vel)
     		{
     			this.vel.y += (this.grav_acc);
@@ -224,7 +224,7 @@ class GameMover extends GameSprite{
     }
 
     public HandleCollisionsAndMove(map){
-        var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
+      var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
     	var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
     	var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
     	var bottom_tile = Math.ceil((this.y + this.bb + this.vel.y + 1) / Tile.HEIGHT);
@@ -295,7 +295,7 @@ class GameMover extends GameSprite{
                 continue;
 
     		this.HandleLeftCollision(tile, q);
-            this.HandleRightCollision(tile, q);
+        this.HandleRightCollision(tile, q);
     	}
 
         for (i = 0; i < entities.length; i++){
@@ -307,7 +307,7 @@ class GameMover extends GameSprite{
         }
     }
 
-    public HandleTopCollision(object, q){
+    public HandleTopCollision(object, q) {
         if (this.vel.y < 0 && this.IsRectColliding(object,
             this.x + this.lb + q,
             this.y + this.tb + this.vel.y-1,

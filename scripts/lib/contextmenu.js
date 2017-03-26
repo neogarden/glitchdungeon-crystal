@@ -120,6 +120,7 @@ var CtxMenu = (function () {
             item.style.cursor = "";
             item.style.color = "#aaaaaa";
             item.onclick = function (e) {
+                //this.Remove();
             }.bind(this);
         }
         else {

@@ -57,6 +57,7 @@ var Dialog = (function () {
         dialogButton.id = "dialogConfirm";
         dialogButton.innerHTML = "OK";
         dialog.appendChild(dialogButton);
+        //set up event handlers
         dialogTitle.onmousedown = function (e) {
             document.getElementsByTagName("html")[0].style.cursor = "default";
             document.getElementsByTagName("body")[0].style.cursor = "default";
@@ -70,6 +71,9 @@ var Dialog = (function () {
             Dialog.removeEventHandler(window, "mousemove", Dialog.move);
         };
         var keyupHandler = function (e) {
+            /*if (e.keyCode === 13 || e.keyCode === 27){
+                closeDialogButton.onclick();
+            }*/
         };
         closeDialogButton.onclick = function (e) {
             Dialog._close();
@@ -114,6 +118,7 @@ var Dialog = (function () {
         dialogConfirm.id = "dialogConfirm";
         dialogConfirm.innerHTML = confirm_text;
         dialog.appendChild(dialogConfirm);
+        //set up event handlers
         dialogTitle.onmousedown = function (e) {
             document.getElementsByTagName("html")[0].style.cursor = "default";
             document.getElementsByTagName("body")[0].style.cursor = "default";
@@ -127,6 +132,12 @@ var Dialog = (function () {
             Dialog.removeEventHandler(window, "mousemove", Dialog.move);
         };
         var keyupHandler = function (e) {
+            /*if (e.keyCode === 13){
+                dialogConfirm.onclick();
+            }
+            if (e.keyCode === 27){
+                closeDialogButton.onclick();
+            }*/
         };
         closeDialogButton.onclick = function (e) {
             Dialog._close();

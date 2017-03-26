@@ -1,19 +1,25 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Checkpoint = (function (_super) {
     __extends(Checkpoint, _super);
     function Checkpoint(x, y) {
-        _super.call(this, x, y, 4, 5, 12, 16, "obj_sheet");
-        this.active = false;
-        this.lex = 1;
-        this.id = new Date().getTime();
-        this.is_glitched = false;
-        this.type = "Checkpoint";
-        this.animation.Change(2, 0, 1);
-        this.z_index = 9;
+        var _this = _super.call(this, x, y, 4, 5, 12, 16, "obj_sheet") || this;
+        _this.active = false;
+        _this.lex = 1;
+        _this.id = new Date().getTime();
+        _this.is_glitched = false;
+        _this.type = "Checkpoint";
+        _this.animation.Change(2, 0, 1);
+        _this.z_index = 9;
+        return _this;
     }
     Checkpoint.prototype.Import = function (obj) {
         _super.prototype.Import.call(this, obj);

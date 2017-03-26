@@ -1,33 +1,39 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Slope = (function () {
     function Slope() {
     }
-    Slope.FLAT = 0;
-    Slope.LOW_POS = (Math.PI / 6);
-    Slope.MID_POS = (Math.PI / 4);
-    Slope.HI_POS = (Math.PI / 3);
-    Slope.LOW_NEG = -(Math.PI / 6);
-    Slope.MID_NEG = -(Math.PI / 4);
-    Slope.HI_NEG = -(Math.PI / 3);
     return Slope;
 }());
+Slope.FLAT = 0;
+Slope.LOW_POS = (Math.PI / 6);
+Slope.MID_POS = (Math.PI / 4);
+Slope.HI_POS = (Math.PI / 3);
+Slope.LOW_NEG = -(Math.PI / 6);
+Slope.MID_NEG = -(Math.PI / 4);
+Slope.HI_NEG = -(Math.PI / 3);
 var Tile = (function (_super) {
     __extends(Tile, _super);
     function Tile(x, y, collision, slope) {
         if (collision === void 0) { collision = Tile.GHOST; }
         if (slope === void 0) { slope = Slope.FLAT; }
-        _super.call(this, x, y, 0, 0, Tile.WIDTH, Tile.HEIGHT);
-        this.tileset_x = 0;
-        this.tileset_y = 0;
-        this.type = "Tile";
-        this.collision = collision;
+        var _this = _super.call(this, x, y, 0, 0, Tile.WIDTH, Tile.HEIGHT) || this;
+        _this.tileset_x = 0;
+        _this.tileset_y = 0;
+        _this.type = "Tile";
+        _this.collision = collision;
         if (collision == Tile.KILL_PLAYER)
-            this.kill_player = true;
-        this.SetLRHeights();
+            _this.kill_player = true;
+        _this.SetLRHeights();
+        return _this;
     }
     Tile.prototype.Import = function (obj) {
         this.collision = obj.collision;
@@ -45,6 +51,7 @@ var Tile = (function (_super) {
         };
     };
     Tile.prototype.SetLRHeights = function () {
+        //default to flat
         switch (this.slope) {
             case Slope.LOW_POS:
             case Slope.MID_POS:
@@ -71,7 +78,11 @@ var Tile = (function (_super) {
         var row = this.tileset_y;
         var column = this.tileset_x;
         if (Tile.DISPLAY_TYPE === Tile.NORMAL_DISPLAY) {
-            ctx.drawImage(image, Tile.WIDTH * column, Tile.HEIGHT * row, Tile.WIDTH, Tile.HEIGHT, ~~(this.x - camera.x + camera.screen_offset_x + 0.5), ~~(this.y - camera.y + camera.screen_offset_y + 0.5), Tile.WIDTH, Tile.HEIGHT);
+            ctx.drawImage(image, 
+            //SOURCE RECTANGLE
+            Tile.WIDTH * column, Tile.HEIGHT * row, Tile.WIDTH, Tile.HEIGHT, 
+            //DESTINATION RECTANGLE
+            ~~(this.x - camera.x + camera.screen_offset_x + 0.5), ~~(this.y - camera.y + camera.screen_offset_y + 0.5), Tile.WIDTH, Tile.HEIGHT);
         }
         else if (Tile.DISPLAY_TYPE === Tile.COLLISION_DISPLAY) {
             switch (this.collision) {
@@ -95,15 +106,15 @@ var Tile = (function (_super) {
             ctx.fillRect(~~(this.x - camera.x + camera.screen_offset_x + 0.5), ~~(this.y - camera.y + camera.screen_offset_y + 0.5), Tile.WIDTH, Tile.HEIGHT);
         }
     };
-    Tile.NORMAL_DISPLAY = 0;
-    Tile.COLLISION_DISPLAY = 1;
-    Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
-    Tile.WIDTH = 8;
-    Tile.HEIGHT = 8;
-    Tile.GHOST = -1;
-    Tile.SOLID = 0;
-    Tile.FALLTHROUGH = 1;
-    Tile.KILL_PLAYER = 2;
-    Tile.SUPER_SOLID = 3;
     return Tile;
 }(GameObject));
+Tile.NORMAL_DISPLAY = 0;
+Tile.COLLISION_DISPLAY = 1;
+Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
+Tile.WIDTH = 8;
+Tile.HEIGHT = 8;
+Tile.GHOST = -1;
+Tile.SOLID = 0;
+Tile.FALLTHROUGH = 1;
+Tile.KILL_PLAYER = 2;
+Tile.SUPER_SOLID = 3;

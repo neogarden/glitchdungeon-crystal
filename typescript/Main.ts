@@ -88,17 +88,17 @@ var startGame = function(){
 };
 
 //main game loop
-var tick = function(){
+var tick = function() {
 	var now = new Date().getTime();
 	var elapsed = now - then;
 	var timeout_time = update_time - elapsed;
 	if (timeout_time < 0) timeout_time = 0;
 
-	if (click_to_start){
+	if (click_to_start) {
 		stopMusic();
 		update();
 		render();
-	}else{
+	} else {
 		//Erase screen
 		ctx.scale(2.0, 2.0);
 		ctx.fillStyle = "#000000";
@@ -127,17 +127,17 @@ var tick = function(){
 
 var player;
 var erase_screen = true;
-var update = function(){
-    room.Update(input_manager);
+var update = function() {
+  room.Update(input_manager);
 	key_manager.ForgetKeysPressed();
 };
 
-var render = function(){
+var render = function() {
 	//ctx.canvas.width = GAME_WIDTH*VIEW_SCALE;
 	//ctx.canvas.height = GAME_HEIGHT*VIEW_SCALE;
 
 	//Erase screen
-	if (erase_screen){
+	if (erase_screen) {
 		ctx.fillStyle = "rgb(0, 0, 0)";
 		ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 	}
@@ -159,7 +159,8 @@ var render = function(){
 	);
 
 	ani_x = 0;
-	if (!resource_manager.play_sound) ani_x = 16;
+	if (!resource_manager.play_sound)
+		ani_x = 16;
 	ctx.drawImage(resource_manager.soundButtons,
 		//SOURCE RECTANGLE
 		ani_x, 16, 16, 16,

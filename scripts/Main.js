@@ -8,9 +8,11 @@ var GAME_WIDTH = 640;
 var GAME_HEIGHT = 480;
 var canvas;
 var ctx;
+//primitive variables
 var game_started = false;
 var then;
 var fontColor = "rgb(0,0,0)";
+//managers
 var level_edit_manager;
 var room_manager;
 var key_manager;
@@ -20,6 +22,7 @@ var room;
 var update_time = 0.33;
 var init = function () {
     level_edit_manager = new LevelEditManager();
+    //comment out if not allowing level editing
     level_edit_manager.Init();
     console.log("init");
     canvas = $("game_canvas");
@@ -40,10 +43,12 @@ var init = function () {
         level_edit_manager.MouseUp(e);
         SoundMouseUp(e);
     };
+    //Handle keyboard controls
     key_manager = new KeyManager();
     window.onkeydown = key_manager.KeyDown.bind(key_manager);
     window.onkeyup = key_manager.KeyUp.bind(key_manager);
     input_manager = new InputManager(key_manager);
+    //When load resources is finished, it will trigger startGame
     setTimeout(function () {
         resource_manager = new ResourceManager();
         resource_manager.LoadResources(ctx);
@@ -57,6 +62,7 @@ var startGame = function () {
     room_manager.Import("main", function () {
         room = room_manager.GetRoom();
         level_edit_manager.setTileImg(0, 1);
+        //Let's play the game!
         console.log("start");
         then = Date.now();
         bg_name = "RoccoW_outOfSight";
@@ -65,6 +71,7 @@ var startGame = function () {
         window['requestAnimFrame'](tick);
     }.bind(this));
 };
+//main game loop
 var tick = function () {
     var now = new Date().getTime();
     var elapsed = now - then;
@@ -77,11 +84,14 @@ var tick = function () {
         render();
     }
     else {
+        //Erase screen
         ctx.scale(2.0, 2.0);
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        //draw the game
         sharpen(ctx);
         ctx.fillStyle = "rgb(255,255,255)";
+        //ctx.font = "24px pixelFont";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         GAME_HEIGHT /= 2;
@@ -103,21 +113,34 @@ var update = function () {
     key_manager.ForgetKeysPressed();
 };
 var render = function () {
+    //ctx.canvas.width = GAME_WIDTH*VIEW_SCALE;
+    //ctx.canvas.height = GAME_HEIGHT*VIEW_SCALE;
+    //Erase screen
     if (erase_screen) {
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     }
+    //draw the game
     sharpen(ctx);
     room.Render(ctx, level_edit);
+    //draw sound buttons
     var ani_x = 0;
     if (!resource_manager.play_music)
         ani_x = 16;
     ctx.scale(2.0, 2.0);
-    ctx.drawImage(resource_manager.soundButtons, ani_x, 0, 16, 16, 4, 4, 16, 16);
+    ctx.drawImage(resource_manager.soundButtons, 
+    //SOURCE RECTANGLE
+    ani_x, 0, 16, 16, 
+    //DESTINATION RECTANGLE
+    4, 4, 16, 16);
     ani_x = 0;
     if (!resource_manager.play_sound)
         ani_x = 16;
-    ctx.drawImage(resource_manager.soundButtons, ani_x, 16, 16, 16, 4, 24, 16, 16);
+    ctx.drawImage(resource_manager.soundButtons, 
+    //SOURCE RECTANGLE
+    ani_x, 16, 16, 16, 
+    //DESTINATION RECTANGLE
+    4, 24, 16, 16);
     ctx.scale(0.5, 0.5);
 };
 window.onload = function () { setTimeout(init, 0); };

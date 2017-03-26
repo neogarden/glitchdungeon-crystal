@@ -5,7 +5,7 @@ class TextDropdown{
 
     public constructor(arr, value){
     	this.value = value;
-        this.arr = arr;
+      this.arr = arr;
     }
 
     public ExportDom(att_name){
@@ -23,6 +23,6 @@ class TextDropdown{
     }
 
     public UpdateFromDom(){
-    	this.value = this.dom.options[this.dom.selectedIndex].value;
+    	this.value = (<HTMLOptionElement>this.dom.options[this.dom.selectedIndex]).value;
     }
 }

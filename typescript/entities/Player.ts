@@ -1,4 +1,4 @@
-class Player extends GameMover{
+class Player extends GameMover {
     public touching_door: boolean = false;
     public touching_checkpoint: boolean = false;
     public speaking: boolean = false;
@@ -13,7 +13,10 @@ class Player extends GameMover{
     public tilesheet_name: string;
 
     public constructor(x, y){
-        super(x, y, 2, 2, 14, 16, "player_grey_sheet");
+        super(x, y,
+          2, 2, 14, 16, /* lb, tb, rb, bb */
+          "player_grey_sheet", /* img_name */
+          2 /* max_run_vel */);
     	this.type = "Player";
     	this.animation.frame_height = 16;
 

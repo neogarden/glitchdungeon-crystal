@@ -15,21 +15,27 @@ var Camera = (function () {
         this.y = y;
     }
     Camera.prototype.Render = function (ctx) {
+        //cover up non existant parts of the room (but that are still in render view
         ctx.fillStyle = "#000000";
         var width = room.GetWidth();
         if (this.width > width) {
+            //left border
             ctx.fillRect(0, 0, -this.x, this.height);
+            //right border
             ctx.fillRect((-this.x) + room.GetWidth(), 0, -this.x, this.height);
         }
         var height = room.GetHeight();
         if (this.height > height) {
+            //top border
             ctx.fillRect(0, 0, this.width, -this.y);
+            //bottom border
             ctx.fillRect(0, (-this.y) + room.GetHeight(), this.width, -this.y);
         }
     };
     Camera.prototype.Update = function (map) {
         this.width = GAME_WIDTH / this.view_scale;
         this.height = GAME_HEIGHT / this.view_scale;
+        //Horizontal panning RIGHT
         if (player.x + player.rb + this.x_lim - this.x >= this.width) {
             if (this.x < map.MAP_WIDTH * Tile.WIDTH - this.width) {
                 if (this.instant)
@@ -40,7 +46,7 @@ var Camera = (function () {
                 if (this.x >= map.MAP_WIDTH * Tile.WIDTH - this.width)
                     this.x = map.MAP_WIDTH * Tile.WIDTH - this.width;
             }
-        }
+        } //HOrizontal panning LEFT
         if (player.x + player.lb - this.x_lim - this.x <= 0) {
             if (this.x > 0) {
                 if (this.instant)
@@ -52,10 +58,12 @@ var Camera = (function () {
                     this.x = 0;
             }
         }
+        //CORRECTION FOR TOO SMALL ROOM :)!
         var width = room.GetWidth();
         if (this.width > width) {
             this.x = -(this.width - width) / 2;
         }
+        //Vertical panning DOWN
         if (player.y + player.bb + this.y_lim - this.y >= this.height) {
             if (this.y < map.MAP_HEIGHT * Tile.HEIGHT - this.height) {
                 if (this.instant)
@@ -66,7 +74,7 @@ var Camera = (function () {
                 if (this.y >= map.MAP_HEIGHT * Tile.HEIGHT - this.height)
                     this.y = map.MAP_HEIGHT * Tile.HEIGHT - this.height;
             }
-        }
+        } //vertical panning UPWARD
         if (player.y + player.tb - this.y_lim - this.y <= 0) {
             if (this.y > 0) {
                 if (this.instant)
@@ -78,6 +86,7 @@ var Camera = (function () {
                     this.y = 0;
             }
         }
+        //CORRECTION FOR TOO SMALL ROOM :)!
         var height = room.GetHeight();
         if (this.height > height) {
             this.y = -(this.height - height) / 2;

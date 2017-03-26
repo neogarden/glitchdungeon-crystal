@@ -15,14 +15,17 @@ var House = (function () {
         this.spellbook = [];
         this.glitch_type = Glitch.GREY;
         this.glitch_index = -1;
+        //extending the rooms to levels
         this.level_spellbooks = [this.spellbook];
     }
+    //defined in HouseLoader.ts
     House.prototype.Save = function () { };
     House.prototype.SaveToFile = function () { };
     House.prototype.Load = function (callback) { };
     House.prototype.LoadName = function (level_name, callback) { };
     House.prototype.Export = function () { };
     House.prototype.Import = function (level_name, callback, reset_rooms) { };
+    /********************************************************************/
     House.prototype.Restart = function () {
         this.then = Date.now();
         this.time = 0;
@@ -75,9 +78,25 @@ var House = (function () {
         var glitch_type = player.glitch_type;
         var could_use_spellbook = room.can_use_spellbook;
         if (this.GetRoom() === undefined) {
+            //create new room!!!
             if (this.rooms[this.room_index_x] === undefined)
                 this.rooms[this.room_index_x] = {};
             this.rooms[this.room_index_x][this.room_index_y] = new Room();
+            //pacman wrap
+            //TODO: needs to be fixed to new [x][y] indexing scheme
+            /*if (this.rooms[this.room_index_y] !== undefined){
+                if (this.room_index_x < 0){
+                    var room_row = Object.keys(this.rooms[this.room_index_y]);
+                    this.room_index_x = room_row[room_row.length-1];
+                }else
+                    this.room_index_x = 0;
+            }else{
+                if (this.room_index_y < 0){
+                    var room_col = Object.keys(this.rooms);
+                    this.room_index_y =  room_col[room_col.length-1];
+                }else
+                    this.room_index_y = 0;
+            }*/
         }
         if (this.old_room_index_x != this.room_index_x || this.old_room_index_y != this.room_index_y) {
             room = this.GetRoom();
@@ -102,6 +121,7 @@ var House = (function () {
         room.Speak(null);
         if (!room.can_use_spellbook)
             room.Speak("a dark force prevents\nyou from casting\nspells here");
+        //MAKE SURE THE FORM CHANGE REMAINS BETWEEN ROOMS
         if (!could_use_spellbook) {
             player.glitch_index = player.inventory.spellbook.spells.length - 1;
             Glitch.TransformPlayer(room, Glitch.GREY, true, false, true);
@@ -114,6 +134,7 @@ var House = (function () {
         }
         catch (e) {
         }
+        //player.die_to_suffocation = true;
         if (cx < 0)
             player.x = room.MAP_WIDTH * Tile.WIDTH - Tile.WIDTH / 2 - player.rb;
         else if (cx > 0)
@@ -122,6 +143,8 @@ var House = (function () {
             player.y = room.MAP_HEIGHT * Tile.HEIGHT - Tile.HEIGHT - player.bb;
         else if (cy > 0)
             player.y = 0 + Tile.HEIGHT / 2 + player.tb;
+        //if (player.x <= 8) player.x+=8;
+        //if (player.x >= room.MAP_WIDTH * Tile.WIDTH - 8) player.x -= 8;
     };
     House.prototype.RevivePlayer = function () {
         this.room_index_x = this.checkpoint.room_x;
@@ -191,16 +214,16 @@ var House = (function () {
             this.new_checkpoint = null;
         }
     };
-    House.Levels = {
-        "dungeon": 0,
-        "ocean": 1,
-    };
-    House.GetLevels = function () {
-        var levels = [];
-        for (var level in House.Levels) {
-            levels.push({ "name": level, "value": House.Levels[level] });
-        }
-        return levels;
-    };
     return House;
 }());
+House.Levels = {
+    "dungeon": 0,
+    "ocean": 1
+};
+House.GetLevels = function () {
+    var levels = [];
+    for (var level in House.Levels) {
+        levels.push({ "name": level, "value": House.Levels[level] });
+    }
+    return levels;
+};

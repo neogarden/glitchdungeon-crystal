@@ -40,29 +40,30 @@ var KeyManager = (function () {
             case KeyManager.SPACE:
                 e.preventDefault();
                 break;
-            default: break;
+            default: break; // do not block other keys
         }
     };
-    KeyManager.LEFT = 37;
-    KeyManager.UP = 38;
-    KeyManager.RIGHT = 39;
-    KeyManager.DOWN = 40;
-    KeyManager.ENTER = 13;
-    KeyManager.SPACE = 32;
-    KeyManager.SHIFT = 16;
-    KeyManager.ESC = 27;
-    KeyManager.H = 72;
-    KeyManager.Q = 81;
-    KeyManager.W = 87;
-    KeyManager.E = 69;
-    KeyManager.R = 82;
-    KeyManager.U = 85;
-    KeyManager.A = 65;
-    KeyManager.S = 83;
-    KeyManager.D = 68;
-    KeyManager.X = 88;
-    KeyManager.Z = 90;
-    KeyManager.DEL = 46;
-    KeyManager.NUMBERS = [49, 50, 51, 52, 53, 54, 55];
     return KeyManager;
 }());
+//KEY STATIC NAMES
+KeyManager.LEFT = 37;
+KeyManager.UP = 38;
+KeyManager.RIGHT = 39;
+KeyManager.DOWN = 40;
+KeyManager.ENTER = 13;
+KeyManager.SPACE = 32;
+KeyManager.SHIFT = 16;
+KeyManager.ESC = 27;
+KeyManager.H = 72;
+KeyManager.Q = 81;
+KeyManager.W = 87;
+KeyManager.E = 69;
+KeyManager.R = 82;
+KeyManager.U = 85;
+KeyManager.A = 65;
+KeyManager.S = 83;
+KeyManager.D = 68;
+KeyManager.X = 88;
+KeyManager.Z = 90;
+KeyManager.DEL = 46;
+KeyManager.NUMBERS = [49, 50, 51, 52, 53, 54, 55];

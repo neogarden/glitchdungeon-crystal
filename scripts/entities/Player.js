@@ -1,24 +1,30 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Player = (function (_super) {
     __extends(Player, _super);
     function Player(x, y) {
-        _super.call(this, x, y, 2, 2, 14, 16, "player_grey_sheet");
-        this.touching_door = false;
-        this.touching_checkpoint = false;
-        this.speaking = false;
-        this.num_deaths = 0;
-        this.spells_cast = 0;
-        this.is_moving_to_spot = false;
-        this.spot_to_move_to = new Point(0, 0);
-        this.glitch_type = Glitch.GREY;
-        this.glitch_index = -1;
-        this.type = "Player";
-        this.animation.frame_height = 16;
-        this.inventory = {
+        var _this = _super.call(this, x, y, 2, 2, 14, 16, /* lb, tb, rb, bb */ "player_grey_sheet", /* img_name */ 2 /* max_run_vel */) || this;
+        _this.touching_door = false;
+        _this.touching_checkpoint = false;
+        _this.speaking = false;
+        _this.num_deaths = 0;
+        _this.spells_cast = 0;
+        _this.is_moving_to_spot = false;
+        _this.spot_to_move_to = new Point(0, 0);
+        _this.glitch_type = Glitch.GREY;
+        _this.glitch_index = -1;
+        _this.type = "Player";
+        _this.animation.frame_height = 16;
+        //INVENTORY
+        _this.inventory = {
             spellbook: {
                 active: false,
                 level: 0,
@@ -26,7 +32,8 @@ var Player = (function (_super) {
             },
             artifacts: []
         };
-        this.z_index = -100;
+        _this.z_index = -100;
+        return _this;
     }
     Player.prototype.Load = function (obj) {
         _super.prototype.Load.call(this, obj);
@@ -53,12 +60,15 @@ var Player = (function (_super) {
         obj.img_name = "player_grey_sheet";
         return obj;
     };
+    /*---------------------------------------------------------------*/
+    //inventory and state
     Player.prototype.NumArtifacts = function () {
         return this.inventory['spellbook'].spells.length;
     };
     Player.prototype.AddSpell = function (spell) {
         var spellbook = this.inventory['spellbook'];
         var level = spellbook.level;
+        //spellbook level 0, can only remember one spell at a time
         if (level == 0) {
             var prev_spell = null;
             if (spellbook.spells.length >= 1)
@@ -192,6 +202,7 @@ var Player = (function (_super) {
                 return;
             }
         }
+        //Colliding with spikes
         var left_tile = Math.floor((this.x + this.lb + this.vel.x - 1) / Tile.WIDTH);
         var right_tile = Math.ceil((this.x + this.rb + this.vel.x + 1) / Tile.WIDTH);
         var top_tile = Math.floor((this.y + this.tb + this.vel.y - 1) / Tile.HEIGHT);
@@ -221,13 +232,22 @@ var Player = (function (_super) {
         var ani = this.animation;
         var row = ani.rel_ani_y;
         var column = ani.rel_ani_x + ani.curr_frame;
-        ctx.drawImage(this.image, ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset, ani.frame_width, ani.frame_height);
+        ctx.drawImage(this.image, 
+        //SOURCE RECTANGLE
+        ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
+        //DESTINATION RECTANGLE
+        ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset, ani.frame_width, ani.frame_height);
         var f = -1;
         if (this.facing === Facing.LEFT)
             f = 1;
+        //NOW DRAW THE HAT
         if (!room_manager.beat_game)
             return;
-        ctx.drawImage(resource_manager.hat_grey_sheet, ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset + f, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset - 6, ani.frame_width, ani.frame_height);
+        ctx.drawImage(resource_manager.hat_grey_sheet, 
+        //SOURCE RECTANGLE
+        ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
+        //DESTINATION RECTANGLE
+        ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset + f, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset - 6, ani.frame_width, ani.frame_height);
     };
     return Player;
 }(GameMover));

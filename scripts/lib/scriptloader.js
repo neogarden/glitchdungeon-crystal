@@ -1,3 +1,4 @@
+//http://stackoverflow.com/questions/14446447/javascript-read-local-text-file
 function loadExternalFile(file_path, callback) {
     var file = new XMLHttpRequest();
     file.open("GET", file_path, true);
@@ -23,8 +24,11 @@ function loadExternalScriptsSequentially(file_objects, final_callback) {
     }
     callback();
 }
+//does not error check if script cannot be loaded...
+//http://stackoverflow.com/questions/950087/include-a-javascript-file-in-another-javascript-file?rq=1
 function loadExternalScripts(file_objects, final_callback) {
     var loaded_files = 0;
+    //http://stackoverflow.com/questions/5999998/how-can-i-check-if-a-javascript-variable-is-function-type
     function isFunction(functionToCheck) {
         var getType = {};
         return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
@@ -84,6 +88,7 @@ function loadExternalScripts(file_objects, final_callback) {
         if (typeof (file_obj.id) !== "undefined") {
             tag.id = file_obj.id;
         }
+        //multiple events for cross browser compatibility
         tag.onreadystatechange = callback;
         tag.onload = callback;
         head.appendChild(tag);

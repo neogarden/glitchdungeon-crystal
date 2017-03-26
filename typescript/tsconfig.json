@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "../scripts"
+        "outDir": "../scripts",
+        "compileOnSave": true
     }
 }

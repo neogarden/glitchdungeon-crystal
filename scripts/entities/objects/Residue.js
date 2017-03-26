@@ -1,17 +1,23 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Residue = (function (_super) {
     __extends(Residue, _super);
     function Residue(x, y, glitched_checkpoint) {
-        _super.call(this, x, y, 4, 5, 12, 16, "obj_sheet");
-        this.id = new Date().getTime();
-        this.type = "Residue";
-        this.animation.Change(3, 1, 2);
-        this.glitched_checkpoint = glitched_checkpoint;
-        this.z_index = 9;
+        var _this = _super.call(this, x, y, 4, 5, 12, 16, "obj_sheet") || this;
+        _this.id = new Date().getTime();
+        _this.type = "Residue";
+        _this.animation.Change(3, 1, 2);
+        _this.glitched_checkpoint = glitched_checkpoint;
+        _this.z_index = 9;
+        return _this;
     }
     Residue.prototype.Update = function (map) {
         _super.prototype.Update.call(this, map);
@@ -24,6 +30,10 @@ var Residue = (function (_super) {
             }
         }
     };
+    /*public Deactivate(){
+        this.active = false;
+        this.animation.Change(this.lex+1, 0, 1);
+    }*/
     Residue.prototype.GlitchRevivePlayer = function () {
         room_manager.room_index_x = this.glitched_checkpoint.room_x;
         room_manager.room_index_y = this.glitched_checkpoint.room_y;

@@ -16,12 +16,16 @@ var GameObject = (function () {
         this.width = rb - lb;
         this.height = bb - tb;
     }
+    /*---------------------------------------------------------------*/
+    //              FUNCTIONS TO SAVE/LOAD IN NORMAL GAMEPLAY
+    //  assumes that appropriate IMPORT function has already been called
     GameObject.prototype.Load = function (obj) {
         this.Import(obj);
     };
     GameObject.prototype.Save = function () {
         return this.Export();
     };
+    //functions to IMPORT/EXPORT object configuration from obj (from file)
     GameObject.prototype.Import = function (obj) {
         this.x = obj.x;
         this.y = obj.y;
@@ -79,6 +83,7 @@ var GameObject = (function () {
     GameObject.ZIndexSort = function (a, b) {
         return b.z_index - a.z_index;
     };
+    /**************************COLLISION DETECTION*************************************/
     GameObject.prototype.IsColliding = function (object) {
         return this.IsRectColliding(object, this.x + this.lb, this.y + this.tb, this.x + this.rb, this.y + this.bb);
     };

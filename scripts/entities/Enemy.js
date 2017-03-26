@@ -1,19 +1,25 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Enemy = (function (_super) {
     __extends(Enemy, _super);
     function Enemy(x, y, enemy_id) {
-        _super.call(this, x, y, 2, 2, 14, 16, "enemy_sheet");
-        this.type = "Enemy";
-        this.kill_player = true;
-        this.enemy_id = enemy_id;
-        this.facing = Facing.LEFT;
-        this.original_facing = this.facing;
-        this.max_run_vel = 1.5;
-        this.GlitchMe();
+        var _this = _super.call(this, x, y, 2, 2, 14, 16, "enemy_sheet") || this;
+        _this.type = "Enemy";
+        _this.kill_player = true;
+        _this.enemy_id = enemy_id;
+        _this.facing = Facing.LEFT;
+        _this.original_facing = _this.facing;
+        _this.max_run_vel = 1.5;
+        _this.GlitchMe();
+        return _this;
     }
     Enemy.prototype.Import = function (obj) {
         GameMover.prototype.Import.call(this, obj);

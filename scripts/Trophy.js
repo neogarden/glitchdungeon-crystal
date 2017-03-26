@@ -1,3 +1,4 @@
+//SECRET TROPHIES!!!
 var Trophy = (function () {
     function Trophy() {
     }
@@ -6,7 +7,10 @@ var Trophy = (function () {
         var user_token = Utils.gup("gjapi_token");
         if (username === null || username === '')
             return;
-        console.log(username + ", ");
+        console.log(username + ", "); // + user_token);
+        //This stuff is contextual to my game jolt game, so
+        //if you're making a game in game jolt, the achievement token
+        //for your game should be able to be used here
         var game_id = GJAPI.game_id;
         var url = "http://gamejolt.com/api/game/v1/trophies/add-achieved/?game_id=" + game_id + "&username=" + username +
             "&user_token=" + user_token;
@@ -29,6 +33,7 @@ var Trophy = (function () {
                 break;
             default: break;
         }
+        //TODO:: BEFORE COMMITTING TO GIT, ADD THIS SOMEWHERE ELSE AND HIDE IT!!!
         var signature = url + GJAPI.private_token;
         signature = md5(signature);
         var xmlhttp = new XMLHttpRequest();
@@ -42,6 +47,9 @@ var Trophy = (function () {
         if (username === null || username === '')
             return;
         console.log(username + ", " + user_token);
+        //This stuff is contextual to my game jolt game, so
+        //if you're making a game in game jolt, the achievement token
+        //for your game should be able to be used here
         var game_id = GJAPI.game_id;
         var url = "http://gamejolt.com/api/game/v1/scores/add/?game_id=" + game_id + "&username=" + username + "&user_token=" + user_token + "&score=" + score + "&sort=" + sort + "&table_id=" + table_id;
         var signature = url + GJAPI.private_token;
@@ -51,9 +59,9 @@ var Trophy = (function () {
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
     };
-    Trophy.POWERS = 0;
-    Trophy.HAT = 1;
-    Trophy.DEATH = 2;
-    Trophy.SECRET = 3;
     return Trophy;
 }());
+Trophy.POWERS = 0;
+Trophy.HAT = 1;
+Trophy.DEATH = 2;
+Trophy.SECRET = 3;

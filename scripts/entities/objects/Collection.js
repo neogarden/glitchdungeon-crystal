@@ -1,17 +1,23 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Collection = (function (_super) {
     __extends(Collection, _super);
     function Collection(x, y, collection_id) {
-        _super.call(this, x, y, 2, 2, 14, 16, "collection_sheet");
-        this.type = "Collection";
-        this.collection_id = collection_id;
-        this.animation.frame_delay = 30;
-        this.UpdateAnimation();
-        this.z_index = 8;
+        var _this = _super.call(this, x, y, 2, 2, 14, 16, "collection_sheet") || this;
+        _this.type = "Collection";
+        _this.collection_id = collection_id;
+        _this.animation.frame_delay = 30;
+        _this.UpdateAnimation();
+        _this.z_index = 8;
+        return _this;
     }
     Collection.prototype.Load = function (obj) {
         _super.prototype.Load.call(this, obj);
@@ -43,8 +49,10 @@ var Collection = (function (_super) {
         options['collection_id'] = new TextDropdown(this.GetCollectionTypes(), this.collection_id);
         return options;
     };
+    /*---------------------------------------------------------------*/
     Collection.prototype.Update = function (map) {
         if (this.IsColliding(player) && this.visible) {
+            //this.delete_me = true;
             this.visible = false;
             Utils.playSound("pickup", master_volume, 0);
             player.inventory.artifacts.push(this);

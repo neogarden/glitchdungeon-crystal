@@ -1,7 +1,9 @@
 var img_path = "assets/images/";
 var snd_path = "assets/sounds/";
+//Display the loading screen while everything else is loading...
 var ResourceManager = (function () {
     function ResourceManager() {
+        //IMAGE VARIABLE DECLARATION
         this.images_loaded = 0;
         this.image_names = [
             "soundButtons",
@@ -31,6 +33,7 @@ var ResourceManager = (function () {
         ];
         this.necessary_images = 9;
         this.num_images = this.image_names.length;
+        //SOUND VARIABLE DECLARATION
         this.play_sound = true;
         this.play_music = true;
         this.can_play_sound = true;
@@ -68,9 +71,11 @@ var ResourceManager = (function () {
     }
     ResourceManager.prototype.DisplayLoadScreen = function (ctx) {
         ctx.scale(2, 2);
+        //Display the LOADING... screen
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.fillStyle = "rgb(255,255,255)";
+        //ctx.font = "24px pixelFont";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
         ctx.fillText("LOADING GAME...", 64, GAME_HEIGHT / 8 + 25 - 16);
@@ -85,8 +90,10 @@ var ResourceManager = (function () {
         this.sounds_loaded++;
         this.CheckLoadedResources();
     };
+    //LOAD ALL THE RESOURCES
     ResourceManager.prototype.LoadResources = function (ctx) {
         this.DisplayLoadScreen(ctx);
+        //Load Images
         for (var i = 0; i < this.image_names.length; i++) {
             var timeoutCallback = (function (self, img) {
                 self[img] = new Image();
@@ -99,6 +106,7 @@ var ResourceManager = (function () {
             this.sounds_loaded = this.sound_names.length;
             return;
         }
+        //Load Sounds
         for (var i = 0; i < this.sound_names.length; i++) {
             var timeoutCallback = (function (self) {
                 var snd = self.sound_names[i];
@@ -108,11 +116,13 @@ var ResourceManager = (function () {
         }
     };
     ResourceManager.prototype.loadBuffer = function (url, index) {
+        // Load buffer asynchronously
         var request = new XMLHttpRequest();
         request.open("GET", url, true);
         request.responseType = "arraybuffer";
         var loader = this;
         request.onload = function () {
+            // Asynchronously decode the audio file data in request.response
             loader.audio_context.decodeAudioData(request.response, function (buffer) {
                 if (!buffer) {
                     alert('error decoding file data: ' + url);
@@ -120,6 +130,8 @@ var ResourceManager = (function () {
                 }
                 loader[index] = buffer;
                 loader.SoundLoad();
+                //Force sequential sound loading
+                //setTimeout(loader.LoadNextSound.bind(loader), 0);
             }, function (error) {
                 console.error('decodeAudioData error', error);
             });

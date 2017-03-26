@@ -1,26 +1,32 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var NPC = (function (_super) {
     __extends(NPC, _super);
     function NPC(x, y) {
-        _super.call(this, x, y, 2, 2, 14, 16, "npc_sheet");
-        this.name = "NPC";
-        this.npc_dialog = [];
-        this.avatar = null;
-        this.dialog_image = resource_manager.collection_sheet;
-        this.dialog_animation = new Animation(2, 20, 16, 16, 6, 3);
-        this.dialog_index = 0;
-        this.on_init_event = "";
-        this.on_end_conversation_event = "";
-        this.on_begin_conversation_event = "";
-        this.speaking = false;
-        this.was_speaking = false;
-        this.type = "NPC";
-        this.solid = true;
-        this.animation.frame_delay = 40;
+        var _this = _super.call(this, x, y, 2, 2, 14, 16, "npc_sheet") || this;
+        _this.name = "NPC";
+        _this.npc_dialog = [];
+        _this.avatar = null;
+        _this.dialog_image = resource_manager.collection_sheet;
+        _this.dialog_animation = new Animation(2, 20, 16, 16, 6, 3);
+        _this.dialog_index = 0;
+        _this.on_init_event = "";
+        _this.on_end_conversation_event = "";
+        _this.on_begin_conversation_event = "";
+        _this.speaking = false;
+        _this.was_speaking = false;
+        _this.type = "NPC";
+        _this.solid = true;
+        _this.animation.frame_delay = 40;
+        return _this;
     }
     NPC.prototype.Import = function (obj) {
         _super.prototype.Import.call(this, obj);
@@ -89,6 +95,7 @@ var NPC = (function (_super) {
                 this.facing = Facing.RIGHT;
             }
         }
+        //If i'm touching the player and the player presses down, speak!
         if (this.IsRectColliding(player, this.x + this.lb - Tile.WIDTH, this.y + this.tb - Tile.WIDTH / 2, this.x + this.rb + Tile.WIDTH, this.y + this.bb + Tile.WIDTH / 2)) {
             if (player.pressed_down) {
                 player.speaking = true;
@@ -102,6 +109,7 @@ var NPC = (function (_super) {
                 player.speaking = false;
             this.speaking = false;
         }
+        //TALK TO PLAYER AND SUCH
         if (this.speaking) {
             room.Speak(this.GetText(), { speech_time: 240,
                 display_arrow: this.npc_dialog.length > 1,
@@ -149,8 +157,8 @@ var NPC = (function (_super) {
             this.dialog_index = 0;
     };
     NPC.prototype.UpdateAnimationFromState = function () {
-        var ani_x = 0;
-        var ani_y = 0;
+        var ani_x = 0; //this.npc_id / 2;
+        var ani_y = 0; //this.npc_id % 2;
         this.animation.Change(ani_x, ani_y, 2);
         if (this.facing === Facing.LEFT) {
             this.animation.abs_ani_y = 2 * this.animation.frame_height;
@@ -166,15 +174,26 @@ var NPC = (function (_super) {
         var ani = this.animation;
         var row = ani.rel_ani_y;
         var column = ani.rel_ani_x + ani.curr_frame;
-        ctx.drawImage(this.image, ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset, ani.frame_width, ani.frame_height);
+        //draw myself
+        ctx.drawImage(this.image, 
+        //SOURCE RECTANGLE
+        ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
+        //DESTINATION RECTANGLE
+        ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset, ani.frame_width, ani.frame_height);
         var f = -1;
         if (this.facing === Facing.LEFT)
             f = 1;
         var v = -this.animation.curr_frame;
+        //NOW DRAW THE HAT
         if (room_manager.beat_game) {
-            ctx.drawImage(resource_manager.hat_grey_sheet, ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset + f, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset - 7 + v, ani.frame_width, ani.frame_height);
+            ctx.drawImage(resource_manager.hat_grey_sheet, 
+            //SOURCE RECTANGLE
+            ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
+            //DESTINATION RECTANGLE
+            ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset + f, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset - 7 + v, ani.frame_width, ani.frame_height);
         }
     };
+    //TEXT BABY
     NPC.prototype.GetText = function () {
         if (this.npc_dialog && this.npc_dialog.length > 0)
             return this.npc_dialog[this.dialog_index];

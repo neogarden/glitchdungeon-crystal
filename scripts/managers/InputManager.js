@@ -9,6 +9,12 @@ var InputManager = (function () {
             this.NormalUpdate(player);
     };
     InputManager.prototype.NormalUpdate = function (player) {
+        //	console.log(this.key_manager.keys_down);
+        if (this.key_manager.keys_pressed[KeyManager.ENTER]) {
+            room.paused = !room.paused;
+        }
+        if (room.paused)
+            return;
         if (this.key_manager.keys_down[KeyManager.RIGHT]) {
             player.MoveRight();
         }
@@ -53,12 +59,22 @@ var InputManager = (function () {
             else
                 Utils.playSound("error", master_volume, 0);
         }
+        /*for (var i = 0; i < KeyManager.NUMBERS.length; i++){
+            if (this.key_manager.keys_pressed[KeyManager.NUMBERS[i]] && room_manager.has_spellbook && room_manager.spellbook.length > i){
+                var temp = room_manager.glitch_index;
+                room_manager.glitch_index = i-1;
+                room_manager.RandomGlitch();
+                if (room_manager.glitch_index === i-1)
+                    room_manager.glitch_index = temp;
+            }
+        }*/
         if (this.key_manager.keys_pressed[KeyManager.A]) {
             player.PrevGlitch();
         }
         if (this.key_manager.keys_pressed[KeyManager.S]) {
             player.NextGlitch();
         }
+        //Restart the game
         if ((this.key_manager.keys_pressed[KeyManager.SHIFT] && this.key_manager.keys_down[KeyManager.R]) || (this.key_manager.keys_down[KeyManager.SHIFT] && this.key_manager.keys_pressed[KeyManager.R])) {
             InputManager.RestartGame();
         }
@@ -78,12 +94,14 @@ var InputManager = (function () {
         room_manager.Restart();
         room = room_manager.GetRoom();
         console.log("start");
+        //Let's play the game!
         then = Date.now();
         bg_name = "RoccoW_outOfSight";
         if (resource_manager.play_music) {
             stopMusic();
             startMusic();
         }
+        //InputManager.RestartGame = function(){}
     };
     return InputManager;
 }());

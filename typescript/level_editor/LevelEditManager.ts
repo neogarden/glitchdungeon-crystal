@@ -480,9 +480,9 @@ class LevelEditManager{
 
     public getSelected(drop_down){
     	var e = <HTMLSelectElement>$(drop_down);
-    	return e.options[e.selectedIndex].value;
+    	return (<HTMLOptionElement>e.options[e.selectedIndex]).value;
     }
-    // 
+    //
     // public select(box, obj_type){
     // 	this.mouse_down = false;
     // 	$("tileset_canvas").style.display="none";

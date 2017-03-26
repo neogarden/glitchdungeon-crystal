@@ -23,6 +23,7 @@ var Room = (function () {
         this.CreateEntities();
         this.InitializeTiles();
     }
+    //defined in RoomLoader.ts
     Room.prototype.Save = function () { };
     Room.prototype.Load = function (room) { };
     Room.prototype.Export = function () { };
@@ -56,12 +57,14 @@ var Room = (function () {
                 this.tiles[i].push(new Tile(j * Tile.WIDTH, i * Tile.HEIGHT));
             }
         }
+        //make the top and bottom row solid
         for (var j = 0; j < this.MAP_WIDTH; j++) {
             this.tiles[0][j].collision = Tile.SOLID;
             this.tiles[0][j].tileset_y = 1;
             this.tiles[this.MAP_HEIGHT - 1][j].collision = Tile.SOLID;
             this.tiles[this.MAP_HEIGHT - 1][j].tileset_y = 1;
         }
+        //make left and right rows solid
         for (var i = 0; i < this.MAP_HEIGHT; i++) {
             this.tiles[i][0].collision = Tile.SOLID;
             this.tiles[i][0].tileset_y = 1;
@@ -84,8 +87,10 @@ var Room = (function () {
                 this.entities.splice(i, 1);
         }
         this.TryUpdateRoomIfPlayerOffscreen();
+        //this.UpdateGlitchSequence();
     };
     Room.prototype.UpdateGlitchSequence = function () {
+        //UPDATE GLITCH SEQUENCE
         if (room_manager && !room_manager.has_spellbook || !this.can_use_spellbook) {
             this.glitch_time++;
             if (this.glitch_sequence.length > 1
@@ -118,12 +123,14 @@ var Room = (function () {
     };
     Room.prototype.TryUpdateRoomIfPlayerOffscreen = function () {
         var new_coords = [0, 0];
+        //OFFSCREEN TOP
         if (player.y + player.bb <= 0) {
             new_coords = [0, -1];
         }
         else if (player.y + player.tb >= (this.MAP_HEIGHT * Tile.HEIGHT)) {
             new_coords = [0, 1];
         }
+        //OFFSCREEN LEFT
         if (player.x <= 0) {
             new_coords = [-1, 0];
         }
@@ -131,6 +138,7 @@ var Room = (function () {
             new_coords = [1, 0];
         }
         if (new_coords[0] !== 0 || new_coords[1] !== 0) {
+            //!!!
             if (this.edge_death) {
                 player.Die();
             }
@@ -164,10 +172,12 @@ var Room = (function () {
             if (player.y + (player.bb / 2) >= GAME_HEIGHT / 2)
                 h = (-1) * (GAME_HEIGHT / 1.5) + Tile.HEIGHT - 8;
             h += GAME_HEIGHT - (Tile.HEIGHT) - speech_height;
+            //RENDER THE SPEECH BOX
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(Tile.WIDTH / 2, h + (Tile.HEIGHT / 2), GAME_WIDTH - (Tile.WIDTH * 1), speech_height);
             ctx.fillStyle = "#000000";
             ctx.fillRect(Tile.WIDTH / 2 + 2, h + (Tile.HEIGHT / 2) + 2, GAME_WIDTH - (Tile.WIDTH * 1) - 4, speech_height - 4);
+            //RENDER THE ACTUAL TEXT
             var fs = 8;
             ctx.font = fs + "px pixelFont";
             ctx.fillStyle = "#ffffff";
@@ -182,10 +192,16 @@ var Room = (function () {
                     ctx.strokeText(texts[i], Tile.WIDTH * 1.5 + 24, h + (fs * i) + (Tile.HEIGHT / 2) - 4, fs - 2);
                 }
             }
+            //RENDER THE SPEAKERS AVATAR IF APPLICABLE
             if (this.speech_avatar !== null && this.speech_avatar !== undefined) {
                 var src_rect = this.speech_avatar.src_rect;
-                ctx.drawImage(this.speech_avatar.image, src_rect[0], src_rect[1], src_rect[2], src_rect[3], 1, h + 3, src_rect[2] * 2, src_rect[3] * 2);
+                ctx.drawImage(this.speech_avatar.image, 
+                //SOURCE RECTANGLE
+                src_rect[0], src_rect[1], src_rect[2], src_rect[3], 
+                //DESTINATION RECTANGLE
+                1, h + 3, src_rect[2] * 2, src_rect[3] * 2);
             }
+            //RENDER THE "PRESS DOWN TO CONTINUE" NOTIFIER IF APPLICABLE
             if (this.speech_display_arrow) {
                 if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))) {
                     ctx.fillText("(v)", GAME_WIDTH - (Tile.WIDTH * 2) - fs, h + (fs * 3) - fs, fs * 3, fs * 3);
@@ -200,14 +216,17 @@ var Room = (function () {
     };
     Room.prototype.Render = function (ctx, level_edit) {
         ctx.scale(this.camera.view_scale, this.camera.view_scale);
+        //SORT ENTITIES BY Z INDEX (descending)
         var entities = this.entities.slice(0);
         entities.push(player);
         entities.sort(GameObject.ZIndexSort);
         var index = 0;
+        //DRAW ENTITIES WITH Z INDEX GREATER THAN 10 UNDER TILES
         while (entities[index].z_index > 10) {
             entities[index].Render(ctx, this.camera);
             index++;
         }
+        //Draw some background code for aesthetic
         var fs = 4;
         ctx.font = fs + "px monospace";
         ctx.fillStyle = "#ffffff";
@@ -223,6 +242,7 @@ var Room = (function () {
                 ctx.strokeText(texts[i], 16, fs * i - 8, fs);
             }
         }
+        //DRAW THE TILES OF THE ROOM
         var tile_img = eval("resource_manager." + this.tilesheet_name);
         var p_tile_img = eval("resource_manager." + player.tilesheet_name);
         var left_tile = Math.floor((player.x + player.lb - 32) / Tile.WIDTH);
@@ -237,13 +257,16 @@ var Room = (function () {
                     this.tiles[i][j].RenderFromImage(ctx, this.camera, tile_img);
             }
         }
+        //DRAW THE REMAINING ENTITIES
         for (var i = index; i < entities.length; i++) {
             entities[i].Render(ctx, this.camera);
         }
+        //coverup
         this.camera.Render(ctx);
         this.RenderSpeech(ctx);
         ctx.scale(1 / this.camera.view_scale, 1 / this.camera.view_scale);
     };
+    /********************OTHER LEVEL EDITING FUNCTIONS********************/
     Room.prototype.ChangeSize = function (width, height) {
         var old_width = this.MAP_WIDTH;
         var old_height = this.MAP_HEIGHT;
@@ -263,6 +286,8 @@ var Room = (function () {
                     this.tiles[i][j] = temp_tiles[i][j];
             }
         }
+        //console.log("NEW WIDTH: ", this.MAP_WIDTH);
+        //console.log("NEW HEIGHT: ", this.MAP_HEIGHT);
     };
     Room.prototype.GetDoor = function (door_id, door) {
         for (var i = 0; i < this.entities.length; i++) {
@@ -273,6 +298,6 @@ var Room = (function () {
         }
         return null;
     };
-    Room.GLITCH_TIME_LIMIT_ORIGINAL = 240;
     return Room;
 }());
+Room.GLITCH_TIME_LIMIT_ORIGINAL = 240;

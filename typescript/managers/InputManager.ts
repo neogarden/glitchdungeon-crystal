@@ -13,6 +13,11 @@ class InputManager{
 
     public NormalUpdate(player){
         //	console.log(this.key_manager.keys_down);
+      if (this.key_manager.keys_pressed[KeyManager.ENTER]) {
+        room.paused = !room.paused;
+      }
+      if (room.paused) return;
+
     	if (this.key_manager.keys_down[KeyManager.RIGHT]){
     		player.MoveRight();
     	}

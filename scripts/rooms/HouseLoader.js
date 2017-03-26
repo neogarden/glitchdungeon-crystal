@@ -35,7 +35,7 @@ House.prototype.Save = function () {
     var room_jsons = [];
     var etc = {
         checkpoint: this.checkpoint,
-        room_indices: [],
+        room_indices: []
     };
     var player_json = JSON.stringify(player.Save());
     for (var j in this.rooms) {
@@ -55,7 +55,8 @@ House.prototype.Save = function () {
     return {
         player: JSON.stringify(player.Save()),
         rooms: room_jsons,
-        etc: JSON.stringify(etc) };
+        etc: JSON.stringify(etc)
+    };
 };
 House.prototype.Load = function (callback) {
     this.LoadName("main_save", callback);
@@ -89,6 +90,7 @@ House.prototype.LoadName = function (level_name, callback) {
                     this.rooms[x][y].Load(room_save);
                     loaded++;
                     if (loaded === needs_loading) {
+                        //FINISHED LOADING ALL THE LEVELS
                         var room = this.rooms[this.room_index_x][this.room_index_y];
                         this.checkpoint = {
                             x: player.x, y: player.y,
@@ -105,6 +107,7 @@ House.prototype.LoadName = function (level_name, callback) {
         }.bind(this));
     }.bind(this));
 };
+/***********************************************************************/
 House.prototype.Export = function () {
     var room_jsons = [];
     var etc = { room_indices: [] };
@@ -164,6 +167,7 @@ House.prototype.Import = function (level_name, callback, reset_rooms) {
                 this.rooms[x][y] = new_room;
                 loaded++;
                 if (loaded === needs_loading) {
+                    //FINISHED LOADING ALL THE LEVELS
                     var room = this.rooms[this.room_index_x][this.room_index_y];
                     this.checkpoint = {
                         x: player.x, y: player.y,

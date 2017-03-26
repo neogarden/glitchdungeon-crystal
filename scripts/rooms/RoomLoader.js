@@ -3,6 +3,8 @@ Room.prototype.Save = function () {
     for (var i = 0; i < this.entities.length; i++) {
         entities.push({ type: this.entities[i].type, obj: this.entities[i].Save() });
     }
+    //don't need to 'save' tiles
+    //only need to 'save' volatile entities
     return {
         level_id: this.level_id,
         glitch_type: this.glitch_type,
@@ -14,6 +16,7 @@ Room.prototype.Save = function () {
     };
 };
 Room.prototype.Load = function (room) {
+    //load level id
     this.level_id = room.level_id || House.Levels["dungeon"];
     this.glitch_index = 0;
     this.glitch_time = 0;
@@ -22,6 +25,7 @@ Room.prototype.Load = function (room) {
     this.glitch_type = this.glitch_sequence[0];
     this.can_use_spellbook = defaultValue(room.can_use_spellbook, true);
     Glitch.TransformPlayer(this, this.glitch_type);
+    //load entities
     this.entities = [];
     if (room.entities) {
         for (var i = 0; i < room.entities.length; i++) {
@@ -31,6 +35,7 @@ Room.prototype.Load = function (room) {
         }
     }
 };
+/*******************************************************/
 Room.prototype.Export = function () {
     var entities = [], tiles = [];
     for (var i = 0; i < this.entities.length; i++) {
@@ -75,6 +80,7 @@ Room.Import = function (file_name) {
     return room;
 };
 Room.prototype.Import = function (room) {
+    //import level id
     this.level_id = room.level_id || House.Levels["dungeon"];
     this.ChangeSize(room.width, room.height);
     this.glitch_index = 0;
@@ -84,6 +90,7 @@ Room.prototype.Import = function (room) {
     this.glitch_type = this.glitch_sequence[0];
     this.can_use_spellbook = defaultValue(room.can_use_spellbook, true);
     Glitch.TransformPlayer(this, this.glitch_type);
+    //import entities
     this.entities = [];
     if (room.entities) {
         for (var i = 0; i < room.entities.length; i++) {
@@ -92,6 +99,7 @@ Room.prototype.Import = function (room) {
             this.entities.push(entity);
         }
     }
+    //Import tiles!!!
     this.tiles = [];
     this.MAP_WIDTH = room.tiles[0].length;
     this.MAP_HEIGHT = room.tiles.length;
@@ -111,6 +119,7 @@ Room.prototype.Import = function (room) {
     if (this.bg_code === undefined)
         this.bg_code = "";
 };
+/************************EXPORTING AND IMPORTING FUNCTIONS************/
 Room.prototype.ImportOptions = function (options) {
     this.level_id = Number(options.level_id.value);
     var width = options.width.value;
@@ -121,17 +130,25 @@ Room.prototype.ImportOptions = function (options) {
     this.edge_death = options.edge_death.value;
     this.ChangeSize(width, height);
     this.bg_code = options.bg_code.value;
+    // update glitch type and related sequence/index
+    this.glitch_type = Number(options.glitch_type.value);
+    Glitch.TransformPlayer(this, this.glitch_type);
+    this.glitch_sequence = [this.glitch_type];
+    this.glitch_index = 0;
 };
 Room.prototype.ExportOptions = function () {
     var options = {};
-    options['level_id'] = new TextDropdown(House.GetLevels(), this.level_id);
+    options['level_id'] = new TextDropdown(House.GetLevels(), /* array of values*/ this.level_id /* current selected value */);
     options['width'] = new NumberOption(this.MAP_WIDTH * Tile.WIDTH);
     options['height'] = new NumberOption(this.MAP_HEIGHT * Tile.HEIGHT);
     options['view_scale'] = new NumberOption(this.camera.view_scale);
     options['edge_death'] = new CheckboxOption(this.edge_death);
     options['bg_code'] = new BigTextOption(this.bg_code);
+    options['glitch_type'] = new TextDropdown(Glitch.GetGlitchTypes(), /* array of values */ this.glitch_type /* current selected value */);
     return options;
 };
+/********************************************************************/
+/////////////////////boilerplate
 Room.prototype.GenerateOptions = function () {
     var dom = document.createElement("div");
     var opt = this.ExportOptions();

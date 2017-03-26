@@ -131,7 +131,7 @@ Room.prototype.Import = function(room){
 
 /************************EXPORTING AND IMPORTING FUNCTIONS************/
 Room.prototype.ImportOptions = function(options){
-    this.level_id = Number(options.level_id.value);
+  this.level_id = Number(options.level_id.value);
 
 	var width = options.width.value;
 	width = ~~(width / Tile.WIDTH) * Tile.WIDTH;
@@ -143,17 +143,27 @@ Room.prototype.ImportOptions = function(options){
 
 	this.ChangeSize(width, height);
 	this.bg_code = options.bg_code.value;
+  // update glitch type and related sequence/index
+  this.glitch_type = Number(options.glitch_type.value);
+  Glitch.TransformPlayer(this, this.glitch_type);
+  this.glitch_sequence = [this.glitch_type];
+  this.glitch_index = 0;
 }
 Room.prototype.ExportOptions = function(){
 	var options = {};
     options['level_id'] = new TextDropdown(
-        House.GetLevels(), this.level_id
+        House.GetLevels(), /* array of values*/
+        this.level_id /* current selected value */
     );
 	options['width'] = new NumberOption(this.MAP_WIDTH*Tile.WIDTH);
 	options['height'] = new NumberOption(this.MAP_HEIGHT*Tile.HEIGHT);
 	options['view_scale'] = new NumberOption(this.camera.view_scale);
 	options['edge_death'] = new CheckboxOption(this.edge_death);
 	options['bg_code'] = new BigTextOption(this.bg_code);
+  options['glitch_type'] = new TextDropdown(
+    Glitch.GetGlitchTypes(), /* array of values */
+    this.glitch_type /* current selected value */
+  );
 	return options;
 }
 /********************************************************************/

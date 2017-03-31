@@ -1,1 +1,4 @@
-1. start designing "scenarios" 
+[ ] - fix NPC generation
+
+1. prompt to press down on NPC
+2. shield? sword beam/wand

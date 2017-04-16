@@ -6,17 +6,21 @@ class MoveState{
 }
 
 class Facing{
-    public static LEFT: number = 0;
-    public static RIGHT: number = 1;
+    public static DOWN: number = 0;
+    public static UP: number = 1;
+    public static RIGHT: number = 2;
+    public static LEFT: number = 3;
 }
 
 class Point{
     public x: number;
     public y: number;
+    public z: number;
 
-    public constructor(x: number, y: number){
+    public constructor(x: number, y: number, z: number = 0){
         this.x = x;
         this.y = y;
+        this.z = z;
     }
 }
 
@@ -29,6 +33,7 @@ class GameMover extends GameSprite{
     public air_run_acc: number;
     public air_run_dec: number;
     public horizontal_input: boolean = false;
+    public vertical_input: boolean = false;
     public mult: number = 0;
 
     public original_grav_acc: number = 0.8;
@@ -62,6 +67,7 @@ class GameMover extends GameSprite{
     public stuck_in_wall: boolean = false;
 
     public vel: Point = new Point(0, 0);
+    private prev_vel: Point = new Point(0, 0);
 
     public constructor(x, y, lb, tb, rb, bb, img_name,
                        max_run_vel = 1.5, jump_vel = 4.5, terminal_vel = 7.0){
@@ -112,13 +118,17 @@ class GameMover extends GameSprite{
     		if (!this.on_ground){
     			if (!this.was_on_ground)
     				this.pressed_down = false;
-    			if (this.vel.y < 0) this.move_state = MoveState.JUMPING;
+    			if (this.vel.z < 0) this.move_state = MoveState.JUMPING;
     			else this.move_state = MoveState.FALLING;
     		}
     	}
     	this.UpdateAnimationFromState();
+      this.prev_move_state = this.move_state;
 
-        super.Update(map);
+      this.prev_vel.x = this.vel.x;
+      this.prev_vel.y = this.vel.y;
+      this.prev_vel.z = this.vel.z;
+      super.Update(map);
     }
 
     /*********************PHYSICS AND COLLISION DETECTIONS********************/
@@ -196,11 +206,12 @@ class GameMover extends GameSprite{
     public Die(){}
 
     public ApplyPhysics(map){
-        var prev_pos = {x: this.x, y: this.y};
+      var prev_pos = {x: this.x, y: this.y};
 
     	this.ApplyGravity();
 
-    	if (!this.horizontal_input) this.MoveStop();
+      if (!this.vertical_input) this.VerticalMoveStop();
+    	if (!this.horizontal_input) this.HorizontalMoveStop();
     	this.HandleCollisionsAndMove(map);
 
     	if (this.x == prev_pos.x) this.vel.x = 0;
@@ -209,18 +220,19 @@ class GameMover extends GameSprite{
     }
 
     public ApplyGravity(){
-      if (!this.on_ground){
-    		if (this.vel.y < this.terminal_vel)
-    		{
-    			this.vel.y += (this.grav_acc);
-    			if (this.vel.y > this.terminal_vel)
-    				this.vel.y = this.terminal_vel;
-    		}else if (this.vel.y > this.terminal_vel){
-    			this.vel.y -= (this.grav_acc);
-    			if (this.vel.y < this.terminal_vel)
-    				this.vel.y = this.terminal_vel;
-    		}
-    	}else{ this.vel.y = 0; }
+      // TODO(jakeonaut): change to z, implement roc's feather
+      // if (!this.on_ground){
+    	// 	if (this.vel.y < this.terminal_vel)
+    	// 	{
+    	// 		this.vel.y += (this.grav_acc);
+    	// 		if (this.vel.y > this.terminal_vel)
+    	// 			this.vel.y = this.terminal_vel;
+    	// 	}else if (this.vel.y > this.terminal_vel){
+    	// 		this.vel.y -= (this.grav_acc);
+    	// 		if (this.vel.y < this.terminal_vel)
+    	// 			this.vel.y = this.terminal_vel;
+    	// 	}
+    	// }else{ this.vel.y = 0; }
     }
 
     public HandleCollisionsAndMove(map){
@@ -230,9 +242,10 @@ class GameMover extends GameSprite{
     	var bottom_tile = Math.ceil((this.y + this.bb + this.vel.y + 1) / Tile.HEIGHT);
 
     	// Reset flag to search for ground collision.
-    	this.was_on_ground = this.on_ground;
-    	this.on_ground = false;
-    	this.true_on_ground = false;
+      // TODO(jaketrower): implement this for roc's feather
+    	// this.was_on_ground = this.on_ground;
+    	// this.on_ground = false;
+    	// this.true_on_ground = false;
     	var q_horz = 2; //q is used to minimize height checked in horizontal collisions and etc.
     	var q_vert = 2;
 
@@ -249,12 +262,17 @@ class GameMover extends GameSprite{
         }
 
     	this.HandleHorizontalCollisions(tiles, map.entities, q_horz);
-    	this.x += this.vel.x;
+      if (this.vertical_input && this.vel.y != 0) {
+        this.x += this.vel.x * 0.75;
+      } else this.x += this.vel.x;
     	this.HandleVerticalCollisions(tiles, map.entities, q_vert);
-    	this.y += this.vel.y;
+      if (this.horizontal_input && this.vel.x != 0) {
+        this.y += this.vel.y * 0.75;
+    	} else this.y += this.vel.y;
+    }
 
-    	if (this.vel.y != 0)
-            this.played_land_sound = false;
+    private PlayLandSound(vel_key: string) {
+      if (this.prev_vel[vel_key] != 0) Utils.playSound("land");
     }
 
     public HandleLeftCollision(object, q){
@@ -264,6 +282,7 @@ class GameMover extends GameSprite{
             this.x + this.lb,
             this.y + this.bb - q)){
 
+                this.PlayLandSound('x');
                 this.vel.x = 0;
                 this.horizontal_collision = true;
                 this.x = object.x + object.rb - this.lb;
@@ -277,6 +296,7 @@ class GameMover extends GameSprite{
             this.x + this.rb + this.vel.x + 2,
             this.y + this.bb - q)){
 
+                this.PlayLandSound('x');
                 this.vel.x = 0;
                 this.horizontal_collision = true;
                 this.x = object.x - this.rb;
@@ -314,6 +334,7 @@ class GameMover extends GameSprite{
             this.x + this.rb - q,
             this.y + this.tb)){
 
+                this.PlayLandSound('y');
                 this.vel.y = 0;
                 this.y = object.y + object.bb - this.tb;
         }
@@ -327,15 +348,8 @@ class GameMover extends GameSprite{
             this.x + this.rb - q,
             this.y + this.bb + this.vel.y + 2)){
 
-                if (!this.played_land_sound){
-                    Utils.playSound("land");
-                    this.played_land_sound = true;
-                }
+                this.PlayLandSound('y');
                 this.vel.y = 0;
-                this.on_ground = true;
-                this.true_on_ground = true;
-                this.has_double_jumped = false;
-                this.has_triple_jumped = false;
                 this.y = object.y - this.bb;
         }
     }
@@ -367,97 +381,120 @@ class GameMover extends GameSprite{
 
     /******************RENDER AND ANIMATION FUNCTIONS***********************/
     public UpdateAnimationFromState(){
+      let ani_y = 0; // let Facing.DOWN be default ani_y = 0;
+      if (this.facing == Facing.UP) ani_y = 1;
+      if (this.facing == Facing.RIGHT) ani_y = 2;
+      if (this.facing == Facing.LEFT) ani_y = 3;
+
     	switch (this.move_state){
     		case MoveState.STANDING:
-    			this.animation.Change(0, 0, 2);
+    			this.animation.Change(0, ani_y, 1);
     			break;
     		case MoveState.RUNNING:
-    			this.animation.Change(2, 0, 4);
-    			if (this.prev_move_state == MoveState.FALLING || this.prev_move_state == MoveState.JUMPING)
-    				this.animation.curr_frame = 1;
-    			break;
-    		case MoveState.JUMPING:
-    			this.animation.Change(0, 1, 2);
-    			break;
-    		case MoveState.FALLING:
-    			this.animation.Change(4, 1, 2);
+          this.animation.Change(0, ani_y, 2);
+          if (this.prev_move_state == MoveState.STANDING) {
+            this.animation.curr_frame += 1;
+          }
+          if (this.vel.x == 0 && this.vel.y == 0) {
+            this.animation.frame_delay = 16;
+          } else {
+            this.animation.frame_delay = 8;
+          }
     			break;
     		default: break;
     	}
-
-    	if (this.facing == Facing.LEFT){
-    		this.animation.abs_ani_y = 2 * this.animation.frame_height;
-    	}else if (this.facing == Facing.RIGHT){
-    		this.animation.abs_ani_y = 0;
-    	}
-    	this.prev_move_state = this.move_state;
     }
 
     /*******************FUNCTIONS FOR MOVEMENT INPUT BY OBJECT*****************/
-    public MoveLeft(){
+    public MoveLeft() {
     	this.facing = Facing.LEFT;
-    	//if (this.vel.x > 0) this.vel.x = 0;
-    	this.Move(-1);
+    	this.HorizontalMove(-1);
     }
 
-    public MoveRight(){
+    public MoveRight() {
     	this.facing = Facing.RIGHT;
-    	//if (this.vel.x < 0) this.vel.x = 0;
-    	this.Move(1);
+    	this.HorizontalMove(1);
     }
 
-    public Move(mult){
-    	this.mult = mult;
-    	this.pressed_down = false;
-
-    	var acc;
-    	this.horizontal_input = true;
-    	if ((this.vel.x * mult) < 0) this.vel.x = 0;
-    	if (this.on_ground){
-    		acc = this.gnd_run_acc;
-    		this.move_state = MoveState.RUNNING;
-    	}
-    	else{ acc = this.air_run_acc; }
-
-    	if (Math.abs(this.vel.x) < this.max_run_vel){
-    		this.vel.x += (acc * mult);
-    		this.CorrectVelocity(mult);
-    	}
-    	else if (Math.abs(this.vel.x) > this.max_run_vel){
-    		this.vel.x -= (acc * mult);
-    		if (Math.abs(this.vel.x) < this.max_run_vel)
-    			this.vel.x = this.max_run_vel * mult;
-    	}
-    	else if (Math.abs(this.vel.x) == this.max_run_vel && this.vel.x != this.max_run_vel * mult){
-    		this.vel.x += (acc * mult);
-    	}
+    public MoveUp() {
+      this.facing = Facing.UP;
+      this.VerticalMove(-1);
     }
 
-    public MoveStop(){
-    	this.mult = 0;
-    	if (this.on_ground){
-    		if (this.vel.x > 0){
-    			this.vel.x -= (this.gnd_run_dec);
-    			if (this.vel.x < 0) this.vel.x = 0;
-    		}else if (this.vel.x < 0){
-    			this.vel.x += (this.gnd_run_dec);
-    			if (this.vel.x > 0) this.vel.x = 0;
-    		}
-    		this.move_state = MoveState.STANDING;
-    	}else{
-    		if (this.vel.x > 0){
-    			this.vel.x -= (this.air_run_dec);
-    			if (this.vel.x < 0) this.vel.x = 0;
-    		}else if (this.vel.x < 0){
-    			this.vel.x += (this.air_run_dec);
-    			if (this.vel.x > 0) this.vel.x = 0;
-    		}
-    	}
+    public MoveDown() {
+      this.facing = Facing.DOWN;
+      this.VerticalMove(1);
     }
 
-    public CorrectVelocity(mult){
-    	if (Math.abs(this.vel.x) > this.max_run_vel)
-    		this.vel.x = this.max_run_vel * mult;
+    public HorizontalMove(mult) {
+      this.horizontal_input = true;
+      this.Move(mult, 'x');
+    }
+
+    public VerticalMove(mult) {
+      this.vertical_input = true;
+      this.Move(mult, 'y');
+    }
+
+    public Move(mult: number, vel_key: string){
+      this.pressed_down = false;
+
+      // pivot snap turn opposite directions
+      if ((this.vel[vel_key] * mult) < 0) this.vel[vel_key] = 0;
+
+      var acc;
+      if (this.on_ground){
+      	acc = this.gnd_run_acc;
+      	this.move_state = MoveState.RUNNING;
+      }
+      else { acc = this.air_run_acc; }
+
+      var max_run_vel = this.max_run_vel;
+      if (Math.abs(this.vel[vel_key]) < max_run_vel){
+      	this.vel[vel_key] += (acc * mult);
+      	this.CorrectVelocity(mult, vel_key);
+      }
+      else if (Math.abs(this.vel[vel_key]) > max_run_vel){
+      	this.vel[vel_key] -= (acc * mult);
+      	if (Math.abs(this.vel[vel_key]) < max_run_vel) {
+      		this.vel.x = max_run_vel * mult;
+        }
+      }
+      else if (Math.abs(this.vel[vel_key]) == max_run_vel
+                && this.vel[vel_key] != max_run_vel * mult){
+    		this.vel[vel_key] += (acc * mult);
+      }
+    }
+
+    public HorizontalMoveStop(){
+      this.MoveStop('x');
+    }
+
+    public VerticalMoveStop() {
+      this.MoveStop('y');
+    }
+
+    private MoveStop(vel_key: string) {
+      let run_dec = this.gnd_run_dec;
+      if (!this.on_ground) run_dec = this.air_run_dec;
+
+  		if (this.vel[vel_key] > 0) {
+  			this.vel[vel_key] -= (this.gnd_run_dec);
+  			if (this.vel[vel_key] < 0) this.vel[vel_key] = 0;
+  		} else if (this.vel[vel_key] < 0) {
+  			this.vel[vel_key] += (this.gnd_run_dec);
+  			if (this.vel[vel_key] > 0) this.vel[vel_key] = 0;
+  		}
+
+      if (this.on_ground && !this.vertical_input && !this.horizontal_input) {
+        this.move_state = MoveState.STANDING;
+      }
+    }
+
+    public CorrectVelocity(mult: number, vel_key: string) {
+      if (Math.abs(this.vel[vel_key]) > this.max_run_vel) {
+        this.vel[vel_key] = this.max_run_vel * mult;
+      }
     }
 
     public StartJump(){
@@ -479,7 +516,8 @@ class GameMover extends GameSprite{
     			this.grav_acc = this.original_grav_acc;
     		}else{
     			this.grav_acc = this.float_grav_acc;
-    			this.vel.y += (-this.jump_vel * ((this.jump_time_limit - (this.jump_timer/2)) / (this.jump_time_limit * 60)));
+          // TODO(jaketrower): change to z (roc's feather)
+    			// this.vel.y += (-this.jump_vel * ((this.jump_time_limit - (this.jump_timer/2)) / (this.jump_time_limit * 60)));
     		}
     	}
     }
@@ -487,21 +525,5 @@ class GameMover extends GameSprite{
     public StopJump(){
     	this.is_jumping = false;
     	this.grav_acc = this.original_grav_acc;
-    }
-
-    public StartPressingDown(){
-        this.pressed_down = true;
-        this.pressing_down = true;
-    }
-
-    public PressDown(){
-        this.pressed_down = false;
-    	this.pressing_down = true;
-    	this.on_ground = false;
-    }
-
-    public StopPressingDown(){
-    	this.pressing_down = false;
-        this.pressed_down = false;
     }
 }

@@ -18,31 +18,31 @@ class InputManager{
       }
       if (room.paused) return;
 
-    	if (this.key_manager.keys_down[KeyManager.RIGHT]){
+      // moving with arrow keys
+    	if (this.key_manager.keys_down[KeyManager.RIGHT]) {
     		player.MoveRight();
-    	}
-    	else if (this.key_manager.keys_down[KeyManager.LEFT]){
+    	} else if (this.key_manager.keys_down[KeyManager.LEFT]) {
     		player.MoveLeft();
-    	}else{
+    	} else {
     		player.horizontal_input = false;
     	}
+      if (this.key_manager.keys_down[KeyManager.DOWN]) {
+        player.MoveDown();
+      } else if (this.key_manager.keys_down[KeyManager.UP]) {
+        player.MoveUp();
+      } else {
+        player.vertical_input = false;
+      }
 
-    	if (this.key_manager.keys_pressed[KeyManager.UP] || this.key_manager.keys_pressed[KeyManager.Z]){
+      // jumping
+    	if (this.key_manager.keys_pressed[KeyManager.Z]){
     		player.StartJump();
     	}
-    	else if (this.key_manager.keys_down[KeyManager.UP] || this.key_manager.keys_down[KeyManager.Z]){
+    	else if (this.key_manager.keys_down[KeyManager.Z]){
     		player.Jump();
     	}
-    	if (this.key_manager.keys_up[KeyManager.UP] || this.key_manager.keys_up[KeyManager.Z]){
+    	if (this.key_manager.keys_up[KeyManager.Z]){
     		player.StopJump();
-    	}
-
-    	if (this.key_manager.keys_pressed[KeyManager.DOWN]){
-    		player.StartPressingDown();
-    	}else if (this.key_manager.keys_down[KeyManager.DOWN]){
-            player.PressDown();
-        }else if(this.key_manager.keys_up[KeyManager.DOWN]){
-    		player.StopPressingDown();
     	}
 
     	if (this.key_manager.keys_pressed[KeyManager.X]){
@@ -64,16 +64,6 @@ class InputManager{
     			Utils.playSound("pickup", master_volume, 0);
     		else Utils.playSound("error", master_volume, 0);
     	}
-
-    	/*for (var i = 0; i < KeyManager.NUMBERS.length; i++){
-    		if (this.key_manager.keys_pressed[KeyManager.NUMBERS[i]] && room_manager.has_spellbook && room_manager.spellbook.length > i){
-    			var temp = room_manager.glitch_index;
-    			room_manager.glitch_index = i-1;
-    			room_manager.RandomGlitch();
-    			if (room_manager.glitch_index === i-1)
-    				room_manager.glitch_index = temp;
-    		}
-    	}*/
 
     	if (this.key_manager.keys_pressed[KeyManager.A]){
     		player.PrevGlitch();

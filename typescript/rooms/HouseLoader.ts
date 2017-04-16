@@ -155,8 +155,8 @@ House.prototype.Import = function(level_name, callback, reset_rooms){
 		}
 
 		var etc = JSON.parse(json);
-		player.x = etc.player_x || 13;
-		player.y = etc.player_y || 64;
+		player.x = etc.player_x || DEFAULT_PLAYER_X;
+		player.y = etc.player_y || DEFAULT_PLAYER_Y;
 		needs_loading = etc.room_indices.length;
 
 		if (reset_rooms)

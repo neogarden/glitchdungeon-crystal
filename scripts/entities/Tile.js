@@ -72,8 +72,7 @@ var Tile = (function (_super) {
         }
     };
     Tile.prototype.RenderFromImage = function (ctx, camera, image) {
-        if ((image === null || (this.tileset_x == 0 && this.tileset_y == 0))
-            && Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY)
+        if (image === null && Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY)
             return;
         var row = this.tileset_y;
         var column = this.tileset_x;
@@ -111,8 +110,8 @@ var Tile = (function (_super) {
 Tile.NORMAL_DISPLAY = 0;
 Tile.COLLISION_DISPLAY = 1;
 Tile.DISPLAY_TYPE = Tile.NORMAL_DISPLAY;
-Tile.WIDTH = 8;
-Tile.HEIGHT = 8;
+Tile.WIDTH = 16;
+Tile.HEIGHT = 16;
 Tile.GHOST = -1;
 Tile.SOLID = 0;
 Tile.FALLTHROUGH = 1;

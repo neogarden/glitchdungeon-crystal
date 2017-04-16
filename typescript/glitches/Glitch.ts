@@ -73,9 +73,6 @@ class Glitch {
     		if (player.is_jumping)
     			player.grav_acc = player.float_grav_acc;
     		//player.grav_acc = grav_acc;
-    		if (map.glitch_type != Glitch.RED){
-    			player.on_ground = false;
-    		}
     		if (checkpoint_power !== undefined)
     			Glitch.PinkTransform();
     		player.has_glitch_checkpoint = checkpoint_power;

@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 var Player = (function (_super) {
     __extends(Player, _super);
     function Player(x, y) {
-        var _this = _super.call(this, x, y, 2, 2, 14, 16, /* lb, tb, rb, bb */ "player_grey_sheet", /* img_name */ 2 /* max_run_vel */) || this;
+        var _this = _super.call(this, x, y, 2, 2, 14, 16, /* lb, tb, rb, bb */ "player_grey_sheet", /* img_name */ 1.5 /* max_run_vel */) || this;
         _this.touching_door = false;
         _this.touching_checkpoint = false;
         _this.speaking = false;
@@ -225,29 +225,6 @@ var Player = (function (_super) {
         Utils.playSound("hurt", master_volume, 0);
         this.num_deaths++;
         room_manager.RevivePlayer();
-    };
-    Player.prototype.Render = function (ctx, camera) {
-        if (this.image === null || !this.visible)
-            return;
-        var ani = this.animation;
-        var row = ani.rel_ani_y;
-        var column = ani.rel_ani_x + ani.curr_frame;
-        ctx.drawImage(this.image, 
-        //SOURCE RECTANGLE
-        ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
-        //DESTINATION RECTANGLE
-        ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset, ani.frame_width, ani.frame_height);
-        var f = -1;
-        if (this.facing === Facing.LEFT)
-            f = 1;
-        //NOW DRAW THE HAT
-        if (!room_manager.beat_game)
-            return;
-        ctx.drawImage(resource_manager.hat_grey_sheet, 
-        //SOURCE RECTANGLE
-        ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
-        //DESTINATION RECTANGLE
-        ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset + f, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset - 6, ani.frame_width, ani.frame_height);
     };
     return Player;
 }(GameMover));

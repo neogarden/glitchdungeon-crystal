@@ -57,20 +57,6 @@ var Room = (function () {
                 this.tiles[i].push(new Tile(j * Tile.WIDTH, i * Tile.HEIGHT));
             }
         }
-        //make the top and bottom row solid
-        for (var j = 0; j < this.MAP_WIDTH; j++) {
-            this.tiles[0][j].collision = Tile.SOLID;
-            this.tiles[0][j].tileset_y = 1;
-            this.tiles[this.MAP_HEIGHT - 1][j].collision = Tile.SOLID;
-            this.tiles[this.MAP_HEIGHT - 1][j].tileset_y = 1;
-        }
-        //make left and right rows solid
-        for (var i = 0; i < this.MAP_HEIGHT; i++) {
-            this.tiles[i][0].collision = Tile.SOLID;
-            this.tiles[i][0].tileset_y = 1;
-            this.tiles[i][this.MAP_WIDTH - 1].collision = Tile.SOLID;
-            this.tiles[i][this.MAP_WIDTH - 1].tileset_y = 1;
-        }
     };
     Room.prototype.isValidTile = function (i, j) {
         return !(i < 0 || i >= this.MAP_HEIGHT || j < 0 || j >= this.MAP_WIDTH);

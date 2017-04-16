@@ -13,8 +13,8 @@ class Tile extends GameObject{
     public static COLLISION_DISPLAY: number = 1;
     public static DISPLAY_TYPE: number = Tile.NORMAL_DISPLAY;
 
-    public static WIDTH = 8;
-    public static HEIGHT = 8;
+    public static WIDTH = 16;
+    public static HEIGHT = 16;
 
     public static GHOST = -1;
     public static SOLID = 0;
@@ -77,9 +77,7 @@ class Tile extends GameObject{
     }
 
     public RenderFromImage(ctx, camera, image){
-        if ((image === null || (this.tileset_x == 0 && this.tileset_y == 0))
-    		&& Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY)
-    			return;
+      if (image === null && Tile.DISPLAY_TYPE !== Tile.COLLISION_DISPLAY) return;
     	var row = this.tileset_y;
     	var column = this.tileset_x;
 
@@ -92,7 +90,7 @@ class Tile extends GameObject{
     			~~(this.y-camera.y+camera.screen_offset_y+0.5),
     			Tile.WIDTH, Tile.HEIGHT
     		);
-    	}else if (Tile.DISPLAY_TYPE === Tile.COLLISION_DISPLAY){
+    	} else if (Tile.DISPLAY_TYPE === Tile.COLLISION_DISPLAY) {
     		switch (this.collision){
     			case Tile.GHOST:
     				ctx.fillStyle = "#000000";

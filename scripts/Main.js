@@ -5,7 +5,9 @@ var bg_name = "RoccoW_outOfSight";
 var tryToPlay = null;
 var click_to_start = false;
 var GAME_WIDTH = 640;
-var GAME_HEIGHT = 480;
+var GAME_HEIGHT = 576;
+var DEFAULT_PLAYER_X = 72;
+var DEFAULT_PLAYER_Y = 56;
 var canvas;
 var ctx;
 //primitive variables

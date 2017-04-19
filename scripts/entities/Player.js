@@ -19,6 +19,7 @@ var Player = (function (_super) {
         _this.spells_cast = 0;
         _this.is_moving_to_spot = false;
         _this.spot_to_move_to = new Point(0, 0);
+        _this.is_examining = false;
         _this.glitch_type = Glitch.GREY;
         _this.glitch_index = -1;
         _this.type = "Player";
@@ -61,6 +62,14 @@ var Player = (function (_super) {
         return obj;
     };
     /*---------------------------------------------------------------*/
+    Player.prototype.HasArtifact = function (desired_artifact) {
+        for (var i = 0; i < this.inventory['artifacts'].length; i++) {
+            var artifact = this.inventory['artifacts'][i];
+            if (artifact.GetName() === desired_artifact)
+                return true;
+        }
+        return false;
+    };
     //inventory and state
     Player.prototype.NumArtifacts = function () {
         return this.inventory['spellbook'].spells.length;
@@ -103,21 +112,15 @@ var Player = (function (_super) {
             this.x = ~~this.x;
         }
     };
-    Player.prototype.MoveToConversationSpot = function (npc) {
-        this.vel.x = 0;
-        var prev_facing = this.facing;
-        this.is_moving_to_spot = true;
-        this.spot_to_move_to.y = npc.y;
-        if (npc.facing === Facing.LEFT) {
-            this.spot_to_move_to.x = npc.x + npc.lb - this.rb;
-            this.facing = Facing.RIGHT;
-        }
-        else {
-            this.spot_to_move_to.x = npc.x + npc.rb - this.lb;
-            this.facing = Facing.LEFT;
-        }
+    Player.prototype.Examine = function () {
+        this.is_examining = true;
     };
-    Player.prototype.PressX = function () { };
+    Player.prototype.StopExam = function () {
+        this.is_examining = false;
+    };
+    Player.prototype.isExamining = function () {
+        return this.is_examining;
+    };
     Player.prototype.MaintainGlitch = function () {
         var spellbook = this.inventory['spellbook'];
         var level = spellbook.level;

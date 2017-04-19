@@ -45,7 +45,10 @@ var InputManager = (function () {
             player.StopJump();
         }
         if (this.key_manager.keys_pressed[KeyManager.X]) {
-            player.PressX();
+            player.Examine();
+        }
+        else {
+            player.StopExam();
         }
         if (this.key_manager.keys_pressed[KeyManager.SPACE]) {
             player.NextGlitch();
@@ -73,14 +76,11 @@ var InputManager = (function () {
         }
     };
     InputManager.prototype.SpeakingUpdate = function (player) {
-        if (this.key_manager.keys_pressed[KeyManager.DOWN]) {
-            player.StartPressingDown();
+        if (this.key_manager.keys_pressed[KeyManager.X]) {
+            player.Examine();
         }
-        else if (this.key_manager.keys_down[KeyManager.DOWN]) {
-            player.PressDown();
-        }
-        else if (this.key_manager.keys_up[KeyManager.DOWN]) {
-            player.StopPressingDown();
+        else {
+            player.StopExam();
         }
     };
     InputManager.RestartGame = function () {

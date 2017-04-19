@@ -8,6 +8,8 @@ class Player extends GameMover {
     public spot_to_move_to: Point = new Point(0, 0);
     public inventory: Object;
 
+    private is_examining: boolean = false;
+
     public glitch_type: number = Glitch.GREY;
     public glitch_index: number = -1;
     public tilesheet_name: string;
@@ -61,6 +63,14 @@ class Player extends GameMover {
     }
     /*---------------------------------------------------------------*/
 
+    public HasArtifact(desired_artifact: string) {
+      for (let i = 0; i < this.inventory['artifacts'].length; i++) {
+        let artifact = this.inventory['artifacts'][i];
+        if (artifact.GetName() === desired_artifact) return true;
+      }
+      return false;
+    }
+
     //inventory and state
     public NumArtifacts(){
         return this.inventory['spellbook'].spells.length;
@@ -110,22 +120,17 @@ class Player extends GameMover {
         }
     }
 
-    public MoveToConversationSpot(npc){
-        this.vel.x = 0;
-
-        var prev_facing = this.facing;
-        this.is_moving_to_spot = true;
-        this.spot_to_move_to.y = npc.y;
-        if (npc.facing === Facing.LEFT){
-            this.spot_to_move_to.x = npc.x + npc.lb - this.rb;
-            this.facing = Facing.RIGHT;
-        }else{
-            this.spot_to_move_to.x = npc.x + npc.rb - this.lb;
-            this.facing = Facing.LEFT;
-        }
+    public Examine() {
+      this.is_examining = true;
     }
 
-    public PressX(){}
+    public StopExam() {
+      this.is_examining = false;
+    }
+
+    public isExamining() {
+      return this.is_examining;
+    }
 
     public MaintainGlitch(){
         var spellbook = this.inventory['spellbook'];

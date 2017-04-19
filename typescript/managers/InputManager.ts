@@ -46,8 +46,10 @@ class InputManager{
     	}
 
     	if (this.key_manager.keys_pressed[KeyManager.X]){
-    		player.PressX();
-    	}
+    		player.Examine();
+    	} else {
+        player.StopExam();
+      }
 
     	if (this.key_manager.keys_pressed[KeyManager.SPACE]){
             player.NextGlitch();
@@ -80,13 +82,11 @@ class InputManager{
     }
 
     public SpeakingUpdate(player){
-        if (this.key_manager.keys_pressed[KeyManager.DOWN]){
-    		player.StartPressingDown();
-    	}else if (this.key_manager.keys_down[KeyManager.DOWN]){
-            player.PressDown();
-        }else if(this.key_manager.keys_up[KeyManager.DOWN]){
-    		player.StopPressingDown();
-    	}
+      if (this.key_manager.keys_pressed[KeyManager.X]) {
+    		player.Examine();
+    	} else {
+        player.StopExam();
+      }
     }
 
     public static RestartGame(){

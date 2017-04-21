@@ -44,7 +44,7 @@ var GameSprite = (function (_super) {
         var column = ani.rel_ani_x + ani.curr_frame;
         ctx.drawImage(this.image, 
         //SOURCE RECTANGLE
-        ani.frame_width * column + ani.abs_ani_x, ani.frame_height * row + ani.abs_ani_y, ani.frame_width, ani.frame_height, 
+        ani.frame_width * column + ani.frame_width * ani.abs_ani_x, ani.frame_height * row + ani.frame_height * ani.abs_ani_y, ani.frame_width, ani.frame_height, 
         //DESTINATION RECTANGLE
         ~~(this.x - camera.x + camera.screen_offset_x + 0.5) + ani.x_offset, ~~(this.y - camera.y + camera.screen_offset_y + 0.5) + ani.y_offset, ani.frame_width, ani.frame_height);
     };

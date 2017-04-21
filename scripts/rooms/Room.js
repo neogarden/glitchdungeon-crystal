@@ -155,14 +155,15 @@ var Room = (function () {
             GAME_HEIGHT /= 4;
             GAME_WIDTH /= 4;
             var h = 0;
-            if (player.y + (player.bb / 2) >= GAME_HEIGHT / 2)
-                h = (-1) * (GAME_HEIGHT / 1.5) + Tile.HEIGHT - 8;
-            h += GAME_HEIGHT - (Tile.HEIGHT) - speech_height;
+            if (player.y + (player.bb / 2) >= GAME_HEIGHT / 2) {
+                h = (-1) * (GAME_HEIGHT / 1.5) + (Tile.HEIGHT / 2) - 8;
+            }
+            h += GAME_HEIGHT - (Tile.HEIGHT / 2) - speech_height;
             //RENDER THE SPEECH BOX
             ctx.fillStyle = "#ffffff";
-            ctx.fillRect(Tile.WIDTH / 2, h + (Tile.HEIGHT / 2), GAME_WIDTH - (Tile.WIDTH * 1), speech_height);
+            ctx.fillRect(Tile.WIDTH / 4, h + (Tile.HEIGHT / 4), GAME_WIDTH - (Tile.WIDTH * 0.5), speech_height);
             ctx.fillStyle = "#000000";
-            ctx.fillRect(Tile.WIDTH / 2 + 2, h + (Tile.HEIGHT / 2) + 2, GAME_WIDTH - (Tile.WIDTH * 1) - 4, speech_height - 4);
+            ctx.fillRect(Tile.WIDTH / 4 + 2, h + (Tile.HEIGHT / 4) + 2, GAME_WIDTH - (Tile.WIDTH * 0.5) - 4, speech_height - 4);
             //RENDER THE ACTUAL TEXT
             var fs = 8;
             ctx.font = fs + "px pixelFont";
@@ -172,10 +173,10 @@ var Room = (function () {
             ctx.textAlign = "left";
             for (var i = 0; i < texts.length; i++) {
                 if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))) {
-                    ctx.fillText(texts[i], Tile.WIDTH * 1.5 + 24, h + (fs * i) + (Tile.HEIGHT / 2) + 4);
+                    ctx.fillText(texts[i], Tile.WIDTH * 0.75 + 24, h + (fs * i) + (Tile.HEIGHT / 4) + 4);
                 }
                 else if (check_textRenderContext(ctx)) {
-                    ctx.strokeText(texts[i], Tile.WIDTH * 1.5 + 24, h + (fs * i) + (Tile.HEIGHT / 2) - 4, fs - 2);
+                    ctx.strokeText(texts[i], Tile.WIDTH * 0.75 + 24, h + (fs * i) + (Tile.HEIGHT / 4) - 4, fs - 2);
                 }
             }
             //RENDER THE SPEAKERS AVATAR IF APPLICABLE
@@ -187,13 +188,13 @@ var Room = (function () {
                 //DESTINATION RECTANGLE
                 1, h + 3, src_rect[2] * 2, src_rect[3] * 2);
             }
-            //RENDER THE "PRESS DOWN TO CONTINUE" NOTIFIER IF APPLICABLE
+            //RENDER THE "PRESS X TO CONTINUE" NOTIFIER IF APPLICABLE
             if (this.speech_display_arrow) {
                 if (!(/^((?!chrome).)*safari/i.test(navigator.userAgent))) {
-                    ctx.fillText("(v)", GAME_WIDTH - (Tile.WIDTH * 2) - fs, h + (fs * 3) - fs, fs * 3, fs * 3);
+                    ctx.fillText("(x)", GAME_WIDTH - Tile.WIDTH - 2, h + (fs * 3) + 2, fs * 3, fs * 3);
                 }
                 else if (check_textRenderContext(ctx)) {
-                    ctx.strokeText("(v)", GAME_WIDTH - (Tile.WIDTH * 2) - fs, h - 8 - fs, fs, fs - 2);
+                    ctx.strokeText("(x)", GAME_WIDTH - Tile.WIDTH - fs, h - 8 - fs, fs, fs - 2);
                 }
             }
             GAME_HEIGHT *= 4;
